@@ -112,8 +112,8 @@ val javadocJar = tasks.create("javadocJar", Jar::class) {
 }
 
 publishing {
-    publications {
-        if (this !is MavenPublication) return@publications
+    publications.all {
+        if (this !is MavenPublication) return@all
         artifact(javadocJar)
         pom {
             name.set(project.name)
