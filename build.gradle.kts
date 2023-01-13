@@ -8,6 +8,8 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlin_version")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.7.20")
+        classpath("org.jetbrains.dokka:dokka-base:1.7.20")
         classpath("com.monkopedia.ksrpc:ksrpc-gradle-plugin:0.7.2")
         classpath("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
     }

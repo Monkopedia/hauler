@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.jetbrains.dokka.gradle.DokkaTask
 plugins {
     java
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.monkopedia.ksrpc.plugin")
+    id("org.jetbrains.dokka")
+    id("org.gradle.maven-publish")
+    id("org.gradle.signing")
 }
 
 repositories {
@@ -28,6 +32,8 @@ repositories {
     maven(url = "https://dl.bintray.com/kotlin/kotlin-eap/")
     maven(url = "https://kotlinx.bintray.com/kotlinx/")
 }
+
+group = "com.monkopedia"
 
 kotlin {
     js(IR) {
@@ -89,3 +95,63 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
         freeCompilerArgs += "-Xno-param-assertions"
     }
 }
+
+val dokkaJavadoc = tasks.create("dokkaJavadocCustom", DokkaTask::class) {
+    project.dependencies {
+        plugins("org.jetbrains.dokka:kotlin-as-java-plugin:1.7.20")
+    }
+    // outputFormat = "javadoc"
+    outputDirectory.set(File(project.buildDir, "javadoc"))
+    inputs.dir("src/commonMain/kotlin")
+}
+
+val javadocJar = tasks.create("javadocJar", Jar::class) {
+    dependsOn(dokkaJavadoc)
+    archiveClassifier.set("javadoc")
+    from(File(project.buildDir, "javadoc"))
+}
+
+publishing {
+    publications {
+        if (this !is MavenPublication) return@publications
+        artifact(javadocJar)
+        pom {
+            name.set(project.name)
+            description.set("A tool for logging over rpcs")
+            url.set("http://www.github.com/Monkopedia/hauler")
+            licenses {
+                license {
+                    name.set("The Apache License, Version 2.0")
+                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                }
+            }
+            developers {
+                developer {
+                    id.set("monkopedia")
+                    name.set("Jason Monk")
+                    email.set("monkopedia@gmail.com")
+                }
+            }
+            scm {
+                connection.set("scm:git:git://github.com/Monkopedia/hauler.git")
+                developerConnection.set("scm:git:ssh://github.com/Monkopedia/hauler.git")
+                url.set("http://github.com/Monkopedia/hauler/")
+            }
+        }
+    }
+    repositories {
+        maven(url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+            name = "OSSRH"
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    sign(publishing.publications)
+}
+
