@@ -18,19 +18,10 @@ plugins {
     java
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-    id("com.monkopedia.ksrpc.plugin")
+    alias(libs.plugins.ksrpc)
     id("org.jetbrains.dokka")
     id("org.gradle.maven-publish")
     id("org.gradle.signing")
-}
-
-repositories {
-    jcenter()
-    mavenCentral()
-    mavenLocal()
-    maven(url = "https://dl.bintray.com/kotlin/kotlin-dev/")
-    maven(url = "https://dl.bintray.com/kotlin/kotlin-eap/")
-    maven(url = "https://kotlinx.bintray.com/kotlinx/")
 }
 
 group = "com.monkopedia"
@@ -60,31 +51,30 @@ kotlin {
         }
     }
     sourceSets["commonMain"].dependencies {
-        api("com.monkopedia.ksrpc:ksrpc-core:0.7.1")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.3")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-        implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+        api(libs.ksrpc)
+        implementation(libs.kotlinx.serialization)
+        implementation(libs.kotlinx.serialization.json)
+        implementation(libs.kotlinx.coroutines)
+        implementation(libs.kotlinx.datetime)
         implementation(kotlin("stdlib"))
-        compileOnly("io.ktor:ktor-io:2.0.2")
+        compileOnly(libs.ktor.io)
     }
     sourceSets["jvmMain"].dependencies {
         implementation(kotlin("stdlib"))
         implementation(kotlin("reflect"))
-        implementation("org.slf4j:slf4j-api:2.0.6")
-        compileOnly("io.ktor:ktor-server-core:2.0.2")
-        compileOnly("io.ktor:ktor-server-host-common:2.0.2")
-        compileOnly("io.ktor:ktor-server-netty:2.0.2")
-        compileOnly("io.ktor:ktor-client-core:2.0.2")
-
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
-        implementation("com.github.ajalt:clikt:2.8.0")
+        implementation(libs.slf4j.api)
+        compileOnly(libs.ktor.server)
+        compileOnly(libs.ktor.server.host.common)
+        compileOnly(libs.ktor.server.netty)
+        compileOnly(libs.ktor.client)
+        implementation(libs.kotlinx.serialization)
+        implementation(libs.kotlinx.serialization.json)
+        implementation(libs.clikt)
         implementation("ch.qos.logback:logback-classic:1.2.3")
     }
     sourceSets["jsMain"].dependencies {
-        compileOnly("io.ktor:ktor-client-core:2.0.2")
-        compileOnly("io.ktor:ktor-client-js:2.0.2")
+        api(libs.ktor.client)
+        api(libs.ktor.client.js)
     }
 }
 
@@ -98,7 +88,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
 
 val dokkaJavadoc = tasks.create("dokkaJavadocCustom", DokkaTask::class) {
     project.dependencies {
-        plugins("org.jetbrains.dokka:kotlin-as-java-plugin:1.7.20")
+        plugins("org.jetbrains.dokka:kotlin-as-java-plugin:1.9.0")
     }
     // outputFormat = "javadoc"
     outputDirectory.set(File(project.buildDir, "javadoc"))

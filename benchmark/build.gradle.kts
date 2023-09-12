@@ -19,16 +19,7 @@ plugins {
     application
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-    id("com.monkopedia.ksrpc.plugin")
-}
-
-repositories {
-    jcenter()
-    mavenCentral()
-    mavenLocal()
-    maven(url = "https://dl.bintray.com/kotlin/kotlin-dev/")
-    maven(url = "https://dl.bintray.com/kotlin/kotlin-eap/")
-    maven(url = "https://kotlinx.bintray.com/kotlinx/")
+    alias(libs.plugins.ksrpc)
 }
 
 application {
@@ -65,42 +56,41 @@ kotlin {
     }
 
     sourceSets["commonMain"].dependencies {
-        api("com.monkopedia.ksrpc:ksrpc-core:0.7.1")
-        api("com.monkopedia.ksrpc:ksrpc-sockets:0.7.1")
-        api("com.monkopedia.ksrpc:ksrpc-ktor-client:0.7.1")
-        api("com.monkopedia.ksrpc:ksrpc-ktor-websocket-client:0.7.1")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.3")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-        implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-        compileOnly("io.ktor:ktor-client-core:2.0.2")
-        compileOnly("io.ktor:ktor-client-websockets:2.0.2")
+        api(libs.ksrpc)
+        api(libs.ksrpc.sockets)
+        api(libs.ksrpc.ktor.client)
+        api(libs.ksrpc.ktor.websocket.client)
+        implementation(libs.kotlinx.serialization)
+        implementation(libs.kotlinx.serialization.json)
+        implementation(libs.kotlinx.coroutines)
+        implementation(libs.kotlinx.datetime)
+        compileOnly(libs.ktor.client)
+        compileOnly(libs.ktor.client.websockets)
         implementation(kotlin("stdlib"))
         api(project(":hauler"))
-        compileOnly("io.ktor:ktor-io:2.0.2")
+        compileOnly(libs.ktor.io)
     }
     sourceSets["jvmMain"].dependencies {
         implementation(kotlin("stdlib"))
         implementation(kotlin("reflect"))
-        implementation("org.slf4j:slf4j-api:2.0.6")
-        compileOnly("io.ktor:ktor-server-core:2.0.2")
-        compileOnly("io.ktor:ktor-server-host-common:2.0.2")
-        compileOnly("io.ktor:ktor-server-netty:2.0.2")
-        compileOnly("io.ktor:ktor-client-core:2.0.2")
-        api("com.monkopedia.ksrpc:ksrpc-sockets:0.7.1")
-
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
-        implementation("com.github.ajalt:clikt:2.8.0")
+        implementation(libs.slf4j.api)
+        compileOnly(libs.ktor.server)
+        compileOnly(libs.ktor.server.host.common)
+        compileOnly(libs.ktor.server.netty)
+        compileOnly(libs.ktor.client)
+        compileOnly(libs.ksrpc.sockets)
+        implementation(libs.kotlinx.serialization)
+        implementation(libs.kotlinx.serialization.json)
+        implementation(libs.kotlinx.coroutines)
+        implementation(libs.clikt)
         implementation(kotlin("test-junit"))
         implementation("ch.qos.logback:logback-classic:1.2.3")
     }
     sourceSets["jsMain"].dependencies {
-        api("com.monkopedia.ksrpc:ksrpc-sockets:0.7.1")
-        compileOnly("io.ktor:ktor-client-core:2.0.2")
-        compileOnly("io.ktor:ktor-client-js:2.0.2")
-        implementation("org.jetbrains.kotlinx:kotlinx-nodejs:0.0.7")
+        api(libs.ksrpc.sockets)
+        api(libs.ktor.client)
+        api(libs.ktor.client.js)
+        implementation(libs.kotlinx.nodejs)
     }
 }
 

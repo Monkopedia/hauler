@@ -17,8 +17,8 @@ import java.io.PipedOutputStream
 
 class JvmHarnessRule : BeforeAfterRule() {
     private var harnessImpl: HarnessProtocol? = null
-    private var conn1: Connection? = null
-    private var conn2: Connection? = null
+    private var conn1: Connection<String>? = null
+    private var conn2: Connection<String>? = null
     private var scope: CoroutineScope? = null
 
     val harness: HarnessProtocol

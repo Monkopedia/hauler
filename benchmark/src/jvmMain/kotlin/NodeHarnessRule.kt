@@ -15,7 +15,7 @@ import java.util.concurrent.CountDownLatch
 
 class NodeHarnessRule : BeforeAfterRule() {
     private var harnessImpl: HarnessProtocol? = null
-    private var connection: Connection? = null
+    private var connection: Connection<String>? = null
 
     val harness: HarnessProtocol
         get() = harnessImpl ?: error("harness can only be accessed within a test")

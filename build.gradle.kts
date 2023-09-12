@@ -1,31 +1,32 @@
 buildscript {
-    val kotlin_version by extra("1.8.0")
     repositories {
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
         gradlePluginPortal()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlin_version")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.7.20")
-        classpath("org.jetbrains.dokka:dokka-base:1.7.20")
-        classpath("com.monkopedia.ksrpc:ksrpc-gradle-plugin:0.7.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.asProvider().get()}")
+        classpath("org.jetbrains.kotlin:kotlin-serialization:${libs.versions.kotlin.asProvider().get()}")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:${libs.versions.dokka.get()}")
+        classpath("org.jetbrains.dokka:dokka-base:${libs.versions.dokka.get()}")
+        classpath("com.monkopedia.ksrpc:ksrpc-gradle-plugin:${libs.versions.ksrpc.get()}")
         classpath("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
     }
 }
+
 plugins {
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
     id("com.github.hierynomus.license") version "0.16.1"
+    id("com.monkopedia.ksrpc.plugin") version libs.versions.ksrpc.get() apply false
 }
 
 group = "com.monkopedia"
 
 allprojects {
     repositories {
-        jcenter()
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
+        jcenter()
     }
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "com.github.hierynomus.license")
