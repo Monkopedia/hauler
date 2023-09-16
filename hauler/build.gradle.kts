@@ -26,6 +26,10 @@ plugins {
 
 group = "com.monkopedia"
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
 kotlin {
     js(IR) {
         browser {}
@@ -145,3 +149,11 @@ signing {
     sign(publishing.publications)
 }
 
+afterEvaluate {
+    tasks.withType(org.gradle.plugins.signing.Sign::class) {
+        val signingTask = this
+        tasks.withType(org.gradle.api.publish.maven.tasks.AbstractPublishToMaven::class) {
+            dependsOn(signingTask)
+        }
+    }
+}
