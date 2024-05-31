@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 import org.jetbrains.dokka.gradle.DokkaTask
+
 plugins {
     java
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksrpc)
-    id("org.jetbrains.dokka")
+    alias(libs.plugins.dokka)
     id("org.gradle.maven-publish")
     id("org.gradle.signing")
 }
@@ -37,23 +38,35 @@ kotlin {
     jvm {
         withJava()
     }
-    // Determine host preset.
-    val hostOs = System.getProperty("os.name")
 
-    // Create target for the host platform.
-    val hostTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native")
-        hostOs == "Linux" -> linuxX64("native")
-        hostOs.startsWith("Windows") -> mingwX64("native")
-        else -> throw GradleException(
-            "Host OS '$hostOs' is not supported in Kotlin/Native $project."
-        )
+    macosX64 {
+        binaries {}
     }
-    hostTarget.apply {
-        binaries {
-            executable()
+    macosArm64 {
+        binaries {}
+    }
+    iosArm64 {
+        binaries {}
+    }
+    iosSimulatorArm64 {
+        binaries {}
+    }
+
+    val hostOs = System.getProperty("os.name")
+    if (hostOs == "Linux") {
+        linuxX64 {
+            binaries {}
+        }
+        linuxArm64 {
+            binaries {}
         }
     }
+    mingwX64 {
+        binaries {}
+    }
+    applyDefaultHierarchyTemplate()
+
+
     sourceSets["commonMain"].dependencies {
         api(libs.ksrpc)
         implementation(libs.kotlinx.serialization)

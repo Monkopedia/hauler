@@ -16,14 +16,10 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
  * limitations under the License.
  */
 plugins {
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlin.serialization)
     application
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
     alias(libs.plugins.ksrpc)
-}
-
-application {
-    mainClass.set("com.monkopedia.hauler.benchmark.MainKt")
 }
 
 kotlin {
@@ -55,43 +51,55 @@ kotlin {
         }
     }
 
-    sourceSets["commonMain"].dependencies {
-        api(libs.ksrpc)
-        api(libs.ksrpc.sockets)
-        api(libs.ksrpc.ktor.client)
-        api(libs.ksrpc.ktor.websocket.client)
-        implementation(libs.kotlinx.serialization)
-        implementation(libs.kotlinx.serialization.json)
-        implementation(libs.kotlinx.coroutines)
-        implementation(libs.kotlinx.datetime)
-        compileOnly(libs.ktor.client)
-        compileOnly(libs.ktor.client.websockets)
-        implementation(kotlin("stdlib"))
-        api(project(":hauler"))
-        compileOnly(libs.ktor.io)
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                api(libs.ksrpc)
+                api(libs.ksrpc.sockets)
+                api(libs.ksrpc.ktor.client)
+                api(libs.ksrpc.ktor.websocket.client)
+                implementation(libs.kotlinx.serialization)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.coroutines)
+                implementation(libs.kotlinx.datetime)
+                compileOnly(libs.ktor.client)
+                compileOnly(libs.ktor.client.websockets)
+                implementation(kotlin("stdlib"))
+                api(project(":hauler"))
+                compileOnly(libs.ktor.io)
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib"))
+                implementation(kotlin("reflect"))
+                implementation(libs.slf4j.api)
+                compileOnly(libs.ktor.server)
+                compileOnly(libs.ktor.server.host.common)
+                compileOnly(libs.ktor.server.netty)
+                compileOnly(libs.ktor.client)
+                compileOnly(libs.ksrpc.sockets)
+                implementation(libs.kotlinx.serialization)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.coroutines)
+                implementation(libs.clikt)
+                implementation(kotlin("test-junit"))
+                implementation("ch.qos.logback:logback-classic:1.2.3")
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                api(libs.ksrpc.sockets)
+                api(libs.ktor.client)
+                api(libs.ktor.client.js)
+//                implementation(libs.kotlinx.nodejs)
+            }
+        }
     }
-    sourceSets["jvmMain"].dependencies {
-        implementation(kotlin("stdlib"))
-        implementation(kotlin("reflect"))
-        implementation(libs.slf4j.api)
-        compileOnly(libs.ktor.server)
-        compileOnly(libs.ktor.server.host.common)
-        compileOnly(libs.ktor.server.netty)
-        compileOnly(libs.ktor.client)
-        compileOnly(libs.ksrpc.sockets)
-        implementation(libs.kotlinx.serialization)
-        implementation(libs.kotlinx.serialization.json)
-        implementation(libs.kotlinx.coroutines)
-        implementation(libs.clikt)
-        implementation(kotlin("test-junit"))
-        implementation("ch.qos.logback:logback-classic:1.2.3")
-    }
-    sourceSets["jsMain"].dependencies {
-        api(libs.ksrpc.sockets)
-        api(libs.ktor.client)
-        api(libs.ktor.client.js)
-        implementation(libs.kotlinx.nodejs)
-    }
+}
+
+application {
+    mainClass.set("com.monkopedia.hauler.benchmark.MainKt")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {

@@ -16,7 +16,7 @@ actual class CallSign actual constructor(val name: String) : ThreadContextElemen
         }
     }
 
-    override val key: CoroutineContext.Key<CallSign>
+    actual override val key: Key
         get() = Key
 
     override fun updateThreadContext(context: CoroutineContext): String? {

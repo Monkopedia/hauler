@@ -1,6 +1,6 @@
 package com.monkopedia.hauler.benchmark
 
-import Buffer
+import WriteStream
 import com.monkopedia.ksrpc.channels.registerDefault
 import com.monkopedia.ksrpc.ksrpcEnvironment
 import com.monkopedia.ksrpc.sockets.asConnection
@@ -16,9 +16,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.khronos.webgl.ArrayBufferView
 import org.khronos.webgl.Uint8Array
 import process
-import process.global.NodeJS.WriteStream
+
 
 object Test {
 
@@ -35,7 +36,7 @@ object Test {
 fun CoroutineScope.stdInByteChannel(): ByteReadChannel {
     val channel = ByteChannel(autoFlush = true)
     var last: Job? = null
-    process.stdin.on("data") { data: Buffer ->
+    process.stdin.on("data") { data: ArrayBufferView ->
         val waitOn = last
         last = launch {
             waitOn?.join()

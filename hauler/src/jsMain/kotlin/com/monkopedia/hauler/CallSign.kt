@@ -10,6 +10,6 @@ actual class CallSign actual constructor(val name: String) : CoroutineContext.El
         }
     }
 
-    override val key: CoroutineContext.Key<CallSign>
+    actual override val key: Key
         get() = Key
 }
