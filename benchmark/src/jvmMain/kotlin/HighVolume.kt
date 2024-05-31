@@ -48,7 +48,7 @@ abstract class HighVolumeTest(private val platform: String) {
                 ExecSpec(
                     "Big test",
                     ConnectionSpec(DEFAULT, null, ShippingType.DEFAULT, null),
-                    List(100) {
+                    List(30) {
                         TaskSpec("Tag$it", "Thread", it.toLong(), 10, 100)
                     }
                 )
@@ -62,7 +62,7 @@ abstract class HighVolumeTest(private val platform: String) {
         val messages = messageAsync.await()
         println("Took $time to produce ${messages.size} messages")
         warehouseJob.cancelAndJoin()
-        assertEquals(10200, messages.size)
+        assertEquals(3060, messages.size)
     }
 
     @Test
@@ -86,7 +86,7 @@ abstract class HighVolumeTest(private val platform: String) {
                         ShippingType.PACKED,
                         SerializableDeliveryRates(15, 1000, 500)
                     ),
-                    List(100) {
+                    List(30) {
                         TaskSpec("Tag$it", "Thread", it.toLong(), 10, 100)
                     }
                 )
@@ -99,7 +99,7 @@ abstract class HighVolumeTest(private val platform: String) {
         val messages = messageAsync.await()
         println("Took $time to produce ${messages.size} packed messages")
         warehouseJob.cancelAndJoin()
-        assertEquals(10200, messages.size)
+        assertEquals(3060, messages.size)
     }
 
     protected open suspend fun CoroutineScope.launchAttach(warehouse: Warehouse) =

@@ -18,9 +18,9 @@ fun main(args: Array<String>): Unit = runBlocking {
     junit.addListener(TextListener(System.out))
 
     val result: Result = junit.run(
-//        BasicNodeTest::class.java,
-//        BasicNativeTest::class.java,
-//        BasicJvmTest::class.java,
+        BasicNodeTest::class.java,
+        BasicNativeTest::class.java,
+        BasicJvmTest::class.java,
         HighVolumeNodeTest::class.java,
         HighVolumeNativeTest::class.java,
         HighVolumeJvmTest::class.java
