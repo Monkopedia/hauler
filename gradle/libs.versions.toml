@@ -15,7 +15,7 @@ dokka = "1.9.10"
 googleautoservice = "1.1.1"
 autoservice-ksp = "1.1.0"
 jnanoid = "2.0.0"
-ksrpc = "0.9.0"
+ksrpc = "0.9.1"
 
 [libraries]
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }

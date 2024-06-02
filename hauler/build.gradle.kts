@@ -16,9 +16,9 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
-    java
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
+    java
     alias(libs.plugins.ksrpc)
     alias(libs.plugins.dokka)
     id("org.gradle.maven-publish")
