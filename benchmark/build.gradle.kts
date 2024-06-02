@@ -19,7 +19,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
     application
-    alias(libs.plugins.ksrpc)
+    id("com.monkopedia.ksrpc.plugin")
 }
 
 kotlin {

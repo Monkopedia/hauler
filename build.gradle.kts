@@ -13,7 +13,6 @@ buildscript {
 plugins {
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
     id("com.github.hierynomus.license") version "0.16.1"
-    id("com.monkopedia.ksrpc.plugin") version libs.versions.ksrpc.get() apply false
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.kotlin.serialization) apply false
 }

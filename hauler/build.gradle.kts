@@ -19,7 +19,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
     java
-    alias(libs.plugins.ksrpc)
+    id("com.monkopedia.ksrpc.plugin")
     alias(libs.plugins.dokka)
     id("org.gradle.maven-publish")
     id("org.gradle.signing")
