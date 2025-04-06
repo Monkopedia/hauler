@@ -49,6 +49,9 @@ kotlin {
     iosArm64 {
         binaries {}
     }
+    iosX64 {
+        binaries {}
+    }
     iosSimulatorArm64 {
         binaries {}
     }
