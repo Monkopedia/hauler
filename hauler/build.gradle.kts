@@ -35,7 +35,7 @@ kotlin {
     wasmJs {
         browser {}
     }
-    jvmToolchain(8)
+    jvmToolchain(11)
     jvm {
         withJava()
     }
@@ -98,7 +98,7 @@ kotlin {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
         freeCompilerArgs += "-Xskip-prerelease-check"
         freeCompilerArgs += "-Xno-param-assertions"
     }
