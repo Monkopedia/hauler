@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
-    application
+    //application
     id("com.monkopedia.ksrpc.plugin")
 }
 
@@ -30,6 +30,7 @@ kotlin {
         useCommonJs()
         binaries.executable()
     }
+    jvmToolchain(17)
     jvm {
         withJava()
     }
@@ -92,15 +93,17 @@ kotlin {
                 api(libs.ksrpc.sockets)
                 api(libs.ktor.client)
                 api(libs.ktor.client.js)
+                api(libs.ktor.io)
+                implementation(kotlin("stdlib"))
 //                implementation(libs.kotlinx.nodejs)
             }
         }
     }
 }
 
-application {
-    mainClass.set("com.monkopedia.hauler.benchmark.MainKt")
-}
+//application {
+//    mainClass.set("com.monkopedia.hauler.benchmark.MainKt")
+//}
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
     kotlinOptions {
@@ -140,14 +143,14 @@ tasks.register("runBenchmark", JavaExec::class) {
 
 afterEvaluate {
 
-//    val task = tasks["jsNodeProductionRun"] as NodeJsExec
-//    val newArgs = mutableListOf<String>()
-//    newArgs.addAll(task.nodeArgs)
-//    if (task.inputFileProperty.isPresent) {
-//        newArgs.add(task.inputFileProperty.asFile.get().canonicalPath)
-//    }
-//    task.args?.let { newArgs.addAll(it) }
-//    println("Args: ${task.executable} $newArgs")
+    val task = tasks["jsNodeProductionRun"] as NodeJsExec
+    val newArgs = mutableListOf<String>()
+    newArgs.addAll(task.nodeArgs)
+    if (task.inputFileProperty.isPresent) {
+        newArgs.add(task.inputFileProperty.asFile.get().canonicalPath)
+    }
+    task.args?.let { newArgs.addAll(it) }
+    println("Args: ${task.executable} $newArgs")
     println("Task: ${tasks["runReleaseExecutableNative"]}")
     println("Task class: ${tasks["runReleaseExecutableNative"]::class}")
 }

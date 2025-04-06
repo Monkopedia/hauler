@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
-    java
     id("com.monkopedia.ksrpc.plugin")
     alias(libs.plugins.dokka)
     id("org.gradle.maven-publish")
@@ -27,14 +27,15 @@ plugins {
 
 group = "com.monkopedia"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
-
 kotlin {
     js(IR) {
         browser {}
     }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser {}
+    }
+    jvmToolchain(8)
     jvm {
         withJava()
     }
@@ -52,14 +53,11 @@ kotlin {
         binaries {}
     }
 
-    val hostOs = System.getProperty("os.name")
-    if (hostOs == "Linux") {
-        linuxX64 {
-            binaries {}
-        }
-        linuxArm64 {
-            binaries {}
-        }
+    linuxX64 {
+        binaries {}
+    }
+    linuxArm64 {
+        binaries {}
     }
     mingwX64 {
         binaries {}

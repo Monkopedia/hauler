@@ -48,8 +48,8 @@ abstract class HighVolumeTest(private val platform: String) {
                 ExecSpec(
                     "Big test",
                     ConnectionSpec(DEFAULT, null, ShippingType.DEFAULT, null),
-                    List(30) {
-                        TaskSpec("Tag$it", "Thread", it.toLong(), 10, 100)
+                    List(60) {
+                        TaskSpec("Tag$it", "Thread", it.toLong(), 1, 1000)
                     }
                 )
             )
@@ -60,9 +60,9 @@ abstract class HighVolumeTest(private val platform: String) {
         }.close()
         Garage.rootHauler.emit(stop)
         val messages = messageAsync.await()
-        println("Took $time to produce ${messages.size} messages")
+        println("Took $time to produce ${messages.size} messages under ${this@HighVolumeTest::class.simpleName}")
         warehouseJob.cancelAndJoin()
-        assertEquals(3060, messages.size)
+        assertEquals(60120, messages.size)
     }
 
     @Test
@@ -84,10 +84,10 @@ abstract class HighVolumeTest(private val platform: String) {
                         DEFAULT,
                         null,
                         ShippingType.PACKED,
-                        SerializableDeliveryRates(15, 1000, 500)
+                        SerializableDeliveryRates(15, 5000, 1000)
                     ),
-                    List(30) {
-                        TaskSpec("Tag$it", "Thread", it.toLong(), 10, 100)
+                    List(60) {
+                        TaskSpec("Tag$it", "Thread", it.toLong(), 1, 1000)
                     }
                 )
             )
@@ -97,9 +97,9 @@ abstract class HighVolumeTest(private val platform: String) {
         }.close()
         Garage.rootHauler.emit(stop)
         val messages = messageAsync.await()
-        println("Took $time to produce ${messages.size} packed messages")
+        println("Took $time to produce ${messages.size} packed messages under ${this@HighVolumeTest::class.simpleName}")
         warehouseJob.cancelAndJoin()
-        assertEquals(3060, messages.size)
+        assertEquals(60120, messages.size)
     }
 
     protected open suspend fun CoroutineScope.launchAttach(warehouse: Warehouse) =
