@@ -103,7 +103,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
 
 val dokkaJavadoc = tasks.create("dokkaJavadocCustom", DokkaTask::class) {
     project.dependencies {
-        plugins("org.jetbrains.dokka:kotlin-as-java-plugin:1.9.0")
+        plugins("org.jetbrains.dokka:kotlin-as-java-plugin:2.0.0")
     }
     // outputFormat = "javadoc"
     outputDirectory.set(File(project.buildDir, "javadoc"))
