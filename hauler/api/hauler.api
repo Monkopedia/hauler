@@ -32,11 +32,6 @@ public abstract interface class com/monkopedia/hauler/AsyncHauler {
 	public abstract fun emit (Lcom/monkopedia/hauler/Box;)V
 }
 
-public final class com/monkopedia/hauler/AsyncHaulerImpl : com/monkopedia/hauler/AsyncHauler {
-	public fun <init> (Lkotlinx/coroutines/flow/FlowCollector;Lkotlinx/coroutines/CoroutineScope;)V
-	public fun emit (Lcom/monkopedia/hauler/Box;)V
-}
-
 public abstract interface class com/monkopedia/hauler/AutomaticDelivery : com/monkopedia/ksrpc/RpcService {
 	public static final field Companion Lcom/monkopedia/hauler/AutomaticDelivery$Companion;
 	public abstract fun onLogEvent (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -130,18 +125,6 @@ public final class com/monkopedia/hauler/CallSign$Key : kotlin/coroutines/Corout
 	public final fun loggingName (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/CircularBuffer {
-	public fun <init> (I)V
-	public final fun add (Ljava/lang/Object;)V
-	public final fun toListAndClear ()Ljava/util/List;
-}
-
-public final class com/monkopedia/hauler/Container : kotlinx/coroutines/flow/FlowCollector {
-	public static final field INSTANCE Lcom/monkopedia/hauler/Container;
-	public fun emit (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public synthetic fun emit (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
 public final class com/monkopedia/hauler/ConversionsKt {
 	public static final fun forEach (Lcom/monkopedia/hauler/Palette;Lkotlin/jvm/functions/Function1;)V
 	public static final fun pack (Ljava/util/List;)Lcom/monkopedia/hauler/Palette;
@@ -186,12 +169,6 @@ public final class com/monkopedia/hauler/CustomerPickup$Stub$AnonymousGet : com/
 public final synthetic class com/monkopedia/hauler/CustomerPickup$Stub$Companion {
 	public fun <init> ()V
 	public final synthetic fun Get$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-}
-
-public final class com/monkopedia/hauler/CustomerPickupImpl : com/monkopedia/hauler/CustomerPickup {
-	public fun <init> (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/DeliveryRates;)V
-	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun get (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract interface class com/monkopedia/hauler/DeliveryDay : com/monkopedia/ksrpc/RpcService {
@@ -530,13 +507,6 @@ public final class com/monkopedia/hauler/LoadingDock$Stub$AnonymousBulkLog : com
 public final synthetic class com/monkopedia/hauler/LoadingDock$Stub$Companion {
 	public fun <init> ()V
 	public final synthetic fun BulkLog$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-}
-
-public final class com/monkopedia/hauler/LogPacker {
-	public fun <init> ()V
-	public final fun dumpLogs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getSize ()I
-	public final fun log (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public abstract class com/monkopedia/hauler/LoggerMatchMode : java/lang/Enum {

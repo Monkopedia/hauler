@@ -18,7 +18,7 @@ package com.monkopedia.hauler
 /**
  * Circular buffer, implemented primarily for behavior over performance.
  */
-class CircularBuffer<T>(
+internal class CircularBuffer<T>(
     private val size: Int,
 ) {
     private var nextIndex = 0

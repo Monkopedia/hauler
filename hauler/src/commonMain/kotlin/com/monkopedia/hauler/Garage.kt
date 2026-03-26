@@ -17,13 +17,10 @@ package com.monkopedia.hauler
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.withLock
 
 /**
  * Global routing center for log messages. Provides a shared [rootHauler] and [deliveries] flow.
@@ -37,25 +34,25 @@ import kotlinx.coroutines.sync.withLock
  * Connect output via [route] or attach a remote endpoint via [DropBox.attach] / [LoadingDock.attach].
  */
 object Garage {
-    private val sharedFlow = MutableSharedFlow<Box>(replay = 0)
-    private val job = SupervisorJob()
+    private val sharedFlow = MutableSharedFlow<Box>(extraBufferCapacity = 64)
     val rootHauler: Hauler =
         Hauler { box ->
-            CoroutineScope(job).launch {
-                sharedFlow.emit(box)
-            }
+            sharedFlow.tryEmit(box)
         }
     val deliveries: Deliveries = sharedFlow
 
+    @Suppress("RedundantSuspendModifier")
     suspend fun flushLogs() {
-        job.children.toList().joinAll()
+        // No-op: tryEmit is synchronous, so there are no pending emissions to flush.
     }
 }
 
 /** Create a [Hauler] that tags all emitted [Box]es with the given [loggerName]. */
 inline fun Hauler.named(loggerName: String): Hauler =
     Hauler { box ->
-        this@named.emit(box.copy(loggerName = loggerName))
+        this@named.emit(
+            Box(box.level, loggerName, box.message, box.timestamp, box.threadName, box.metadata),
+        )
     }
 
 /** Create a [Hauler] that only emits [Box]es at or above the given [level]. */

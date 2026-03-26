@@ -43,8 +43,11 @@ open class Warehouse(
     override suspend fun deliveries(u: Unit): DeliveryService = centralFlow.deliveries(scope, deliveryRates)
 
     override suspend fun close() {
-        super.close()
-        scope.cancel()
+        try {
+            super.close()
+        } finally {
+            scope.cancel()
+        }
     }
 
     inner class DropBox : com.monkopedia.hauler.DropBox {
@@ -158,8 +161,7 @@ fun SharedFlow<Box>.deliveries(
     deliveries(
         this,
         flow {
-            val replay = replayCache.toList()
-            replay.forEach { emit(it) }
+            replayCache.forEach { emit(it) }
         },
         scope,
         deliveryRates,

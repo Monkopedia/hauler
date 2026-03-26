@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class CustomerPickupImpl(
+internal class CustomerPickupImpl(
     private val deliveries: Deliveries,
     deliveryRates: DeliveryRates,
 ) : CustomerPickup {
@@ -41,13 +41,17 @@ class CustomerPickupImpl(
     }
 
     override suspend fun get(maxEntries: Int): Palette {
-        lock.withLock {
-            return circBuffer.toListAndClear().pack()
+        val items = lock.withLock {
+            circBuffer.toListAndClear()
         }
+        return items.pack()
     }
 
     override suspend fun close() {
-        super.close()
-        scope.cancel()
+        try {
+            super.close()
+        } finally {
+            scope.cancel()
+        }
     }
 }

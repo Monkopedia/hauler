@@ -27,19 +27,25 @@ import kotlinx.coroutines.sync.withLock
 
 /** Compress a list of [Box]es into a [Palette] for efficient transport, deduplicating logger and thread names. */
 fun List<Box>.pack(): Palette {
-    val tagsIndex = linkedMapOf<String, Int>()
-    val threadsIndex = linkedMapOf<String, Int>()
+    val tagsIndex = hashMapOf<String, Int>()
+    val tagsList = mutableListOf<String>()
+    val threadsIndex = hashMapOf<String, Int>()
+    val threadsList = mutableListOf<String>()
     val packages = ArrayList<Package>(size)
     for (box in this) {
-        val tagIdx = tagsIndex.getOrPut(box.loggerName) { tagsIndex.size }
+        val tagIdx = tagsIndex.getOrPut(box.loggerName) {
+            tagsList.size.also { tagsList.add(box.loggerName) }
+        }
         val threadIdx = box.threadName?.let { name ->
-            threadsIndex.getOrPut(name) { threadsIndex.size }
+            threadsIndex.getOrPut(name) {
+                threadsList.size.also { threadsList.add(name) }
+            }
         }
         packages.add(
             Package(box.level.intLevel, tagIdx, box.message, box.timestamp, threadIdx, box.metadata),
         )
     }
-    return Palette(tagsIndex.keys.toList(), threadsIndex.keys.toList(), packages)
+    return Palette(tagsList, threadsList, packages)
 }
 
 /** Batch a stream of [Box]es into [Palette]s, flushing by size or time interval. */
@@ -66,8 +72,7 @@ fun Palette.unpack(): List<Box> =
         unpack(it)
     }
 
-@Suppress("NOTHING_TO_INLINE")
-inline fun Palette.unpack(event: Package) =
+fun Palette.unpack(event: Package) =
     Box(
         event.intLevel.asLevel(),
         loggerNames[event.loggerName],
@@ -100,7 +105,7 @@ fun Flow<Palette>.unpack(): Deliveries =
  * avoiding allocation of new collections on each flush. All operations are protected
  * by a [Mutex] for coroutine safety.
  */
-class LogPacker {
+internal class LogPacker {
     private val tagsLists = listOf(mutableListOf<String>(), mutableListOf())
     private val tagsIndexMaps = listOf(mutableMapOf<String, Int>(), mutableMapOf())
     private val threadsLists = listOf(mutableListOf<String>(), mutableListOf())
@@ -134,9 +139,9 @@ class LogPacker {
     suspend fun dumpLogs(): Palette =
         lock.withLock {
             Palette(
-                tagsList,
-                threadsList,
-                messagesList,
+                tagsList.toList(),
+                threadsList.toList(),
+                messagesList.toList(),
             ).also {
                 swapBuffers()
             }

@@ -83,8 +83,6 @@ kotlin {
         compileOnly(libs.ktor.server.host.common)
         compileOnly(libs.ktor.server.netty)
         compileOnly(libs.ktor.client)
-        implementation(libs.kotlinx.serialization)
-        implementation(libs.kotlinx.serialization.json)
         implementation(libs.clikt)
         implementation(libs.logback.classic)
     }

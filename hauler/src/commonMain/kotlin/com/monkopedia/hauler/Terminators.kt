@@ -56,8 +56,15 @@ suspend fun FlowCollector<String>.defaultFormat(box: Box) {
         Instant
             .fromEpochMilliseconds(box.timestamp)
             .toLocalDateTime(defaultTimeZone)
-    val prefix = "$time (${box.threadName}) ${box.loggerName} - "
-    box.message.split("\n").forEach {
-        emit(prefix + it)
+    val prefix = buildString {
+        append(time)
+        append(" (")
+        append(box.threadName)
+        append(") ")
+        append(box.loggerName)
+        append(" - ")
+    }
+    for (line in box.message.split('\n')) {
+        emit(prefix + line)
     }
 }

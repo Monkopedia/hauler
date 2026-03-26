@@ -18,7 +18,7 @@ package com.monkopedia.hauler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class AsyncHaulerImpl(
+internal class AsyncHaulerImpl(
     private val hauler: Hauler,
     private val scope: CoroutineScope,
 ) : AsyncHauler {
