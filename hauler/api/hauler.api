@@ -1,0 +1,985 @@
+public final class com/monkopedia/hauler/AndFilter : com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/AndFilter$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/WeighStation;Lcom/monkopedia/hauler/WeighStation;)V
+	public final fun component1 ()Lcom/monkopedia/hauler/WeighStation;
+	public final fun component2 ()Lcom/monkopedia/hauler/WeighStation;
+	public fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public final fun copy (Lcom/monkopedia/hauler/WeighStation;Lcom/monkopedia/hauler/WeighStation;)Lcom/monkopedia/hauler/AndFilter;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/AndFilter;Lcom/monkopedia/hauler/WeighStation;Lcom/monkopedia/hauler/WeighStation;ILjava/lang/Object;)Lcom/monkopedia/hauler/AndFilter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFirst ()Lcom/monkopedia/hauler/WeighStation;
+	public final fun getSecond ()Lcom/monkopedia/hauler/WeighStation;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/AndFilter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/AndFilter$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/AndFilter;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/AndFilter;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/AndFilter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class com/monkopedia/hauler/AsyncHauler {
+	public abstract fun emit (Lcom/monkopedia/hauler/Box;)V
+}
+
+public final class com/monkopedia/hauler/AsyncHaulerImpl : com/monkopedia/hauler/AsyncHauler {
+	public fun <init> (Lkotlinx/coroutines/flow/FlowCollector;Lkotlinx/coroutines/CoroutineScope;)V
+	public fun emit (Lcom/monkopedia/hauler/Box;)V
+}
+
+public abstract interface class com/monkopedia/hauler/AutomaticDelivery : com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/AutomaticDelivery$Companion;
+	public abstract fun onLogEvent (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/AutomaticDelivery$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/AutomaticDelivery;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/AutomaticDelivery$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/AutomaticDelivery$Stub : com/monkopedia/hauler/AutomaticDelivery, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/AutomaticDelivery$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun onLogEvent (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/AutomaticDelivery$Stub$AnonymousOnLogEvent : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/AutomaticDelivery$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun OnLogEvent$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
+public final class com/monkopedia/hauler/Box {
+	public static final field Companion Lcom/monkopedia/hauler/Box$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/util/Map;)V
+	public synthetic fun <init> (Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/monkopedia/hauler/Level;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()J
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Ljava/util/Map;
+	public final fun copy (Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/util/Map;)Lcom/monkopedia/hauler/Box;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/Box;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lcom/monkopedia/hauler/Box;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLevel ()Lcom/monkopedia/hauler/Level;
+	public final fun getLoggerName ()Ljava/lang/String;
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getMetadata ()Ljava/util/Map;
+	public final fun getThreadName ()Ljava/lang/String;
+	public final fun getTimestamp ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/Box$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/Box$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/Box;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/Box;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/Box$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/CallSign : kotlin/coroutines/CoroutineContext$Element, kotlinx/coroutines/ThreadContextElement {
+	public static final field Key Lcom/monkopedia/hauler/CallSign$Key;
+	public fun <init> (Ljava/lang/String;)V
+	public fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
+	public fun get (Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext$Element;
+	public fun getKey ()Lcom/monkopedia/hauler/CallSign$Key;
+	public synthetic fun getKey ()Lkotlin/coroutines/CoroutineContext$Key;
+	public final fun getName ()Ljava/lang/String;
+	public fun minusKey (Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext;
+	public fun plus (Lkotlin/coroutines/CoroutineContext;)Lkotlin/coroutines/CoroutineContext;
+	public synthetic fun restoreThreadContext (Lkotlin/coroutines/CoroutineContext;Ljava/lang/Object;)V
+	public fun restoreThreadContext (Lkotlin/coroutines/CoroutineContext;Ljava/lang/String;)V
+	public synthetic fun updateThreadContext (Lkotlin/coroutines/CoroutineContext;)Ljava/lang/Object;
+	public fun updateThreadContext (Lkotlin/coroutines/CoroutineContext;)Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/CallSign$Key : kotlin/coroutines/CoroutineContext$Key {
+	public final fun getThreadLoggingName ()Ljava/lang/String;
+	public final fun loggingName (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/CircularBuffer {
+	public fun <init> (I)V
+	public final fun add (Ljava/lang/Object;)V
+	public final fun toListAndClear ()Ljava/util/List;
+}
+
+public final class com/monkopedia/hauler/Container : kotlinx/coroutines/flow/FlowCollector {
+	public static final field INSTANCE Lcom/monkopedia/hauler/Container;
+	public fun emit (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public synthetic fun emit (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/ConversionsKt {
+	public static final fun forEach (Lcom/monkopedia/hauler/Palette;Lkotlin/jvm/functions/Function1;)V
+	public static final fun pack (Ljava/util/List;)Lcom/monkopedia/hauler/Palette;
+	public static final fun pack (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/DeliveryRates;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun pack$default (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun unpack (Lcom/monkopedia/hauler/Palette;)Ljava/util/List;
+	public static final fun unpack (Lcom/monkopedia/hauler/Palette;Lcom/monkopedia/hauler/Package;)Lcom/monkopedia/hauler/Box;
+	public static final fun unpack (Lkotlinx/coroutines/flow/Flow;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public abstract interface class com/monkopedia/hauler/CustomerPickup : com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/CustomerPickup$Companion;
+	public abstract fun get (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun get$default (Lcom/monkopedia/hauler/CustomerPickup;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/CustomerPickup$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/CustomerPickup;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/CustomerPickup$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/CustomerPickup;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun get$default (Lcom/monkopedia/hauler/CustomerPickup;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/CustomerPickup$Stub : com/monkopedia/hauler/CustomerPickup, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/CustomerPickup$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun get (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/CustomerPickup$Stub$AnonymousGet : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/CustomerPickup$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun Get$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
+public final class com/monkopedia/hauler/CustomerPickupImpl : com/monkopedia/hauler/CustomerPickup {
+	public fun <init> (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/DeliveryRates;)V
+	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun get (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/monkopedia/hauler/DeliveryDay : com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/DeliveryDay$Companion;
+	public abstract fun onLogs (Lcom/monkopedia/hauler/Palette;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryDay$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/DeliveryDay;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/DeliveryDay$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryDay$Stub : com/monkopedia/hauler/DeliveryDay, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/DeliveryDay$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun onLogs (Lcom/monkopedia/hauler/Palette;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryDay$Stub$AnonymousOnLogs : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/DeliveryDay$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun OnLogs$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
+public final class com/monkopedia/hauler/DeliveryRates {
+	public synthetic fun <init> (IIJLkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (IIJLkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3-UwyO8pc ()J
+	public final fun component4 ()Lkotlin/jvm/functions/Function1;
+	public final fun copy-exY8QGI (IIJLkotlin/jvm/functions/Function1;)Lcom/monkopedia/hauler/DeliveryRates;
+	public static synthetic fun copy-exY8QGI$default (Lcom/monkopedia/hauler/DeliveryRates;IIJLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/monkopedia/hauler/DeliveryRates;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDefaultBoxRetention ()I
+	public final fun getDefaultPaletteInterval-UwyO8pc ()J
+	public final fun getDefaultPaletteSize ()I
+	public final fun getOnDeliveryError ()Lkotlin/jvm/functions/Function1;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/monkopedia/hauler/DeliveryService : com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/DeliveryService$Companion;
+	public abstract fun dumpCustomerPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun dumpCustomerPickup$default (Lcom/monkopedia/hauler/DeliveryService;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun dumpDelivery (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun dumpDeliveryDay (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun recurringCustomerPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun recurringCustomerPickup$default (Lcom/monkopedia/hauler/DeliveryService;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun registerDelivery (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun registerDeliveryDay (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun weighIn (Lcom/monkopedia/hauler/WeighStation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/DeliveryService;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/DeliveryService;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun dumpCustomerPickup$default (Lcom/monkopedia/hauler/DeliveryService;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun recurringCustomerPickup$default (Lcom/monkopedia/hauler/DeliveryService;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Stub : com/monkopedia/hauler/DeliveryService, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/DeliveryService$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun dumpCustomerPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun dumpDelivery (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun dumpDeliveryDay (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun recurringCustomerPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun registerDelivery (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun registerDeliveryDay (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun weighIn (Lcom/monkopedia/hauler/WeighStation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpCustomerPickup : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDelivery : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDeliveryDay : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRecurringCustomerPickup : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRegisterDelivery : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRegisterDeliveryDay : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousWeighIn : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/DeliveryService$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun DumpCustomerPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun DumpDelivery$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun DumpDeliveryDay$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RecurringCustomerPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RegisterDelivery$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RegisterDeliveryDay$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun WeighIn$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
+public abstract interface class com/monkopedia/hauler/DropBox : com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/DropBox$Companion;
+	public abstract fun log (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DropBox$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/DropBox;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/DropBox$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/DropBox;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DropBox$Stub : com/monkopedia/hauler/DropBox, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/DropBox$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun log (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/DropBox$Stub$AnonymousLog : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/DropBox$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun Log$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
+public final class com/monkopedia/hauler/FilterBuilderKt {
+	public static final fun weighStation (Lkotlin/jvm/functions/Function1;)Lcom/monkopedia/hauler/WeighStation;
+}
+
+public abstract interface annotation class com/monkopedia/hauler/FilterDsl : java/lang/annotation/Annotation {
+}
+
+public final class com/monkopedia/hauler/FlowsKt {
+	public static final fun deliveries (Lcom/monkopedia/hauler/DeliveryService;Lkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun dumpDeliveries (Lcom/monkopedia/hauler/DeliveryService;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun dumpWithDeliveryDay (Lcom/monkopedia/hauler/DeliveryService;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun dumpWithPickup-dWUq8MI (Lcom/monkopedia/hauler/DeliveryService;JILkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun dumpWithPickup-dWUq8MI$default (Lcom/monkopedia/hauler/DeliveryService;JILkotlinx/coroutines/CoroutineScope;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun withDeliveryDay (Lcom/monkopedia/hauler/DeliveryService;Lkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun withPickup-dWUq8MI (Lcom/monkopedia/hauler/DeliveryService;JILkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun withPickup-dWUq8MI$default (Lcom/monkopedia/hauler/DeliveryService;JILkotlinx/coroutines/CoroutineScope;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class com/monkopedia/hauler/Garage {
+	public static final field INSTANCE Lcom/monkopedia/hauler/Garage;
+	public final fun flushLogs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getDeliveries ()Lkotlinx/coroutines/flow/Flow;
+	public final fun getRootHauler ()Lkotlinx/coroutines/flow/FlowCollector;
+}
+
+public final class com/monkopedia/hauler/GarageKt {
+	public static final fun attach (Lcom/monkopedia/hauler/DropBox;Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun attach (Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lkotlinx/coroutines/Job;
+	public static synthetic fun attach$default (Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
+	public static final fun hauler (Ljava/lang/String;)Lkotlinx/coroutines/flow/FlowCollector;
+	public static final fun level (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/Level;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun level (Lkotlinx/coroutines/flow/FlowCollector;Lcom/monkopedia/hauler/Level;)Lkotlinx/coroutines/flow/FlowCollector;
+	public static final fun named (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;)Lkotlinx/coroutines/flow/FlowCollector;
+	public static final fun route (Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/Job;
+	public static final fun route (Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun route$default (Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
+}
+
+public final class com/monkopedia/hauler/HaulerImplKt {
+	public static final fun loggingName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/HaulerKt {
+	public static final fun asAsync (Lkotlinx/coroutines/flow/FlowCollector;Lkotlinx/coroutines/CoroutineScope;)Lcom/monkopedia/hauler/AsyncHauler;
+	public static final fun combine (Ljava/lang/String;Ljava/lang/Throwable;)Ljava/lang/String;
+	public static final fun convert (Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/lang/String;Ljava/util/Map;)Lcom/monkopedia/hauler/Box;
+	public static synthetic fun convert$default (Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lcom/monkopedia/hauler/Box;
+	public static final fun debug (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
+	public static final fun debug (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun debug$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
+	public static synthetic fun debug$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun error (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
+	public static final fun error (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun error$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
+	public static synthetic fun error$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun info (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
+	public static final fun info (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun info$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
+	public static synthetic fun info$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun ship (Lcom/monkopedia/hauler/AsyncHauler;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
+	public static final fun ship (Lkotlinx/coroutines/flow/FlowCollector;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun ship$default (Lcom/monkopedia/hauler/AsyncHauler;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
+	public static synthetic fun ship$default (Lkotlinx/coroutines/flow/FlowCollector;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun trace (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
+	public static final fun trace (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun trace$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
+	public static synthetic fun trace$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun warn (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
+	public static final fun warn (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun warn$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
+	public static synthetic fun warn$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Level : java/lang/Enum {
+	public static final field Companion Lcom/monkopedia/hauler/Level$Companion;
+	public static final field DEBUG Lcom/monkopedia/hauler/Level;
+	public static final field ERROR Lcom/monkopedia/hauler/Level;
+	public static final field INFO Lcom/monkopedia/hauler/Level;
+	public static final field TRACE Lcom/monkopedia/hauler/Level;
+	public static final field WARN Lcom/monkopedia/hauler/Level;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getIntLevel ()I
+	public static fun valueOf (Ljava/lang/String;)Lcom/monkopedia/hauler/Level;
+	public static fun values ()[Lcom/monkopedia/hauler/Level;
+}
+
+public final class com/monkopedia/hauler/Level$Companion {
+	public final fun asLevel (I)Lcom/monkopedia/hauler/Level;
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/LevelFilter : com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/LevelFilter$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/LevelMatchMode;Lcom/monkopedia/hauler/Level;)V
+	public final fun component1 ()Lcom/monkopedia/hauler/LevelMatchMode;
+	public final fun component2 ()Lcom/monkopedia/hauler/Level;
+	public fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public final fun copy (Lcom/monkopedia/hauler/LevelMatchMode;Lcom/monkopedia/hauler/Level;)Lcom/monkopedia/hauler/LevelFilter;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/LevelFilter;Lcom/monkopedia/hauler/LevelMatchMode;Lcom/monkopedia/hauler/Level;ILjava/lang/Object;)Lcom/monkopedia/hauler/LevelFilter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLevel ()Lcom/monkopedia/hauler/Level;
+	public final fun getMode ()Lcom/monkopedia/hauler/LevelMatchMode;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/LevelFilter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/LevelFilter$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/LevelFilter;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/LevelFilter;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/LevelFilter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract class com/monkopedia/hauler/LevelMatchMode : java/lang/Enum {
+	public static final field EQ Lcom/monkopedia/hauler/LevelMatchMode;
+	public static final field GT Lcom/monkopedia/hauler/LevelMatchMode;
+	public static final field LT Lcom/monkopedia/hauler/LevelMatchMode;
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public abstract fun checkMatch (Ljava/lang/Comparable;Ljava/lang/Comparable;)Z
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/monkopedia/hauler/LevelMatchMode;
+	public static fun values ()[Lcom/monkopedia/hauler/LevelMatchMode;
+}
+
+public abstract interface class com/monkopedia/hauler/LoadingDock : com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/LoadingDock$Companion;
+	public abstract fun bulkLog (Lcom/monkopedia/hauler/Palette;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/LoadingDock$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/LoadingDock;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/LoadingDock$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/LoadingDock;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/LoadingDock$Stub : com/monkopedia/hauler/LoadingDock, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/LoadingDock$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun bulkLog (Lcom/monkopedia/hauler/Palette;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/LoadingDock$Stub$AnonymousBulkLog : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/LoadingDock$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun BulkLog$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
+public final class com/monkopedia/hauler/LogPacker {
+	public fun <init> ()V
+	public final fun dumpLogs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getSize ()I
+	public final fun log (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract class com/monkopedia/hauler/LoggerMatchMode : java/lang/Enum {
+	public static final field EXACT Lcom/monkopedia/hauler/LoggerMatchMode;
+	public static final field PREFIX Lcom/monkopedia/hauler/LoggerMatchMode;
+	public static final field REGEX Lcom/monkopedia/hauler/LoggerMatchMode;
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public abstract fun checkMatch (Ljava/lang/String;Ljava/lang/String;)Z
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/monkopedia/hauler/LoggerMatchMode;
+	public static fun values ()[Lcom/monkopedia/hauler/LoggerMatchMode;
+}
+
+public final class com/monkopedia/hauler/LoggerNameFilter : com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/LoggerNameFilter$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)V
+	public final fun component1 ()Lcom/monkopedia/hauler/LoggerMatchMode;
+	public final fun component2 ()Ljava/lang/String;
+	public fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public final fun copy (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)Lcom/monkopedia/hauler/LoggerNameFilter;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/LoggerNameFilter;Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;ILjava/lang/Object;)Lcom/monkopedia/hauler/LoggerNameFilter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMatchMode ()Lcom/monkopedia/hauler/LoggerMatchMode;
+	public final fun getQuery ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/LoggerNameFilter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/LoggerNameFilter$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/LoggerNameFilter;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/LoggerNameFilter;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/LoggerNameFilter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/LoggingTypesKt {
+	public static final field DEBUG_INT I
+	public static final field ERROR_INT I
+	public static final field INFO_INT I
+	public static final field TRACE_INT I
+	public static final field WARN_INT I
+}
+
+public final class com/monkopedia/hauler/MessageFilter : com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/MessageFilter$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)V
+	public final fun component1 ()Lcom/monkopedia/hauler/LoggerMatchMode;
+	public final fun component2 ()Ljava/lang/String;
+	public fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public final fun copy (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)Lcom/monkopedia/hauler/MessageFilter;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/MessageFilter;Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;ILjava/lang/Object;)Lcom/monkopedia/hauler/MessageFilter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMatchMode ()Lcom/monkopedia/hauler/LoggerMatchMode;
+	public final fun getQuery ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/MessageFilter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/MessageFilter$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/MessageFilter;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/MessageFilter;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/MessageFilter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/NotFilter : com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/NotFilter$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/WeighStation;)V
+	public final fun component1 ()Lcom/monkopedia/hauler/WeighStation;
+	public fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public final fun copy (Lcom/monkopedia/hauler/WeighStation;)Lcom/monkopedia/hauler/NotFilter;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/NotFilter;Lcom/monkopedia/hauler/WeighStation;ILjava/lang/Object;)Lcom/monkopedia/hauler/NotFilter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBase ()Lcom/monkopedia/hauler/WeighStation;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/NotFilter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/NotFilter$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/NotFilter;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/NotFilter;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/NotFilter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/OrFilter : com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/OrFilter$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/WeighStation;Lcom/monkopedia/hauler/WeighStation;)V
+	public final fun component1 ()Lcom/monkopedia/hauler/WeighStation;
+	public final fun component2 ()Lcom/monkopedia/hauler/WeighStation;
+	public fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public final fun copy (Lcom/monkopedia/hauler/WeighStation;Lcom/monkopedia/hauler/WeighStation;)Lcom/monkopedia/hauler/OrFilter;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/OrFilter;Lcom/monkopedia/hauler/WeighStation;Lcom/monkopedia/hauler/WeighStation;ILjava/lang/Object;)Lcom/monkopedia/hauler/OrFilter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFirst ()Lcom/monkopedia/hauler/WeighStation;
+	public final fun getSecond ()Lcom/monkopedia/hauler/WeighStation;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/OrFilter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/OrFilter$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/OrFilter;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/OrFilter;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/OrFilter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/Package {
+	public static final field Companion Lcom/monkopedia/hauler/Package$Companion;
+	public fun <init> (IILjava/lang/String;JLjava/lang/Integer;Ljava/util/Map;)V
+	public synthetic fun <init> (IILjava/lang/String;JLjava/lang/Integer;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun component2 ()I
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()J
+	public final fun component5 ()Ljava/lang/Integer;
+	public final fun component6 ()Ljava/util/Map;
+	public final fun copy (IILjava/lang/String;JLjava/lang/Integer;Ljava/util/Map;)Lcom/monkopedia/hauler/Package;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/Package;IILjava/lang/String;JLjava/lang/Integer;Ljava/util/Map;ILjava/lang/Object;)Lcom/monkopedia/hauler/Package;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIntLevel ()I
+	public final fun getLoggerName ()I
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getMetadata ()Ljava/util/Map;
+	public final fun getThreadName ()Ljava/lang/Integer;
+	public final fun getTimestamp ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/Package$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/Package$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/Package;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/Package;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/Package$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/Palette {
+	public static final field Companion Lcom/monkopedia/hauler/Palette$Companion;
+	public fun <init> (Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;Ljava/util/List;Ljava/util/List;)Lcom/monkopedia/hauler/Palette;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/Palette;Ljava/util/List;Ljava/util/List;Ljava/util/List;ILjava/lang/Object;)Lcom/monkopedia/hauler/Palette;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getLoggerNames ()Ljava/util/List;
+	public final fun getMessages ()Ljava/util/List;
+	public final fun getThreadNames ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/Palette$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/Palette$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/Palette;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/Palette;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/Palette$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/PickupsKt {
+	public static final fun attach (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/DropBox;Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun attach (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lkotlinx/coroutines/Job;
+	public static synthetic fun attach$default (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
+}
+
+public abstract interface class com/monkopedia/hauler/Registration : com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/Registration$Companion;
+	public abstract fun ping (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun ping$default (Lcom/monkopedia/hauler/Registration;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun unregister (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun unregister$default (Lcom/monkopedia/hauler/Registration;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Registration$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/Registration;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/Registration$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/Registration;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun ping$default (Lcom/monkopedia/hauler/Registration;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun unregister$default (Lcom/monkopedia/hauler/Registration;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Registration$Stub : com/monkopedia/hauler/Registration, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/Registration$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun ping (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun unregister (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Registration$Stub$AnonymousPing : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Registration$Stub$AnonymousUnregister : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/Registration$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun Ping$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun Unregister$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
+public abstract interface class com/monkopedia/hauler/Shipper : com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/Shipper$Companion;
+	public abstract fun deliveries (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun deliveries$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun requestDockPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun requestDockPickup$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun requestPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun requestPickup$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Shipper$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/Shipper;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+}
+
+public final class com/monkopedia/hauler/Shipper$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/Shipper;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun deliveries$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun requestDockPickup$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun requestPickup$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Shipper$Stub : com/monkopedia/hauler/Shipper, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/Shipper$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun deliveries (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun requestDockPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun requestPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Shipper$Stub$AnonymousDeliveries : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Shipper$Stub$AnonymousRequestDockPickup : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Shipper$Stub$AnonymousRequestPickup : com/monkopedia/ksrpc/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/Shipper$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun Deliveries$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RequestDockPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RequestPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
+public final class com/monkopedia/hauler/TerminatorsKt {
+	public static final fun defaultFormat (Lkotlinx/coroutines/flow/FlowCollector;Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getDefaultFormat ()Lkotlin/jvm/functions/Function3;
+	public static final fun route (Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/Job;
+	public static final fun route (Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun route$default (Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
+	public static synthetic fun route$default (Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/ThreadNameFilter : com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/ThreadNameFilter$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)V
+	public final fun component1 ()Lcom/monkopedia/hauler/LoggerMatchMode;
+	public final fun component2 ()Ljava/lang/String;
+	public fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public final fun copy (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)Lcom/monkopedia/hauler/ThreadNameFilter;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/ThreadNameFilter;Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;ILjava/lang/Object;)Lcom/monkopedia/hauler/ThreadNameFilter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMatchMode ()Lcom/monkopedia/hauler/LoggerMatchMode;
+	public final fun getQuery ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/ThreadNameFilter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/ThreadNameFilter$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/ThreadNameFilter;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/ThreadNameFilter;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/ThreadNameFilter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/TimeFilter : com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/TimeFilter$Companion;
+	public fun <init> (Lcom/monkopedia/hauler/LevelMatchMode;J)V
+	public final fun component1 ()Lcom/monkopedia/hauler/LevelMatchMode;
+	public final fun component2 ()J
+	public fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public final fun copy (Lcom/monkopedia/hauler/LevelMatchMode;J)Lcom/monkopedia/hauler/TimeFilter;
+	public static synthetic fun copy$default (Lcom/monkopedia/hauler/TimeFilter;Lcom/monkopedia/hauler/LevelMatchMode;JILjava/lang/Object;)Lcom/monkopedia/hauler/TimeFilter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMode ()Lcom/monkopedia/hauler/LevelMatchMode;
+	public final fun getTime ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/monkopedia/hauler/TimeFilter$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/monkopedia/hauler/TimeFilter$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/monkopedia/hauler/TimeFilter;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/monkopedia/hauler/TimeFilter;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/TimeFilter$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/TrucksKt {
+	public static final fun getFlatbed ()Lkotlinx/coroutines/flow/FlowCollector;
+}
+
+public final class com/monkopedia/hauler/UnitFlowKt {
+	public static final fun getUnitFlow ()Lkotlinx/coroutines/flow/Flow;
+}
+
+public class com/monkopedia/hauler/Warehouse : com/monkopedia/hauler/Shipper {
+	public fun <init> ()V
+	public fun <init> (Lcom/monkopedia/hauler/DeliveryRates;)V
+	public synthetic fun <init> (Lcom/monkopedia/hauler/DeliveryRates;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun deliveries (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun requestDockPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun requestPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Warehouse$DropBox : com/monkopedia/hauler/DropBox {
+	public fun <init> (Lcom/monkopedia/hauler/Warehouse;)V
+	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun log (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/Warehouse$LoadingDock : com/monkopedia/hauler/LoadingDock {
+	public fun <init> (Lcom/monkopedia/hauler/Warehouse;)V
+	public fun bulkLog (Lcom/monkopedia/hauler/Palette;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/WarehouseKt {
+	public static final fun deliveries (Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lcom/monkopedia/hauler/DeliveryService;
+	public static final fun deliveries (Lkotlinx/coroutines/flow/SharedFlow;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lcom/monkopedia/hauler/DeliveryService;
+	public static synthetic fun deliveries$default (Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lcom/monkopedia/hauler/DeliveryService;
+	public static synthetic fun deliveries$default (Lkotlinx/coroutines/flow/SharedFlow;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lcom/monkopedia/hauler/DeliveryService;
+}
+
+public abstract class com/monkopedia/hauler/WeighStation {
+	public static final field Companion Lcom/monkopedia/hauler/WeighStation$Companion;
+	public synthetic fun <init> (ILkotlinx/serialization/internal/SerializationConstructorMarker;)V
+	public abstract fun contains (Lcom/monkopedia/hauler/Box;)Z
+	public static final synthetic fun write$Self (Lcom/monkopedia/hauler/WeighStation;Lkotlinx/serialization/encoding/CompositeEncoder;Lkotlinx/serialization/descriptors/SerialDescriptor;)V
+}
+
+public final class com/monkopedia/hauler/WeighStation$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/monkopedia/hauler/WeighStationBuilder {
+	public fun <init> ()V
+	public final fun and (Lkotlin/jvm/functions/Function1;)V
+	public final fun level (Lcom/monkopedia/hauler/LevelMatchMode;Lcom/monkopedia/hauler/Level;)V
+	public final fun logger (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)V
+	public final fun message (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)V
+	public final fun not (Lkotlin/jvm/functions/Function1;)V
+	public final fun or (Lkotlin/jvm/functions/Function1;)V
+	public final fun thread (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)V
+	public final fun time (Lcom/monkopedia/hauler/LevelMatchMode;J)V
+}
+

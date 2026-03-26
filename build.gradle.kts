@@ -14,9 +14,14 @@ plugins {
     alias(libs.plugins.hierynomus.license)
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.binary.compatibility.validator)
 }
 
 group = "com.monkopedia"
+
+apiValidation {
+    ignoredProjects += listOf("benchmark", "microbenchmark")
+}
 
 repositories {
     mavenLocal()
