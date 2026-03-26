@@ -67,9 +67,7 @@ open class HarnessImpl(
                             executeTask(it)
                         }
                     }.awaitAll()
-                Garage.flushLogs()
                 delay((exec.connection.deliveryRates?.defaultPaletteInterval ?: 0) + 10)
-                Garage.flushLogs()
             } finally {
                 job.cancelAndJoin()
             }

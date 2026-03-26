@@ -97,7 +97,7 @@ class PickupsTest {
         }
 
         // Small palette size so size-based flush triggers. Long interval to avoid timer-based.
-        val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds)
+        val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
         val job = flow.attach(dock, scope, rates)
         assertTrue(job.isActive)
 
@@ -124,7 +124,7 @@ class PickupsTest {
         }
 
         // Palette size = 3, long interval so only size triggers flush
-        val rates = DeliveryRates(defaultPaletteSize = 3, defaultPaletteInterval = 100.seconds)
+        val rates = DeliveryRates(defaultPaletteSize = 3, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
         val job = flow.attach(dock, scope, rates)
 
         flow.emit(box(message = "1"))

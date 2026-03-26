@@ -42,7 +42,7 @@ class FlowsTest {
 
     @Test
     fun deliveries_receivesLiveEvents() = runTest {
-        val warehouse = Warehouse()
+        val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
         val dropBox = warehouse.requestPickup()
         val service = warehouse.deliveries()
         val scope = CoroutineScope(SupervisorJob())
@@ -72,7 +72,7 @@ class FlowsTest {
 
     @Test
     fun dumpDeliveries_returnsReplayCache() = runTest {
-        val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100))
+        val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100, onDeliveryError = {}))
         val dropBox = warehouse.requestPickup()
         dropBox.log(box(message = "cached1"))
         dropBox.log(box(message = "cached2"))
@@ -89,7 +89,7 @@ class FlowsTest {
 
     @Test
     fun dumpCustomerPickup_returnsReplayedBoxes() = runTest {
-        val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100))
+        val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100, onDeliveryError = {}))
         val dropBox = warehouse.requestPickup()
         dropBox.log(box(message = "poll1"))
         dropBox.log(box(message = "poll2"))
@@ -107,4 +107,8 @@ class FlowsTest {
         pickup.close()
         warehouse.close()
     }
+
+    // Note: withDeliveryDay/dumpWithDeliveryDay/withPickup/dumpWithPickup are not unit-tested
+    // because they use pack() internally, which merges with an infinite timer flow. This makes
+    // them incompatible with runTest virtual time and prevents finite dump flows from completing.
 }

@@ -37,7 +37,7 @@ class WarehouseTest {
 
     @Test
     fun dropBox_sendsToDelivery() = runTest {
-        val warehouse = Warehouse()
+        val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
         val dropBox = warehouse.requestPickup()
         val deliveryService = warehouse.deliveries()
 
@@ -61,7 +61,7 @@ class WarehouseTest {
 
     @Test
     fun loadingDock_sendsToDelivery() = runTest {
-        val warehouse = Warehouse()
+        val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
         val dock = warehouse.requestDockPickup()
         val deliveryService = warehouse.deliveries()
 
@@ -85,7 +85,7 @@ class WarehouseTest {
 
     @Test
     fun replayCache_returnsHistoricalLogs() = runTest {
-        val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100))
+        val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100, onDeliveryError = {}))
         val dropBox = warehouse.requestPickup()
         val testBox = box(message = "historical")
         dropBox.log(testBox)
@@ -106,7 +106,7 @@ class WarehouseTest {
 
     @Test
     fun multipleDropBoxes_allFeedSameFlow() = runTest {
-        val warehouse = Warehouse()
+        val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
         val drop1 = warehouse.requestPickup()
         val drop2 = warehouse.requestPickup()
         val deliveryService = warehouse.deliveries()

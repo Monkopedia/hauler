@@ -58,7 +58,7 @@ suspend fun Deliveries.attach(
 fun Deliveries.attach(
     dock: LoadingDock,
     scope: CoroutineScope,
-    deliveryRates: DeliveryRates = DeliveryRates(),
+    deliveryRates: DeliveryRates = DeliveryRates(onDeliveryError = {}),
 ): Job =
     scope.launch {
         pack(deliveryRates).collect(dock::bulkLog)

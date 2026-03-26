@@ -42,7 +42,7 @@ class DeliveryServiceTest {
     private fun createDeliveryService(): Triple<MutableSharedFlow<Box>, DeliveryService, CoroutineScope> {
         val flow = MutableSharedFlow<Box>(replay = 100)
         val scope = CoroutineScope(SupervisorJob())
-        val service = flow.deliveries(scope)
+        val service = flow.deliveries(scope, DeliveryRates(onDeliveryError = {}))
         return Triple(flow, service, scope)
     }
 
@@ -146,7 +146,7 @@ class DeliveryServiceTest {
         }
 
         // Use small palette size so size-based flush triggers
-        val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds)
+        val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
         val flow = MutableSharedFlow<Box>(replay = 100)
         val scope = CoroutineScope(SupervisorJob())
         val service = flow.deliveries(scope, rates)

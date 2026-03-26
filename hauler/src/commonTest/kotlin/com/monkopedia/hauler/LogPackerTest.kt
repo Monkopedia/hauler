@@ -15,7 +15,6 @@
  */
 package com.monkopedia.hauler
 
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -31,7 +30,7 @@ class LogPackerTest {
     ) = Box(level, loggerName, message, timestamp, threadName, metadata)
 
     @Test
-    fun log_incrementsSize() = runTest {
+    fun log_incrementsSize() {
         val packer = LogPacker()
         assertEquals(0, packer.size)
         packer.log(box(message = "a"))
@@ -41,7 +40,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun dumpLogs_returnsPackedPalette() = runTest {
+    fun dumpLogs_returnsPackedPalette() {
         val packer = LogPacker()
         packer.log(box(message = "a", loggerName = "Logger1"))
         packer.log(box(message = "b", loggerName = "Logger2"))
@@ -56,7 +55,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun dumpLogs_resetsSize() = runTest {
+    fun dumpLogs_resetsSize() {
         val packer = LogPacker()
         packer.log(box(message = "a"))
         packer.log(box(message = "b"))
@@ -67,7 +66,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun dumpLogs_emptyReturnsEmptyPalette() = runTest {
+    fun dumpLogs_emptyReturnsEmptyPalette() {
         val packer = LogPacker()
         val palette = packer.dumpLogs()
         assertEquals(0, palette.messages.size)
@@ -75,7 +74,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun dumpLogs_deduplicatesLoggerNames() = runTest {
+    fun dumpLogs_deduplicatesLoggerNames() {
         val packer = LogPacker()
         packer.log(box(loggerName = "Same"))
         packer.log(box(loggerName = "Same"))
@@ -88,7 +87,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun dumpLogs_deduplicatesThreadNames() = runTest {
+    fun dumpLogs_deduplicatesThreadNames() {
         val packer = LogPacker()
         packer.log(box(threadName = "t1"))
         packer.log(box(threadName = "t1"))
@@ -101,7 +100,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun dumpLogs_multipleDumpsIndependent() = runTest {
+    fun dumpLogs_multipleDumpsIndependent() {
         val packer = LogPacker()
 
         packer.log(box(message = "batch1"))
@@ -121,7 +120,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun dumpLogs_threeDumpsRotatesCorrectly() = runTest {
+    fun dumpLogs_threeDumpsRotatesCorrectly() {
         val packer = LogPacker()
 
         packer.log(box(message = "a"))
@@ -140,7 +139,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun log_preservesMetadata() = runTest {
+    fun log_preservesMetadata() {
         val packer = LogPacker()
         val meta = mapOf("key" to "value")
         packer.log(box(metadata = meta))
@@ -150,7 +149,7 @@ class LogPackerTest {
     }
 
     @Test
-    fun log_preservesNullThreadName() = runTest {
+    fun log_preservesNullThreadName() {
         val packer = LogPacker()
         packer.log(box(threadName = null))
 

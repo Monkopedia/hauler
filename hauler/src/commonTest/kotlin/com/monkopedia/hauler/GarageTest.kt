@@ -142,7 +142,6 @@ class GarageTest {
         }
         delay(50)
         Garage.rootHauler.emit(box(message = "garage test"))
-        Garage.flushLogs()
         withTimeout(2.seconds) { job.join() }
         assertEquals(1, result.size)
         assertEquals("garage test", result[0].message)
@@ -158,7 +157,6 @@ class GarageTest {
 
         val namedHauler = Garage.rootHauler.named("MyComponent")
         namedHauler.emit(box())
-        Garage.flushLogs()
         withTimeout(2.seconds) { job.join() }
         assertEquals("MyComponent", result[0].loggerName)
     }

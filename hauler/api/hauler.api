@@ -363,22 +363,25 @@ public final class com/monkopedia/hauler/FlowsKt {
 
 public final class com/monkopedia/hauler/Garage {
 	public static final field INSTANCE Lcom/monkopedia/hauler/Garage;
-	public final fun flushLogs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getDeliveries ()Lkotlinx/coroutines/flow/Flow;
-	public final fun getRootHauler ()Lkotlinx/coroutines/flow/FlowCollector;
+	public final fun getRootHauler ()Lcom/monkopedia/hauler/Hauler;
 }
 
 public final class com/monkopedia/hauler/GarageKt {
 	public static final fun attach (Lcom/monkopedia/hauler/DropBox;Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun attach (Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lkotlinx/coroutines/Job;
 	public static synthetic fun attach$default (Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
-	public static final fun hauler (Ljava/lang/String;)Lkotlinx/coroutines/flow/FlowCollector;
+	public static final fun hauler (Ljava/lang/String;)Lcom/monkopedia/hauler/Hauler;
+	public static final fun level (Lcom/monkopedia/hauler/Hauler;Lcom/monkopedia/hauler/Level;)Lcom/monkopedia/hauler/Hauler;
 	public static final fun level (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/Level;)Lkotlinx/coroutines/flow/Flow;
-	public static final fun level (Lkotlinx/coroutines/flow/FlowCollector;Lcom/monkopedia/hauler/Level;)Lkotlinx/coroutines/flow/FlowCollector;
-	public static final fun named (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;)Lkotlinx/coroutines/flow/FlowCollector;
+	public static final fun named (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;)Lcom/monkopedia/hauler/Hauler;
 	public static final fun route (Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;)Lkotlinx/coroutines/Job;
 	public static final fun route (Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun route$default (Lkotlinx/coroutines/CoroutineScope;Lkotlinx/coroutines/flow/FlowCollector;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
+}
+
+public abstract interface class com/monkopedia/hauler/Hauler {
+	public abstract fun emit (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class com/monkopedia/hauler/HaulerImplKt {
@@ -386,34 +389,34 @@ public final class com/monkopedia/hauler/HaulerImplKt {
 }
 
 public final class com/monkopedia/hauler/HaulerKt {
-	public static final fun asAsync (Lkotlinx/coroutines/flow/FlowCollector;Lkotlinx/coroutines/CoroutineScope;)Lcom/monkopedia/hauler/AsyncHauler;
+	public static final fun asAsync (Lcom/monkopedia/hauler/Hauler;Lkotlinx/coroutines/CoroutineScope;)Lcom/monkopedia/hauler/AsyncHauler;
 	public static final fun combine (Ljava/lang/String;Ljava/lang/Throwable;)Ljava/lang/String;
 	public static final fun convert (Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/lang/String;Ljava/util/Map;)Lcom/monkopedia/hauler/Box;
 	public static synthetic fun convert$default (Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lcom/monkopedia/hauler/Box;
 	public static final fun debug (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
-	public static final fun debug (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun debug (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun debug$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
-	public static synthetic fun debug$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun debug$default (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun error (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
-	public static final fun error (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun error (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun error$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
-	public static synthetic fun error$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun error$default (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun info (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
-	public static final fun info (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun info (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun info$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
-	public static synthetic fun info$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun info$default (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun ship (Lcom/monkopedia/hauler/AsyncHauler;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
-	public static final fun ship (Lkotlinx/coroutines/flow/FlowCollector;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun ship (Lcom/monkopedia/hauler/Hauler;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun ship$default (Lcom/monkopedia/hauler/AsyncHauler;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
-	public static synthetic fun ship$default (Lkotlinx/coroutines/flow/FlowCollector;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun ship$default (Lcom/monkopedia/hauler/Hauler;Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun trace (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
-	public static final fun trace (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun trace (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun trace$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
-	public static synthetic fun trace$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun trace$default (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public static final fun warn (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;)V
-	public static final fun warn (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun warn (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun warn$default (Lcom/monkopedia/hauler/AsyncHauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;ILjava/lang/Object;)V
-	public static synthetic fun warn$default (Lkotlinx/coroutines/flow/FlowCollector;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun warn$default (Lcom/monkopedia/hauler/Hauler;Ljava/lang/String;Ljava/lang/Throwable;Ljava/util/Map;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/monkopedia/hauler/Level : java/lang/Enum {
@@ -902,9 +905,7 @@ public final class com/monkopedia/hauler/UnitFlowKt {
 }
 
 public class com/monkopedia/hauler/Warehouse : com/monkopedia/hauler/Shipper {
-	public fun <init> ()V
 	public fun <init> (Lcom/monkopedia/hauler/DeliveryRates;)V
-	public synthetic fun <init> (Lcom/monkopedia/hauler/DeliveryRates;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun deliveries (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun requestDockPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -926,8 +927,6 @@ public final class com/monkopedia/hauler/Warehouse$LoadingDock : com/monkopedia/
 public final class com/monkopedia/hauler/WarehouseKt {
 	public static final fun deliveries (Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lcom/monkopedia/hauler/DeliveryService;
 	public static final fun deliveries (Lkotlinx/coroutines/flow/SharedFlow;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lcom/monkopedia/hauler/DeliveryService;
-	public static synthetic fun deliveries$default (Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/flow/Flow;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lcom/monkopedia/hauler/DeliveryService;
-	public static synthetic fun deliveries$default (Lkotlinx/coroutines/flow/SharedFlow;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lcom/monkopedia/hauler/DeliveryService;
 }
 
 public abstract class com/monkopedia/hauler/WeighStation {
@@ -942,7 +941,6 @@ public final class com/monkopedia/hauler/WeighStation$Companion {
 }
 
 public final class com/monkopedia/hauler/WeighStationBuilder {
-	public fun <init> ()V
 	public final fun and (Lkotlin/jvm/functions/Function1;)V
 	public final fun level (Lcom/monkopedia/hauler/LevelMatchMode;Lcom/monkopedia/hauler/Level;)V
 	public final fun logger (Lcom/monkopedia/hauler/LoggerMatchMode;Ljava/lang/String;)V

@@ -25,5 +25,5 @@ data class DeliveryRates(
     val defaultBoxRetention: Int = 1000,
     val defaultPaletteSize: Int = 500,
     val defaultPaletteInterval: Duration = 500.milliseconds,
-    val onDeliveryError: (Throwable) -> Unit = {},
+    val onDeliveryError: (Throwable) -> Unit,
 )

@@ -75,7 +75,6 @@ abstract class HighVolumeTest(
                             },
                         ),
                     )
-                    Garage.flushLogs()
                 }
             warehouse
                 .requestPickup()

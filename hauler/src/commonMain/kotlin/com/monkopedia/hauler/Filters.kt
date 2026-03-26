@@ -15,6 +15,7 @@
  */
 package com.monkopedia.hauler
 
+import kotlin.concurrent.Volatile
 import kotlinx.serialization.Serializable
 
 /**
@@ -68,7 +69,7 @@ enum class LoggerMatchMode {
     REGEX {
         // Copy-on-write cache: immutable map replaced atomically.
         // Tolerates duplicate compilations under races but never corrupts state.
-        private var cache = mapOf<String, Regex>()
+        @Volatile private var cache = mapOf<String, Regex>()
 
         override fun checkMatch(
             query: String,

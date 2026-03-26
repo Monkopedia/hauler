@@ -20,10 +20,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.transform
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 /** Compress a list of [Box]es into a [Palette] for efficient transport, deduplicating logger and thread names. */
 fun List<Box>.pack(): Palette {
@@ -49,11 +49,12 @@ fun List<Box>.pack(): Palette {
 }
 
 /** Batch a stream of [Box]es into [Palette]s, flushing by size or time interval. */
-fun Deliveries.pack(deliveryRates: DeliveryRates = DeliveryRates()): Flow<Palette> {
+fun Deliveries.pack(deliveryRates: DeliveryRates = DeliveryRates(onDeliveryError = {})): Flow<Palette> {
     val logPacker = LogPacker()
+    var sourceCompleted = false
     return merge(
-        this,
-        UnitFlow.onEach { delay(deliveryRates.defaultPaletteInterval) },
+        this@pack.onCompletion { sourceCompleted = true },
+        UnitFlow.onEach { delay(deliveryRates.defaultPaletteInterval) }.takeWhile { !sourceCompleted },
     ).transform { v ->
         if (v is Box) {
             logPacker.log(v)
@@ -61,8 +62,10 @@ fun Deliveries.pack(deliveryRates: DeliveryRates = DeliveryRates()): Flow<Palett
                 emit(logPacker.dumpLogs())
             }
         } else {
-            emit(logPacker.dumpLogs())
+            logPacker.dumpLogs().takeIf { it.messages.isNotEmpty() }?.let { emit(it) }
         }
+    }.onCompletion {
+        logPacker.dumpLogs().takeIf { it.messages.isNotEmpty() }?.let { emit(it) }
     }
 }
 
@@ -102,8 +105,9 @@ fun Flow<Palette>.unpack(): Deliveries =
  *
  * Uses double-buffering: two sets of lists/maps are maintained so that [dumpLogs] can
  * return the current batch as a [Palette] and immediately swap to the alternate buffer,
- * avoiding allocation of new collections on each flush. All operations are protected
- * by a [Mutex] for coroutine safety.
+ * avoiding allocation of new collections on each flush.
+ *
+ * Not thread-safe: callers must ensure sequential access (e.g. within a flow [transform]).
  */
 internal class LogPacker {
     private val tagsLists = listOf(mutableListOf<String>(), mutableListOf())
@@ -122,8 +126,6 @@ internal class LogPacker {
         get() = threadsIndexMaps[currentIndex]
     private val messagesList
         get() = messagesLists[currentIndex]
-    private val lock = Mutex()
-
     val size: Int
         get() = messagesList.size
 
@@ -136,34 +138,31 @@ internal class LogPacker {
         messagesList.clear()
     }
 
-    suspend fun dumpLogs(): Palette =
-        lock.withLock {
-            Palette(
-                tagsList.toList(),
-                threadsList.toList(),
-                messagesList.toList(),
-            ).also {
-                swapBuffers()
-            }
+    fun dumpLogs(): Palette =
+        Palette(
+            tagsList.toList(),
+            threadsList.toList(),
+            messagesList.toList(),
+        ).also {
+            swapBuffers()
         }
 
-    suspend fun log(logEvent: Box): Unit =
-        lock.withLock {
-            messagesList.add(
-                Package(
-                    logEvent.level.intLevel,
-                    tagsIndexMap.getOrPut(logEvent.loggerName) {
-                        tagsList.size.also { tagsList.add(logEvent.loggerName) }
-                    },
-                    logEvent.message,
-                    logEvent.timestamp,
-                    logEvent.threadName?.let { threadName ->
-                        threadsIndexMap.getOrPut(threadName) {
-                            threadsList.size.also { threadsList.add(threadName) }
-                        }
-                    },
-                    logEvent.metadata,
-                ),
-            )
-        }
+    fun log(logEvent: Box) {
+        messagesList.add(
+            Package(
+                logEvent.level.intLevel,
+                tagsIndexMap.getOrPut(logEvent.loggerName) {
+                    tagsList.size.also { tagsList.add(logEvent.loggerName) }
+                },
+                logEvent.message,
+                logEvent.timestamp,
+                logEvent.threadName?.let { threadName ->
+                    threadsIndexMap.getOrPut(threadName) {
+                        threadsList.size.also { threadsList.add(threadName) }
+                    }
+                },
+                logEvent.metadata,
+            ),
+        )
+    }
 }

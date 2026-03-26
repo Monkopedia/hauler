@@ -19,7 +19,7 @@ package com.monkopedia.hauler
 annotation class FilterDsl
 
 @FilterDsl
-class WeighStationBuilder {
+class WeighStationBuilder internal constructor() {
     private val filters = mutableListOf<WeighStation>()
 
     fun level(mode: LevelMatchMode, level: Level) {

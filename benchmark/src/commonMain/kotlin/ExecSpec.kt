@@ -57,6 +57,7 @@ data class SerializableDeliveryRates(
                 defaultBoxRetention,
                 defaultPaletteSize,
                 defaultPaletteInterval.milliseconds,
+                onDeliveryError = { it.printStackTrace() },
             )
 
     companion object {

@@ -16,6 +16,7 @@
 package com.monkopedia.hauler.bench
 
 import com.monkopedia.hauler.Box
+import com.monkopedia.hauler.DeliveryRates
 import com.monkopedia.hauler.Level
 import com.monkopedia.hauler.LoadingDock
 import com.monkopedia.hauler.Palette
@@ -78,7 +79,7 @@ class LoadingDockPipelineBenchmark {
         palette = boxes.pack()
 
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-        warehouse = Warehouse()
+        warehouse = Warehouse(DeliveryRates(onDeliveryError = { it.printStackTrace() }))
 
         val o1 = PipedOutputStream()
         val i1 = PipedInputStream(o1)

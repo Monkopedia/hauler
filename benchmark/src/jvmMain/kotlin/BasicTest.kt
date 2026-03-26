@@ -51,7 +51,7 @@ abstract class BasicTest {
                     listOf(TaskSpec("Tag1", "MyThread", 0, 0, 1)),
                 ),
             )
-            Garage.flushLogs()
+
             val messages = warehouse.deliveries().dumpDeliveries().toCollection(mutableListOf())
             warehouseJob.cancelAndJoin()
             assertEquals(3, messages.size)
@@ -76,7 +76,7 @@ abstract class BasicTest {
                     listOf(TaskSpec("Tag1", "MyThread", 100, 0, 10)),
                 ),
             )
-            Garage.flushLogs()
+
             val messages = warehouse.deliveries().dumpDeliveries().toCollection(mutableListOf())
             warehouseJob.cancelAndJoin()
             println("\n\n\nStart")

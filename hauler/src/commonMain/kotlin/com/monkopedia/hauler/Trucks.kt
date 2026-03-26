@@ -19,7 +19,7 @@ package com.monkopedia.hauler
  * A place that can have [Box]s put in it, but they don't go anywhere.
  */
 internal object Container : Hauler {
-    override suspend fun emit(value: Box) {
+    override suspend fun emit(box: Box) {
     }
 }
 

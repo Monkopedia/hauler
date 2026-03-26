@@ -21,7 +21,6 @@ import com.monkopedia.hauler.Level.INFO
 import com.monkopedia.hauler.Level.TRACE
 import com.monkopedia.hauler.Level.WARN
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.FlowCollector
 import kotlin.time.Clock
 
 /**
@@ -30,7 +29,9 @@ import kotlin.time.Clock
  * Use [ship], [error], [warn], [info], [debug], or [trace] extension functions
  * to create and emit log messages with appropriate metadata.
  */
-typealias Hauler = FlowCollector<Box>
+fun interface Hauler {
+    suspend fun emit(box: Box)
+}
 
 /** Emit a log message at the given [level], optionally including a [throwable] stack trace. */
 suspend inline fun Hauler.ship(

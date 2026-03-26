@@ -39,31 +39,15 @@ kotlin {
     jvm {
     }
 
-    macosX64 {
-        binaries {}
-    }
-    macosArm64 {
-        binaries {}
-    }
-    iosArm64 {
-        binaries {}
-    }
-    iosX64 {
-        binaries {}
-    }
-    iosSimulatorArm64 {
-        binaries {}
-    }
+    macosX64()
+    macosArm64()
+    iosArm64()
+    iosX64()
+    iosSimulatorArm64()
 
-    linuxX64 {
-        binaries {}
-    }
-    linuxArm64 {
-        binaries {}
-    }
-    mingwX64 {
-        binaries {}
-    }
+    linuxX64()
+    linuxArm64()
+    mingwX64()
     applyDefaultHierarchyTemplate()
 
     sourceSets["commonMain"].dependencies {

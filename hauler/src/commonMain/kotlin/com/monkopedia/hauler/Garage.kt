@@ -41,10 +41,6 @@ object Garage {
         }
     val deliveries: Deliveries = sharedFlow
 
-    @Suppress("RedundantSuspendModifier")
-    suspend fun flushLogs() {
-        // No-op: tryEmit is synchronous, so there are no pending emissions to flush.
-    }
 }
 
 /** Create a [Hauler] that tags all emitted [Box]es with the given [loggerName]. */
@@ -95,5 +91,5 @@ suspend fun DropBox.attach(scope: CoroutineScope): Job = Garage.deliveries.attac
 
 fun LoadingDock.attach(
     scope: CoroutineScope,
-    deliveryRates: DeliveryRates = DeliveryRates(),
+    deliveryRates: DeliveryRates = DeliveryRates(onDeliveryError = {}),
 ): Job = Garage.deliveries.attach(this, scope, deliveryRates)

@@ -48,7 +48,7 @@ class CustomerPickupImplTest {
     @Test
     fun get_returnsCollectedBoxes() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates())
+        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}))
 
         flow.emit(box(message = "a"))
         flow.emit(box(message = "b"))
@@ -63,7 +63,7 @@ class CustomerPickupImplTest {
     @Test
     fun get_clearsBufferAfterRead() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates())
+        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}))
 
         flow.emit(box(message = "first"))
         val first = pollBoxes(pickup, 1)
@@ -77,7 +77,7 @@ class CustomerPickupImplTest {
 
     @Test
     fun get_respectsCircularBufferSize() = runTest {
-        val rates = DeliveryRates(defaultPaletteSize = 3)
+        val rates = DeliveryRates(defaultPaletteSize = 3, onDeliveryError = {})
         val flow = MutableSharedFlow<Box>(replay = 100)
         val pickup = CustomerPickupImpl(flow, rates)
 
@@ -97,7 +97,7 @@ class CustomerPickupImplTest {
     @Test
     fun get_emptyWhenNothingEmitted() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates())
+        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}))
 
         val palette = pickup.get()
         assertEquals(0, palette.unpack().size)
@@ -107,7 +107,7 @@ class CustomerPickupImplTest {
     @Test
     fun get_multiplePollingCycles() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates())
+        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}))
 
         flow.tryEmit(box(message = "batch1"))
         val p1 = pollBoxes(pickup, 1)
@@ -124,7 +124,7 @@ class CustomerPickupImplTest {
     @Test
     fun close_stopsCollection() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates())
+        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}))
 
         flow.emit(box(message = "before"))
         pollBoxes(pickup, 1)

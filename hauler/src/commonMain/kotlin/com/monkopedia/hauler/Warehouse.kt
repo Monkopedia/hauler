@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
  * Default implementation af a [Shipper]. Can send and receive Boxes as needed.
  */
 open class Warehouse(
-    private val deliveryRates: DeliveryRates = DeliveryRates(),
+    private val deliveryRates: DeliveryRates,
 ) : Shipper {
     private val scope = CoroutineScope(SupervisorJob())
     private val centralFlow = MutableSharedFlow<Box>(replay = deliveryRates.defaultBoxRetention)
@@ -156,7 +156,7 @@ private class DeliveryServiceImpl(
 
 fun SharedFlow<Box>.deliveries(
     scope: CoroutineScope,
-    deliveryRates: DeliveryRates = DeliveryRates(),
+    deliveryRates: DeliveryRates,
 ): DeliveryService =
     deliveries(
         this,
@@ -171,5 +171,5 @@ fun deliveries(
     flow: Flow<Box>,
     dumpFlow: Flow<Box>,
     scope: CoroutineScope,
-    deliveryRates: DeliveryRates = DeliveryRates(),
+    deliveryRates: DeliveryRates,
 ): DeliveryService = DeliveryServiceImpl(flow, dumpFlow, scope, deliveryRates)
