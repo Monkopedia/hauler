@@ -1,65 +1,70 @@
+/*
+ * Copyright (C) 2026 Jason Monk <monkopedia@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.monkopedia.hauler
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(DelicateCoroutinesApi::class)
-fun DeliveryService.deliveries(closeScope: CoroutineScope = GlobalScope): Deliveries =
+/** Convert a [DeliveryService] into a [Deliveries] flow using automatic delivery callbacks. */
+fun DeliveryService.deliveries(closeScope: CoroutineScope): Deliveries =
     callbackFlow {
-        val job = SupervisorJob(coroutineContext[Job])
-        val scope = CoroutineScope(closeScope.coroutineContext + job)
-        val observer = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {
-                scope.launch {
-                    send(event)
+        val observer =
+            object : AutomaticDelivery {
+                override suspend fun onLogEvent(event: Box) {
+                    trySend(event)
                 }
             }
-        }
         val registration = registerDelivery(observer)
         awaitClose {
-            job.cancel()
             closeScope.launch {
                 registration.unregister()
             }
         }
     }
 
-@OptIn(DelicateCoroutinesApi::class)
-fun DeliveryService.withDeliveryDay(closeScope: CoroutineScope = GlobalScope): Deliveries =
+/** Convert a [DeliveryService] into a [Deliveries] flow using batched delivery day callbacks. */
+fun DeliveryService.withDeliveryDay(closeScope: CoroutineScope): Deliveries =
     callbackFlow {
-        val job = SupervisorJob(coroutineContext[Job])
-        val scope = CoroutineScope(job)
-        val observer = object : DeliveryDay {
-            override suspend fun onLogs(event: Palette) {
-                scope.launch {
+        val observer =
+            object : DeliveryDay {
+                override suspend fun onLogs(event: Palette) {
                     event.forEach {
-                        send(it)
+                        trySend(it)
                     }
                 }
             }
-        }
         val registration = registerDeliveryDay(observer)
         awaitClose {
-            job.cancel()
             closeScope.launch {
                 registration.unregister()
             }
         }
     }
 
-@OptIn(DelicateCoroutinesApi::class)
+/** Convert a [DeliveryService] into a [Deliveries] flow by polling at the given [interval]. */
 fun DeliveryService.withPickup(
-    interval: Long = 500L,
+    interval: Duration = 500.milliseconds,
     maxEntries: Int = 100,
-    closeScope: CoroutineScope = GlobalScope
+    closeScope: CoroutineScope,
 ): Deliveries =
     callbackFlow {
         coroutineScope {
@@ -80,43 +85,39 @@ fun DeliveryService.withPickup(
         }
     }
 
+/** Drain the replay cache as a [Deliveries] flow, then close. */
 fun DeliveryService.dumpDeliveries(): Deliveries =
     callbackFlow {
-        coroutineScope {
-            val observer = object : AutomaticDelivery {
+        val observer =
+            object : AutomaticDelivery {
                 override suspend fun onLogEvent(event: Box) {
-                    launch {
-                        send(event)
-                    }
+                    send(event)
                 }
             }
-            dumpDelivery(observer)
-        }
+        dumpDelivery(observer)
         close()
     }
 
+/** Drain the replay cache as batched [Palette]s, unpacked into a [Deliveries] flow, then close. */
 fun DeliveryService.dumpWithDeliveryDay(): Deliveries =
     callbackFlow {
-        coroutineScope {
-            val observer = object : DeliveryDay {
+        val observer =
+            object : DeliveryDay {
                 override suspend fun onLogs(event: Palette) {
-                    launch {
-                        event.forEach {
-                            send(it)
-                        }
+                    event.forEach {
+                        send(it)
                     }
                 }
             }
-            dumpDeliveryDay(observer)
-            close()
-        }
+        dumpDeliveryDay(observer)
+        close()
     }
 
-@OptIn(DelicateCoroutinesApi::class)
+/** Drain the replay cache by polling, as a [Deliveries] flow. */
 fun DeliveryService.dumpWithPickup(
-    interval: Long = 500L,
+    interval: Duration = 500.milliseconds,
     maxEntries: Int = 100,
-    closeScope: CoroutineScope = GlobalScope
+    closeScope: CoroutineScope,
 ): Deliveries =
     callbackFlow {
         coroutineScope {

@@ -1,12 +1,12 @@
 /*
  * Copyright 2022 Jason Monk
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,6 @@ kotlin {
     }
     jvmToolchain(11)
     jvm {
-        withJava()
     }
 
     macosX64 {
@@ -67,7 +66,6 @@ kotlin {
     }
     applyDefaultHierarchyTemplate()
 
-
     sourceSets["commonMain"].dependencies {
         api(libs.ksrpc)
         implementation(libs.kotlinx.serialization)
@@ -88,36 +86,38 @@ kotlin {
         implementation(libs.kotlinx.serialization)
         implementation(libs.kotlinx.serialization.json)
         implementation(libs.clikt)
-        implementation("ch.qos.logback:logback-classic:1.2.3")
+        implementation(libs.logback.classic)
+    }
+    sourceSets["commonTest"].dependencies {
+        implementation(kotlin("test"))
+        implementation(libs.kotlinx.coroutines.test)
     }
     sourceSets["jsMain"].dependencies {
         api(libs.ktor.client)
         api(libs.ktor.client.js)
     }
-}
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs += "-Xskip-prerelease-check"
-        freeCompilerArgs += "-Xno-param-assertions"
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xskip-prerelease-check")
     }
 }
 
-val dokkaJavadoc = tasks.create("dokkaJavadocCustom", DokkaTask::class) {
-    project.dependencies {
-        plugins("org.jetbrains.dokka:kotlin-as-java-plugin:2.0.0")
+val dokkaJavadoc =
+    tasks.create("dokkaJavadocCustom", DokkaTask::class) {
+        project.dependencies {
+            plugins(libs.dokka.javaPlugin)
+        }
+        // outputFormat = "javadoc"
+        outputDirectory.set(File(project.buildDir, "javadoc"))
+        inputs.dir("src/commonMain/kotlin")
     }
-    // outputFormat = "javadoc"
-    outputDirectory.set(File(project.buildDir, "javadoc"))
-    inputs.dir("src/commonMain/kotlin")
-}
 
-val javadocJar = tasks.create("javadocJar", Jar::class) {
-    dependsOn(dokkaJavadoc)
-    archiveClassifier.set("javadoc")
-    from(File(project.buildDir, "javadoc"))
-}
+val javadocJar =
+    tasks.create("javadocJar", Jar::class) {
+        dependsOn(dokkaJavadoc)
+        archiveClassifier.set("javadoc")
+        from(File(project.buildDir, "javadoc"))
+    }
 
 publishing {
     publications.all {
