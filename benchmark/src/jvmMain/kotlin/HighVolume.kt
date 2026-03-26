@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2026 Jason Monk <monkopedia@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.monkopedia.hauler.benchmark
 
 import com.monkopedia.hauler.Box
@@ -28,82 +43,98 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 @OptIn(ExperimentalTime::class)
-abstract class HighVolumeTest(private val platform: String) {
-
+abstract class HighVolumeTest(
+    private val platform: String,
+) {
     abstract val harness: HarnessProtocol
 
     @Test
-    fun testExecute() = runBlocking {
-        val warehouse = Warehouse()
-        val warehouseJob = launchAttach(warehouse)
-        val stop = Box(Level.ERROR, "DONE", "DONE", 0, null)
-        val messageAsync = async {
-            warehouse.deliveries().deliveries(this).takeWhile { it != stop }
-                .toCollection(mutableListOf())
-        }
-        harness.setShipper(warehouse)
+    fun testExecute() =
+        runBlocking {
+            val warehouse = Warehouse()
+            val warehouseJob = launchAttach(warehouse)
+            val stop = Box(Level.ERROR, "DONE", "DONE", 0, null)
+            val messageAsync =
+                async {
+                    warehouse
+                        .deliveries()
+                        .deliveries(this)
+                        .takeWhile { it != stop }
+                        .toCollection(mutableListOf())
+                }
+            harness.setShipper(warehouse)
 
-        val time = measureTime {
-            harness.execTasks(
-                ExecSpec(
-                    "Big test",
-                    ConnectionSpec(DEFAULT, null, ShippingType.DEFAULT, null),
-                    List(60) {
-                        TaskSpec("Tag$it", "Thread", it.toLong(), 1, 1000)
-                    }
-                )
-            )
-            Garage.flushLogs()
+            val time =
+                measureTime {
+                    harness.execTasks(
+                        ExecSpec(
+                            "Big test",
+                            ConnectionSpec(DEFAULT, null, ShippingType.DEFAULT, null),
+                            List(60) {
+                                TaskSpec("Tag$it", "Thread", it.toLong(), 1, 1000)
+                            },
+                        ),
+                    )
+                    Garage.flushLogs()
+                }
+            warehouse
+                .requestPickup()
+                .also {
+                    it.log(stop)
+                }.close()
+            Garage.rootHauler.emit(stop)
+            val messages = messageAsync.await()
+            println("Took $time to produce ${messages.size} messages under ${this@HighVolumeTest::class.simpleName}")
+            warehouseJob.cancelAndJoin()
+            assertEquals(60120, messages.size)
         }
-        warehouse.requestPickup().also {
-            it.log(stop)
-        }.close()
-        Garage.rootHauler.emit(stop)
-        val messages = messageAsync.await()
-        println("Took $time to produce ${messages.size} messages under ${this@HighVolumeTest::class.simpleName}")
-        warehouseJob.cancelAndJoin()
-        assertEquals(60120, messages.size)
-    }
 
     @Test
-    fun testBulkExecute() = runBlocking {
-        val warehouse = Warehouse()
-        val warehouseJob = launchAttach(warehouse)
-        val stop = Box(Level.ERROR, "DONE", "DONE", 0, null)
-        val messageAsync = async {
-            warehouse.deliveries().deliveries(this).takeWhile { it != stop }
-                .toCollection(mutableListOf())
-        }
-        harness.setShipper(warehouse)
+    fun testBulkExecute() =
+        runBlocking {
+            val warehouse = Warehouse()
+            val warehouseJob = launchAttach(warehouse)
+            val stop = Box(Level.ERROR, "DONE", "DONE", 0, null)
+            val messageAsync =
+                async {
+                    warehouse
+                        .deliveries()
+                        .deliveries(this)
+                        .takeWhile { it != stop }
+                        .toCollection(mutableListOf())
+                }
+            harness.setShipper(warehouse)
 
-        val time = measureTime {
-            harness.execTasks(
-                ExecSpec(
-                    "Big test",
-                    ConnectionSpec(
-                        DEFAULT,
-                        null,
-                        ShippingType.PACKED,
-                        SerializableDeliveryRates(15, 5000, 1000)
-                    ),
-                    List(60) {
-                        TaskSpec("Tag$it", "Thread", it.toLong(), 1, 1000)
-                    }
-                )
-            )
+            val time =
+                measureTime {
+                    harness.execTasks(
+                        ExecSpec(
+                            "Big test",
+                            ConnectionSpec(
+                                DEFAULT,
+                                null,
+                                ShippingType.PACKED,
+                                SerializableDeliveryRates(15, 5000, 1000),
+                            ),
+                            List(60) {
+                                TaskSpec("Tag$it", "Thread", it.toLong(), 1, 1000)
+                            },
+                        ),
+                    )
+                }
+            warehouse
+                .requestPickup()
+                .also {
+                    it.log(stop)
+                }.close()
+            Garage.rootHauler.emit(stop)
+            val messages = messageAsync.await()
+            println("Took $time to produce ${messages.size} packed messages under ${this@HighVolumeTest::class.simpleName}")
+            warehouseJob.cancelAndJoin()
+            assertEquals(60120, messages.size)
         }
-        warehouse.requestPickup().also {
-            it.log(stop)
-        }.close()
-        Garage.rootHauler.emit(stop)
-        val messages = messageAsync.await()
-        println("Took $time to produce ${messages.size} packed messages under ${this@HighVolumeTest::class.simpleName}")
-        warehouseJob.cancelAndJoin()
-        assertEquals(60120, messages.size)
-    }
 
-    protected open suspend fun CoroutineScope.launchAttach(warehouse: Warehouse) =
-        warehouse.requestPickup().attach(this)
+    protected open suspend fun CoroutineScope.launchAttach(warehouse: Warehouse) = warehouse.requestPickup().attach(this)
 }
 
 @RunWith(JUnit4::class)
@@ -132,7 +163,5 @@ class HighVolumeJvmTest : HighVolumeTest("JVM") {
     override val harness: HarnessProtocol
         get() = harnessRule.harness
 
-    override suspend fun CoroutineScope.launchAttach(warehouse: Warehouse): Job {
-        return launch { }
-    }
+    override suspend fun CoroutineScope.launchAttach(warehouse: Warehouse): Job = launch { }
 }

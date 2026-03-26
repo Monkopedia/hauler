@@ -15,7 +15,14 @@
  */
 package com.monkopedia.hauler.benchmark
 
-class HarnessJvm : HarnessImpl("JVM") {
-    override suspend fun finish(u: Unit) {
-    }
+import com.monkopedia.hauler.Shipper
+import kotlin.system.exitProcess
+
+actual fun exit(code: Int) {
+    exitProcess(code)
 }
+
+actual fun createPlatformShipper(
+    exec: ConnectionSpec,
+    lastShipper: Shipper?,
+): Shipper? = null

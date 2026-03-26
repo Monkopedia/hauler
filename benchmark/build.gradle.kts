@@ -18,9 +18,25 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsExec
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
-    //application
+    // application
     id("com.monkopedia.ksrpc.plugin")
 }
+
+// Determine host preset.
+val hostOs = System.getProperty("os.name")
+val nativeTargetName =
+    when {
+        hostOs == "Mac OS X" -> "macosX64"
+
+        hostOs == "Linux" -> "linuxX64"
+
+        hostOs.startsWith("Windows") -> "mingwX64"
+
+        else -> throw GradleException(
+            "Host OS '$hostOs' is not supported in Kotlin/Native $project.",
+        )
+    }
+val nativeTaskSuffix = nativeTargetName.replaceFirstChar { it.uppercase() }
 
 kotlin {
     js(IR) {
@@ -30,27 +46,29 @@ kotlin {
         useCommonJs()
         binaries.executable()
     }
-    jvmToolchain(17)
+    jvmToolchain(21)
     jvm {
-        withJava()
     }
-    // Determine host preset.
-    val hostOs = System.getProperty("os.name")
 
     // Create target for the host platform.
-    val hostTarget = when {
-        hostOs == "Mac OS X" -> macosX64("native")
-        hostOs == "Linux" -> linuxX64("native")
-        hostOs.startsWith("Windows") -> mingwX64("native")
-        else -> throw GradleException(
-            "Host OS '$hostOs' is not supported in Kotlin/Native $project."
-        )
-    }
+    val hostTarget =
+        when {
+            hostOs == "Mac OS X" -> macosX64()
+
+            hostOs == "Linux" -> linuxX64()
+
+            hostOs.startsWith("Windows") -> mingwX64()
+
+            else -> throw GradleException(
+                "Host OS '$hostOs' is not supported in Kotlin/Native $project.",
+            )
+        }
     hostTarget.apply {
         binaries {
             executable()
         }
     }
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
@@ -85,7 +103,7 @@ kotlin {
                 implementation(libs.kotlinx.coroutines)
                 implementation(libs.clikt)
                 implementation(kotlin("test-junit"))
-                implementation("ch.qos.logback:logback-classic:1.2.3")
+                implementation(libs.logback.classic)
             }
         }
         val jsMain by getting {
@@ -99,19 +117,15 @@ kotlin {
             }
         }
     }
-}
 
-//application {
-//    mainClass.set("com.monkopedia.hauler.benchmark.MainKt")
-//}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs += "-Xskip-prerelease-check"
-        freeCompilerArgs += "-Xno-param-assertions"
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xskip-prerelease-check")
     }
 }
+
+// application {
+//    mainClass.set("com.monkopedia.hauler.benchmark.MainKt")
+// }
 
 tasks.register("runBenchmark", JavaExec::class) {
     classpath = sourceSets["main"].runtimeClasspath
@@ -122,7 +136,11 @@ tasks.register("runBenchmark", JavaExec::class) {
     runArgs.add("-i")
     runArgs.addAll(jsTask.nodeArgs)
     if (jsTask.inputFileProperty.isPresent) {
-        runArgs.add(jsTask.inputFileProperty.asFile.get().canonicalPath)
+        runArgs.add(
+            jsTask.inputFileProperty.asFile
+                .get()
+                .canonicalPath,
+        )
     }
     jsTask.args?.let { runArgs.addAll(it) }
     runArgs.add(0, runArgs.size.toString())
@@ -131,8 +149,8 @@ tasks.register("runBenchmark", JavaExec::class) {
         dependsOn(it)
     }
 
-    val nativeTask = tasks["runDebugExecutableNative"] as Exec
-//    val nativeTask = tasks["runReleaseExecutableNative"] as Exec
+    val nativeTask = tasks["runDebugExecutable$nativeTaskSuffix"] as Exec
+//    val nativeTask = tasks["runReleaseExecutable$nativeTaskSuffix"] as Exec
     runArgs.add(nativeTask.executable ?: error("No executable?"))
     nativeTask.args?.let { runArgs.addAll(it) }
     nativeTask.dependsOn.forEach {
@@ -147,10 +165,14 @@ afterEvaluate {
     val newArgs = mutableListOf<String>()
     newArgs.addAll(task.nodeArgs)
     if (task.inputFileProperty.isPresent) {
-        newArgs.add(task.inputFileProperty.asFile.get().canonicalPath)
+        newArgs.add(
+            task.inputFileProperty.asFile
+                .get()
+                .canonicalPath,
+        )
     }
     task.args?.let { newArgs.addAll(it) }
     println("Args: ${task.executable} $newArgs")
-    println("Task: ${tasks["runReleaseExecutableNative"]}")
-    println("Task class: ${tasks["runReleaseExecutableNative"]::class}")
+    println("Task: ${tasks["runReleaseExecutable$nativeTaskSuffix"]}")
+    println("Task class: ${tasks["runReleaseExecutable$nativeTaskSuffix"]::class}")
 }

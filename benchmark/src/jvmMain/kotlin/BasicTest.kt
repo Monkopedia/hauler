@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2026 Jason Monk <monkopedia@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.monkopedia.hauler.benchmark
 
 import com.monkopedia.hauler.DefaultFormat
@@ -20,63 +35,63 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 abstract class BasicTest {
-
     abstract val harness: HarnessProtocol
 
     @Test
-    fun testExecute() = runBlocking {
-        val warehouse = Warehouse()
-        val warehouseJob = launchAttach(warehouse)
-        harness.setShipper(warehouse)
+    fun testExecute() =
+        runBlocking {
+            val warehouse = Warehouse()
+            val warehouseJob = launchAttach(warehouse)
+            harness.setShipper(warehouse)
 
-        harness.execTasks(
-            ExecSpec(
-                "First test",
-                ConnectionSpec(DEFAULT, null, ShippingType.DEFAULT, null),
-                listOf(TaskSpec("Tag1", "MyThread", 0, 0, 1))
+            harness.execTasks(
+                ExecSpec(
+                    "First test",
+                    ConnectionSpec(DEFAULT, null, ShippingType.DEFAULT, null),
+                    listOf(TaskSpec("Tag1", "MyThread", 0, 0, 1)),
+                ),
             )
-        )
-        Garage.flushLogs()
-        val messages = warehouse.deliveries().dumpDeliveries().toCollection(mutableListOf())
-        warehouseJob.cancelAndJoin()
-        assertEquals(3, messages.size)
-    }
+            Garage.flushLogs()
+            val messages = warehouse.deliveries().dumpDeliveries().toCollection(mutableListOf())
+            warehouseJob.cancelAndJoin()
+            assertEquals(3, messages.size)
+        }
 
     @Test
-    fun testBulkExecute() = runBlocking {
-        val warehouse = Warehouse()
-        val warehouseJob = launchAttach(warehouse)
-        harness.setShipper(warehouse)
+    fun testBulkExecute() =
+        runBlocking {
+            val warehouse = Warehouse()
+            val warehouseJob = launchAttach(warehouse)
+            harness.setShipper(warehouse)
 
-        harness.execTasks(
-            ExecSpec(
-                "First test",
-                ConnectionSpec(
-                    DEFAULT,
-                    null,
-                    ShippingType.PACKED,
-                    SerializableDeliveryRates(15, 5, 1)
+            harness.execTasks(
+                ExecSpec(
+                    "First test",
+                    ConnectionSpec(
+                        DEFAULT,
+                        null,
+                        ShippingType.PACKED,
+                        SerializableDeliveryRates(15, 5, 1),
+                    ),
+                    listOf(TaskSpec("Tag1", "MyThread", 100, 0, 10)),
                 ),
-                listOf(TaskSpec("Tag1", "MyThread", 100, 0, 10))
             )
-        )
-        Garage.flushLogs()
-        val messages = warehouse.deliveries().dumpDeliveries().toCollection(mutableListOf())
-        warehouseJob.cancelAndJoin()
-        println("\n\n\nStart")
-        messages.forEach {
-            DefaultFormat.invoke(
-                FlowCollector {
-                    println(it)
-                },
-                it
-            )
+            Garage.flushLogs()
+            val messages = warehouse.deliveries().dumpDeliveries().toCollection(mutableListOf())
+            warehouseJob.cancelAndJoin()
+            println("\n\n\nStart")
+            messages.forEach {
+                DefaultFormat.invoke(
+                    FlowCollector {
+                        println(it)
+                    },
+                    it,
+                )
+            }
+            assertEquals(12, messages.size)
         }
-        assertEquals(12, messages.size)
-    }
 
-    protected open suspend fun CoroutineScope.launchAttach(warehouse: Warehouse) =
-        warehouse.requestPickup().attach(this)
+    protected open suspend fun CoroutineScope.launchAttach(warehouse: Warehouse) = warehouse.requestPickup().attach(this)
 }
 
 @RunWith(JUnit4::class)
@@ -105,7 +120,5 @@ class BasicJvmTest : BasicTest() {
     override val harness: HarnessProtocol
         get() = harnessRule.harness
 
-    override suspend fun CoroutineScope.launchAttach(warehouse: Warehouse): Job {
-        return launch { }
-    }
+    override suspend fun CoroutineScope.launchAttach(warehouse: Warehouse): Job = launch { }
 }

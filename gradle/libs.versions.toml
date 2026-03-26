@@ -1,24 +1,26 @@
 [versions]
-kotlin = "2.1.20"
-kotlin-coroutines = "1.10.1"
-kotlin-serialization = "1.8.1"
-kotlin-datetime = "0.6.2"
+kotlin = "2.3.0"
+kotlin-coroutines = "1.10.2"
+kotlin-serialization = "1.10.0"
+kotlin-datetime = "0.7.1"
 kotlin-nodejs = "0.0.7"
-ksp = "2.1.20-1.0.32"
-ktor = "3.1.2"
+ksp = "2.3.4"
+ktor = "3.4.1"
 slf4j = "2.0.17"
-clikt = "5.0.3"
-gradleplugin = "8.10.0-rc01"
-kotlin-atomicfu = "0.27.0"
+clikt = "5.1.0"
+gradleplugin = "9.1.0"
+kotlin-atomicfu = "0.31.0"
 kotlin-compiletesting = "1.6.0"
-dokka = "2.0.0"
+dokka = "2.1.0"
 googleautoservice = "1.1.1"
 autoservice-ksp = "1.2.0"
 jnanoid = "2.0.0"
-ksrpc = "0.9.5"
+ksrpc = "0.11.0"
 hierynomus = "0.16.1"
-ktlint-plugin = "12.2.0"
-buildconfig = "5.6.2"
+ktlint-plugin = "14.2.0"
+buildconfig = "6.0.7"
+logback = "1.5.32"
+kotlinx-benchmark = "0.4.14"
 
 [libraries]
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
@@ -52,6 +54,10 @@ ktor-kotlinx-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json
 ktor-jackson-serialization = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktor" }
 ktor-websockets = { module = "io.ktor:ktor-websockets", version.ref = "ktor" }
 ktor-websockets-serialization = { module = "io.ktor:ktor-websocket-serialization", version.ref = "ktor" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
+kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinx-benchmark" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+dokka-javaPlugin = { module = "org.jetbrains.dokka:kotlin-as-java-plugin", version.ref = "dokka" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt"}
 ksrpc = { module = "com.monkopedia.ksrpc:ksrpc-core", version.ref = "ksrpc"}
 ksrpc-sockets = { module = "com.monkopedia.ksrpc:ksrpc-sockets", version.ref = "ksrpc"}
@@ -70,7 +76,9 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-hierynomus-license = { id = "com.github.hierynomus.license", version = "hierynomus" }
-jlleitschuh-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "ktlint-plugin" }
+hierynomus-license = { id = "com.github.hierynomus.license", version.ref = "hierynomus" }
+jlleitschuh-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
-gmazzo-buildconfig = { id = "com.github.gmazzo.buildconfig", version = "buildconfig" }
+kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+kotlinx-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinx-benchmark" }
+gmazzo-buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }

@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2026 Jason Monk <monkopedia@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.monkopedia.hauler.benchmark
 
 import com.monkopedia.hauler.CallSign
@@ -25,16 +40,16 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock.System
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-open class HarnessImpl(private val platform: String) : HarnessProtocol {
+open class HarnessImpl(
+    private val platform: String,
+) : HarnessProtocol {
     private var lastShipper: Shipper? = null
 
-    override suspend fun getPlatform(controller: String): String {
-        return platform
-    }
+    override suspend fun getPlatform(controller: String): String = platform
 
     override suspend fun setShipper(shipper: Shipper) {
         lastShipper = shipper
@@ -46,11 +61,12 @@ open class HarnessImpl(private val platform: String) : HarnessProtocol {
             val job = attachShipper(exec.connection, shipper)
             delay(1)
             try {
-                exec.taskSpec.map {
-                    async {
-                        executeTask(it)
-                    }
-                }.awaitAll()
+                exec.taskSpec
+                    .map {
+                        async {
+                            executeTask(it)
+                        }
+                    }.awaitAll()
                 Garage.flushLogs()
                 delay((exec.connection.deliveryRates?.defaultPaletteInterval ?: 0) + 10)
                 Garage.flushLogs()
@@ -67,45 +83,71 @@ open class HarnessImpl(private val platform: String) : HarnessProtocol {
 
 expect fun exit(code: Int)
 
-expect fun createPlatformShipper(exec: ConnectionSpec, lastShipper: Shipper?): Shipper?
+expect fun createPlatformShipper(
+    exec: ConnectionSpec,
+    lastShipper: Shipper?,
+): Shipper?
 
-suspend fun createShipper(exec: ConnectionSpec, lastShipper: Shipper?): Shipper {
+suspend fun createShipper(
+    exec: ConnectionSpec,
+    lastShipper: Shipper?,
+): Shipper {
     createPlatformShipper(exec, lastShipper)?.let { return it }
     return when (exec.type) {
-        DEFAULT -> lastShipper ?: error("Expected shipper to be set through harness")
-        HTTPS -> HttpClient().asConnection(exec.endpoint!!, ksrpcEnvironment { }).defaultChannel()
-            .toStub()
-        WSS -> HttpClient {
-            install(WebSockets)
-        }.asConnection(exec.endpoint!!, ksrpcEnvironment { }).defaultChannel()
-            .toStub()
-        else -> error("Not sure how to handle $exec")
+        DEFAULT -> {
+            lastShipper ?: error("Expected shipper to be set through harness")
+        }
+
+        HTTPS -> {
+            HttpClient()
+                .asConnection(exec.endpoint!!, ksrpcEnvironment { })
+                .defaultChannel()
+                .toStub()
+        }
+
+        WSS -> {
+            HttpClient {
+                install(WebSockets)
+            }.asConnection(exec.endpoint!!, ksrpcEnvironment { })
+                .defaultChannel()
+                .toStub()
+        }
+
+        else -> {
+            error("Not sure how to handle $exec")
+        }
     }
 }
 
 private suspend fun CoroutineScope.attachShipper(
     connection: ConnectionSpec,
-    shipper: Shipper
-): Job {
-    return when (connection.shippingType) {
-        ShippingType.DEFAULT -> shipper.requestPickup().attach(this)
-        PACKED -> shipper.requestDockPickup()
-            .attach(this, connection.deliveryRates!!.asDeliveryRates)
+    shipper: Shipper,
+): Job =
+    when (connection.shippingType) {
+        ShippingType.DEFAULT -> {
+            shipper.requestPickup().attach(this)
+        }
+
+        PACKED -> {
+            shipper
+                .requestDockPickup()
+                .attach(this, connection.deliveryRates!!.asDeliveryRates)
+        }
     }
-}
 
 @OptIn(ExperimentalTime::class)
 suspend fun executeTask(task: TaskSpec) {
     val hauler = hauler(task.loggerName)
     withContext(CallSign(task.threadName)) {
-        val time = measureTime {
-            hauler.error("Starting task with delay ${task.startDelay} ${task.count}")
-            delay(task.startDelay)
-            for (i in 0 until task.count) {
-                hauler.info("Task (${i + 1}/${task.count}) has executed at ${System.now()}")
-                delay(task.interval)
+        val time =
+            measureTime {
+                hauler.error("Starting task with delay ${task.startDelay} ${task.count}")
+                delay(task.startDelay)
+                for (i in 0 until task.count) {
+                    hauler.info("Task (${i + 1}/${task.count}) has executed at ${Clock.System.now()}")
+                    delay(task.interval)
+                }
             }
-        }
         hauler.warn("Ending task after $time", Throwable("Test throwable"))
     }
     // Settling time

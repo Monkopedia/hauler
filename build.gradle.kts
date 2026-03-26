@@ -6,13 +6,12 @@ buildscript {
     }
     dependencies {
         classpath("com.monkopedia.ksrpc:ksrpc-gradle-plugin:${libs.versions.ksrpc.get()}")
-        classpath("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
     }
 }
 
 plugins {
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
-    id("com.github.hierynomus.license") version "0.16.1"
+    alias(libs.plugins.jlleitschuh.ktlint)
+    alias(libs.plugins.hierynomus.license)
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.kotlin.serialization) apply false
 }
@@ -34,16 +33,24 @@ subprojects {
         apply(plugin = "com.github.hierynomus.license")
         tasks.register(
             "licenseCheckForKotlin",
-            com.hierynomus.gradle.license.tasks.LicenseCheck::class
+            com.hierynomus.gradle.license.tasks.LicenseCheck::class,
         ) {
-            source = fileTree(project.projectDir) { include("**/*.kt") }
+            source =
+                fileTree(project.projectDir) {
+                    include("**/*.kt")
+                    exclude("build/**")
+                }
         }
         tasks["license"].dependsOn("licenseCheckForKotlin")
         tasks.register(
             "licenseFormatForKotlin",
-            com.hierynomus.gradle.license.tasks.LicenseFormat::class
+            com.hierynomus.gradle.license.tasks.LicenseFormat::class,
         ) {
-            source = fileTree(project.projectDir) { include("**/*.kt") }
+            source =
+                fileTree(project.projectDir) {
+                    include("**/*.kt")
+                    exclude("build/**")
+                }
         }
         tasks["licenseFormat"].dependsOn("licenseFormatForKotlin")
 
@@ -51,13 +58,17 @@ subprojects {
             header = rootProject.file("license-header.txt")
             includes(listOf("**/*.kt"))
             strictCheck = true
-            ext["year"] = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+            mapping("kt", "SLASHSTAR_STYLE")
+            ext["year"] =
+                java.util.Calendar
+                    .getInstance()
+                    .get(java.util.Calendar.YEAR)
             ext["name"] = "Jason Monk"
             ext["email"] = "monkopedia@gmail.com"
         }
 
         configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-            version.set("0.48.0")
+            version.set("1.8.0")
             android.set(true)
         }
     }

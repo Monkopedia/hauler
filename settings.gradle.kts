@@ -10,3 +10,4 @@
 rootProject.name = "Hauler"
 include(":hauler")
 include(":benchmark")
+include(":microbenchmark")
