@@ -97,7 +97,7 @@ private class DeliveryServiceImpl(
         }
     }
 
-    private fun Flow<Box>.fetchCustomerPickup(): CustomerPickup = CustomerPickupImpl(this, deliveryRates)
+    private fun Flow<Box>.fetchCustomerPickup(): CustomerPickup = CustomerPickupImpl(this, deliveryRates, scope)
 
     override suspend fun registerDelivery(receiver: AutomaticDelivery): Registration =
         RegistrationImpl(

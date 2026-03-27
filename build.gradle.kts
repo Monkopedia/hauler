@@ -28,6 +28,8 @@ repositories {
     mavenCentral()
 }
 
+val ktlintCoreVersion = libs.versions.ktlint.formatter.get()
+
 subprojects {
     repositories {
         mavenLocal()
@@ -73,7 +75,7 @@ subprojects {
         }
 
         configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-            version.set("1.8.0")
+            version.set(ktlintCoreVersion)
             android.set(true)
         }
     }

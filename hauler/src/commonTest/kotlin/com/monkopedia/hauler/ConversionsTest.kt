@@ -15,8 +15,10 @@
  */
 package com.monkopedia.hauler
 
+import com.monkopedia.hauler.Level.Companion.asLevel
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -182,6 +184,46 @@ class ConversionsTest {
             with(Level.Companion) {
                 assertEquals(level, level.intLevel.asLevel())
             }
+        }
+    }
+
+    @Test
+    fun asLevel_invalidInt_throws() {
+        assertFailsWith<IllegalArgumentException> {
+            with(Level.Companion) { 99.asLevel() }
+        }
+    }
+
+    @Test
+    fun asLevel_negativeInt_throws() {
+        assertFailsWith<IllegalArgumentException> {
+            with(Level.Companion) { (-1).asLevel() }
+        }
+    }
+
+    // --- Palette.unpack bounds checking ---
+
+    @Test
+    fun unpack_invalidLoggerIndex_throws() {
+        val palette = Palette(
+            loggerNames = listOf("A"),
+            threadNames = emptyList(),
+            messages = listOf(Package(INFO_INT, 5, "msg", 100L, null)),
+        )
+        assertFailsWith<IllegalArgumentException> {
+            palette.unpack()
+        }
+    }
+
+    @Test
+    fun unpack_invalidThreadIndex_throws() {
+        val palette = Palette(
+            loggerNames = listOf("A"),
+            threadNames = listOf("t1"),
+            messages = listOf(Package(INFO_INT, 0, "msg", 100L, 5)),
+        )
+        assertFailsWith<IllegalArgumentException> {
+            palette.unpack()
         }
     }
 

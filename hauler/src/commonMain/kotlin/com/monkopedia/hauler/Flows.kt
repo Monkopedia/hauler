@@ -17,7 +17,6 @@ package com.monkopedia.hauler
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
@@ -67,20 +66,18 @@ fun DeliveryService.withPickup(
     closeScope: CoroutineScope,
 ): Deliveries =
     callbackFlow {
-        coroutineScope {
-            val polling = recurringCustomerPickup()
-            launch {
-                while (true) {
-                    polling.get(maxEntries = maxEntries).forEach {
-                        send(it)
-                    }
-                    delay(interval)
+        val polling = recurringCustomerPickup()
+        launch {
+            while (true) {
+                polling.get(maxEntries = maxEntries).forEach {
+                    send(it)
                 }
+                delay(interval)
             }
-            awaitClose {
-                closeScope.launch {
-                    polling.close()
-                }
+        }
+        awaitClose {
+            closeScope.launch {
+                polling.close()
             }
         }
     }
@@ -120,20 +117,18 @@ fun DeliveryService.dumpWithPickup(
     closeScope: CoroutineScope,
 ): Deliveries =
     callbackFlow {
-        coroutineScope {
-            val polling = dumpCustomerPickup()
-            launch {
-                while (true) {
-                    polling.get(maxEntries = maxEntries).forEach {
-                        send(it)
-                    }
-                    delay(interval)
+        val polling = dumpCustomerPickup()
+        launch {
+            while (true) {
+                polling.get(maxEntries = maxEntries).forEach {
+                    send(it)
                 }
+                delay(interval)
             }
-            awaitClose {
-                closeScope.launch {
-                    polling.close()
-                }
+        }
+        awaitClose {
+            closeScope.launch {
+                polling.close()
             }
         }
     }

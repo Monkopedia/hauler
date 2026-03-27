@@ -25,8 +25,9 @@ import kotlinx.coroutines.sync.withLock
 internal class CustomerPickupImpl(
     private val deliveries: Deliveries,
     deliveryRates: DeliveryRates,
+    parentScope: CoroutineScope,
 ) : CustomerPickup {
-    private val scope = CoroutineScope(SupervisorJob())
+    private val scope = CoroutineScope(parentScope.coroutineContext + SupervisorJob())
     private val lock = Mutex()
     private val circBuffer = CircularBuffer<Box>(deliveryRates.defaultPaletteSize)
 
@@ -42,7 +43,13 @@ internal class CustomerPickupImpl(
 
     override suspend fun get(maxEntries: Int): Palette {
         val items = lock.withLock {
-            circBuffer.toListAndClear()
+            val all = circBuffer.toListAndClear()
+            if (all.size > maxEntries) {
+                all.drop(maxEntries).forEach { circBuffer.add(it) }
+                all.take(maxEntries)
+            } else {
+                all
+            }
         }
         return items.pack()
     }

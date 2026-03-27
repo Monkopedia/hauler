@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
     id("com.monkopedia.ksrpc.plugin")
-    alias(libs.plugins.dokka)
-    id("org.gradle.maven-publish")
-    id("org.gradle.signing")
+    alias(libs.plugins.vannik.publish)
+    `signing`
 }
 
 group = "com.monkopedia"
 
 kotlin {
     js(IR) {
-        browser {}
+        nodejs()
     }
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        browser {}
+        nodejs()
     }
     jvmToolchain(11)
     jvm {
@@ -55,6 +53,7 @@ kotlin {
         implementation(libs.kotlinx.serialization)
         implementation(libs.kotlinx.serialization.json)
         implementation(libs.kotlinx.coroutines)
+        implementation(libs.kotlinx.atomicfu)
         implementation(libs.kotlinx.datetime)
         implementation(kotlin("stdlib"))
         compileOnly(libs.ktor.io)
@@ -84,72 +83,35 @@ kotlin {
     }
 }
 
-val dokkaJavadoc =
-    tasks.create("dokkaJavadocCustom", DokkaTask::class) {
-        project.dependencies {
-            plugins(libs.dokka.javaPlugin)
-        }
-        // outputFormat = "javadoc"
-        outputDirectory.set(File(project.buildDir, "javadoc"))
-        inputs.dir("src/commonMain/kotlin")
-    }
-
-val javadocJar =
-    tasks.create("javadocJar", Jar::class) {
-        dependsOn(dokkaJavadoc)
-        archiveClassifier.set("javadoc")
-        from(File(project.buildDir, "javadoc"))
-    }
-
-publishing {
-    publications.all {
-        if (this !is MavenPublication) return@all
-        artifact(javadocJar)
-        pom {
-            name.set(project.name)
-            description.set("A tool for logging over rpcs")
-            url.set("http://www.github.com/Monkopedia/hauler")
-            licenses {
-                license {
-                    name.set("The Apache License, Version 2.0")
-                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                }
-            }
-            developers {
-                developer {
-                    id.set("monkopedia")
-                    name.set("Jason Monk")
-                    email.set("monkopedia@gmail.com")
-                }
-            }
-            scm {
-                connection.set("scm:git:git://github.com/Monkopedia/hauler.git")
-                developerConnection.set("scm:git:ssh://github.com/Monkopedia/hauler.git")
-                url.set("http://github.com/Monkopedia/hauler/")
+mavenPublishing {
+    pom {
+        name.set(project.name)
+        description.set("A tool for logging over rpcs")
+        url.set("https://www.github.com/Monkopedia/hauler")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-    }
-    repositories {
-        maven(url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-            name = "OSSRH"
-            credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
+        developers {
+            developer {
+                id.set("monkopedia")
+                name.set("Jason Monk")
+                email.set("monkopedia@gmail.com")
             }
         }
+        scm {
+            connection.set("scm:git:git://github.com/Monkopedia/hauler.git")
+            developerConnection.set("scm:git:ssh://github.com/Monkopedia/hauler.git")
+            url.set("https://github.com/Monkopedia/hauler/")
+        }
     }
+    publishToMavenCentral()
+    signAllPublications()
 }
 
 signing {
     useGpgCmd()
     sign(publishing.publications)
-}
-
-afterEvaluate {
-    tasks.withType(org.gradle.plugins.signing.Sign::class) {
-        val signingTask = this
-        tasks.withType(org.gradle.api.publish.maven.tasks.AbstractPublishToMaven::class) {
-            dependsOn(signingTask)
-        }
-    }
 }

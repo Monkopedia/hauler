@@ -16,9 +16,9 @@
 package com.monkopedia.hauler
 
 import com.monkopedia.hauler.Level.Companion.asLevel
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -51,10 +51,10 @@ fun List<Box>.pack(): Palette {
 /** Batch a stream of [Box]es into [Palette]s, flushing by size or time interval. */
 fun Deliveries.pack(deliveryRates: DeliveryRates = DeliveryRates(onDeliveryError = {})): Flow<Palette> {
     val logPacker = LogPacker()
-    var sourceCompleted = false
+    val sourceCompleted = atomic(false)
     return merge(
-        this@pack.onCompletion { sourceCompleted = true },
-        UnitFlow.onEach { delay(deliveryRates.defaultPaletteInterval) }.takeWhile { !sourceCompleted },
+        this@pack.onCompletion { sourceCompleted.value = true },
+        UnitFlow.onEach { delay(deliveryRates.defaultPaletteInterval) }.takeWhile { !sourceCompleted.value },
     ).transform { v ->
         if (v is Box) {
             logPacker.log(v)
@@ -75,8 +75,14 @@ fun Palette.unpack(): List<Box> =
         unpack(it)
     }
 
-fun Palette.unpack(event: Package) =
-    Box(
+fun Palette.unpack(event: Package): Box {
+    require(event.loggerName in loggerNames.indices) {
+        "loggerName index ${event.loggerName} out of bounds for ${loggerNames.size} logger names"
+    }
+    require(event.threadName == null || event.threadName in threadNames.indices) {
+        "threadName index ${event.threadName} out of bounds for ${threadNames.size} thread names"
+    }
+    return Box(
         event.intLevel.asLevel(),
         loggerNames[event.loggerName],
         event.message,
@@ -84,6 +90,7 @@ fun Palette.unpack(event: Package) =
         event.threadName?.let(threadNames::get),
         event.metadata,
     )
+}
 
 /** Iterate over unpacked [Box]es without allocating an intermediate list. */
 inline fun Palette.forEach(onLog: (Box) -> Unit) {

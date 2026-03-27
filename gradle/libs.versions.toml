@@ -17,11 +17,13 @@ autoservice-ksp = "1.2.0"
 jnanoid = "2.0.0"
 ksrpc = "0.11.0"
 hierynomus = "0.16.1"
+ktlint-formatter = "1.8.0"
 ktlint-plugin = "14.2.0"
 buildconfig = "6.0.7"
 logback = "1.5.32"
 kotlinx-benchmark = "0.4.14"
 binary-compatibility-validator = "0.18.1"
+vannik = "0.35.0"
 
 [libraries]
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
@@ -58,7 +60,6 @@ ktor-websockets-serialization = { module = "io.ktor:ktor-websocket-serialization
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinx-benchmark" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-dokka-javaPlugin = { module = "org.jetbrains.dokka:kotlin-as-java-plugin", version.ref = "dokka" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt"}
 ksrpc = { module = "com.monkopedia.ksrpc:ksrpc-core", version.ref = "ksrpc"}
 ksrpc-sockets = { module = "com.monkopedia.ksrpc:ksrpc-sockets", version.ref = "ksrpc"}
@@ -84,3 +85,4 @@ kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "ko
 kotlinx-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinx-benchmark" }
 gmazzo-buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
+vannik-publish = { id = "com.vanniktech.maven.publish", version.ref = "vannik" }
