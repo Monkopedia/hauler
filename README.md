@@ -95,7 +95,7 @@ service.withDeliveryDay(scope).collect { box ->
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("com.monkopedia:hauler:0.2.1")
+    implementation("com.monkopedia:hauler:0.3.0")
 }
 ```
 
