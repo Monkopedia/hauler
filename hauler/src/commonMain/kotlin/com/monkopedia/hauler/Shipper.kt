@@ -15,19 +15,33 @@
  */
 package com.monkopedia.hauler
 
+import com.monkopedia.ksrpc.RpcBidiService
 import com.monkopedia.ksrpc.RpcHostService
 import com.monkopedia.ksrpc.annotation.KsMethod
 import com.monkopedia.ksrpc.annotation.KsService
 
-/** Central dispatch for log transport. Request a [DropBox] for single messages, a [LoadingDock] for batches, or [DeliveryService] for observing. */
+/**
+ * Push-only subset of [Shipper]: request a [DropBox] for single messages or a [LoadingDock] for
+ * batches. Hostable on simple transports (HTTP, JSON-RPC) — does not require bidirectional
+ * capability.
+ */
 @KsService
-interface Shipper : RpcHostService {
+interface BasicShipper : RpcHostService {
     @KsMethod("/pickup")
     suspend fun requestPickup(u: Unit = Unit): DropBox
 
     @KsMethod("/pickup_bulk")
     suspend fun requestDockPickup(u: Unit = Unit): LoadingDock
+}
 
+/**
+ * Full [BasicShipper] plus observation via [deliveries]. Requires a bidirectional transport
+ * (websocket, sockets, JNI) because [DeliveryService] accepts callback sub-services.
+ */
+@KsService
+interface Shipper :
+    BasicShipper,
+    RpcBidiService {
     @KsMethod("/deliveries")
     suspend fun deliveries(u: Unit = Unit): DeliveryService
 }

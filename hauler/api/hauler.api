@@ -67,6 +67,53 @@ public final synthetic class com/monkopedia/hauler/AutomaticDelivery$Stub$Compan
 	public final synthetic fun OnLogEvent$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
+public abstract interface class com/monkopedia/hauler/BasicShipper : com/monkopedia/ksrpc/RpcHostService {
+	public static final field Companion Lcom/monkopedia/hauler/BasicShipper$Companion;
+	public abstract fun requestDockPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun requestDockPickup$default (Lcom/monkopedia/hauler/BasicShipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun requestPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun requestPickup$default (Lcom/monkopedia/hauler/BasicShipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/BasicShipper$Companion : com/monkopedia/ksrpc/RpcObject {
+	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/BasicShipper;
+	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
+	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
+	public final fun getEndpoints ()Ljava/util/List;
+	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
+}
+
+public final class com/monkopedia/hauler/BasicShipper$DefaultImpls {
+	public static fun close (Lcom/monkopedia/hauler/BasicShipper;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun requestDockPickup$default (Lcom/monkopedia/hauler/BasicShipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun requestPickup$default (Lcom/monkopedia/hauler/BasicShipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/BasicShipper$Stub : com/monkopedia/hauler/BasicShipper, com/monkopedia/ksrpc/RpcService {
+	public static final field Companion Lcom/monkopedia/hauler/BasicShipper$Stub$Companion;
+	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
+	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun requestDockPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun requestPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/BasicShipper$Stub$AnonymousRequestDockPickup : com/monkopedia/ksrpc/internal/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class com/monkopedia/hauler/BasicShipper$Stub$AnonymousRequestPickup : com/monkopedia/ksrpc/internal/ServiceExecutor {
+	public fun <init> ()V
+	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final synthetic class com/monkopedia/hauler/BasicShipper$Stub$Companion {
+	public fun <init> ()V
+	public final synthetic fun RequestDockPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RequestPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+}
+
 public final class com/monkopedia/hauler/Box {
 	public static final field Companion Lcom/monkopedia/hauler/Box$Companion;
 	public fun <init> (Lcom/monkopedia/hauler/Level;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;Ljava/util/Map;)V
@@ -778,14 +825,10 @@ public final synthetic class com/monkopedia/hauler/Registration$Stub$Companion {
 	public final synthetic fun Unregister$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
-public abstract interface class com/monkopedia/hauler/Shipper : com/monkopedia/ksrpc/RpcHostService {
+public abstract interface class com/monkopedia/hauler/Shipper : com/monkopedia/hauler/BasicShipper, com/monkopedia/ksrpc/RpcBidiService {
 	public static final field Companion Lcom/monkopedia/hauler/Shipper$Companion;
 	public abstract fun deliveries (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun deliveries$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public abstract fun requestDockPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun requestDockPickup$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public abstract fun requestPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun requestPickup$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/monkopedia/hauler/Shipper$Companion : com/monkopedia/ksrpc/RpcObject {
@@ -800,8 +843,6 @@ public final class com/monkopedia/hauler/Shipper$Companion : com/monkopedia/ksrp
 public final class com/monkopedia/hauler/Shipper$DefaultImpls {
 	public static fun close (Lcom/monkopedia/hauler/Shipper;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun deliveries$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static synthetic fun requestDockPickup$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static synthetic fun requestPickup$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
 public final class com/monkopedia/hauler/Shipper$Stub : com/monkopedia/hauler/Shipper, com/monkopedia/ksrpc/RpcService {
