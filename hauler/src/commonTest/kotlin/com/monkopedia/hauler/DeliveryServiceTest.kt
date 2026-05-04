@@ -22,6 +22,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -189,6 +191,26 @@ class DeliveryServiceTest {
         assertEquals(2, received.size)
         assertEquals("replayed1", received[0].message)
         assertEquals("replayed2", received[1].message)
+        scope.cancel()
+    }
+
+    // --- onDeliveryError (server-side source error hook) ---
+
+    @Test
+    fun streamDeliveries_sourceErrorReachesOnDeliveryError() = runTest {
+        val errors = mutableListOf<Throwable>()
+        val rates = DeliveryRates(onDeliveryError = { errors.add(it) })
+        val source = flow {
+            emit(box(message = "ok"))
+            throw RuntimeException("source boom")
+        }
+        val scope = CoroutineScope(SupervisorJob())
+        val service = deliveries(source, emptyFlow(), scope, rates)
+        val received = service.streamDeliveries().toList()
+        assertEquals(1, received.size)
+        assertEquals("ok", received[0].message)
+        assertEquals(1, errors.size)
+        assertEquals("source boom", errors[0].message)
         scope.cancel()
     }
 

@@ -21,6 +21,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 
@@ -70,13 +71,15 @@ private class DeliveryServiceImpl(
 ) : DeliveryService {
     private fun Flow<Box>.fetchCustomerPickup(): CustomerPickup = CustomerPickupImpl(this, deliveryRates, scope)
 
-    override suspend fun streamDeliveries(): Flow<Box> = flow
+    override suspend fun streamDeliveries(): Flow<Box> = flow.observeErrors()
 
-    override suspend fun streamDeliveriesPacked(): Flow<Palette> = flow.pack(deliveryRates)
+    override suspend fun streamDeliveriesPacked(): Flow<Palette> = flow.pack(deliveryRates).observeErrors()
 
-    override suspend fun dumpDeliveries(): Flow<Box> = dumpFlow
+    override suspend fun dumpDeliveries(): Flow<Box> = dumpFlow.observeErrors()
 
-    override suspend fun dumpDeliveriesPacked(): Flow<Palette> = dumpFlow.pack(deliveryRates)
+    override suspend fun dumpDeliveriesPacked(): Flow<Palette> = dumpFlow.pack(deliveryRates).observeErrors()
+
+    private fun <T> Flow<T>.observeErrors(): Flow<T> = catch { deliveryRates.onDeliveryError(it) }
 
     override suspend fun recurringCustomerPickup(u: Unit): CustomerPickup = flow.fetchCustomerPickup()
 

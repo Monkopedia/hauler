@@ -21,9 +21,10 @@ import kotlin.time.Duration.Companion.milliseconds
 /**
  * Options specifying how often deliveries will happen and how they will perform.
  *
- * [onDeliveryError] is retained for source compatibility but is no longer invoked since the
- * register/dump callback paths were replaced with Flow returns; client-side collection errors
- * propagate through the flow and are the consumer's responsibility to handle.
+ * [onDeliveryError] is invoked on the server side when a delivery flow's source throws — for
+ * example, an exception inside a custom `Flow<Box>` driving the warehouse, or a serialization
+ * failure mid-stream. It is NOT called for errors in the client's own `.collect { }` block;
+ * those propagate to the client-side coroutine as usual.
  */
 data class DeliveryRates(
     val defaultBoxRetention: Int = 1000,

@@ -18,13 +18,14 @@ package com.monkopedia.hauler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 internal class CustomerPickupImpl(
     private val deliveries: Deliveries,
-    deliveryRates: DeliveryRates,
+    private val deliveryRates: DeliveryRates,
     parentScope: CoroutineScope,
 ) : CustomerPickup {
     private val scope = CoroutineScope(parentScope.coroutineContext + SupervisorJob())
@@ -33,11 +34,13 @@ internal class CustomerPickupImpl(
 
     init {
         scope.launch {
-            deliveries.collect { box ->
-                lock.withLock {
-                    circBuffer.add(box)
+            deliveries
+                .catch { deliveryRates.onDeliveryError(it) }
+                .collect { box ->
+                    lock.withLock {
+                        circBuffer.add(box)
+                    }
                 }
-            }
         }
     }
 
