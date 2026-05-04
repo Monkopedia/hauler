@@ -31,7 +31,8 @@ import kotlinx.coroutines.launch
  * log.info("Something happened")
  * ```
  *
- * Connect output via [route] or attach a remote endpoint via [DropBox.attach] / [LoadingDock.attach].
+ * Connect output via [route] or attach a remote endpoint via [DropBox.attach] / [LoadingDock.attach]
+ * (which delegate to [Deliveries.forwardTo]).
  */
 object Garage {
     private val sharedFlow = MutableSharedFlow<Box>(extraBufferCapacity = 64)
@@ -87,9 +88,9 @@ suspend inline fun route(
     Garage.deliveries.route(display, formatter)
 }
 
-suspend fun DropBox.attach(scope: CoroutineScope): Job = Garage.deliveries.attach(this, scope)
+suspend fun DropBox.attach(scope: CoroutineScope): Job = Garage.deliveries.forwardTo(this, scope)
 
 fun LoadingDock.attach(
     scope: CoroutineScope,
-    deliveryRates: DeliveryRates = DeliveryRates(onDeliveryError = {}),
-): Job = Garage.deliveries.attach(this, scope, deliveryRates)
+    deliveryRates: DeliveryRates = DeliveryRates(),
+): Job = Garage.deliveries.forwardTo(this, scope, deliveryRates)

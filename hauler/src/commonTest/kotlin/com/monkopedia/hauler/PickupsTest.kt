@@ -43,10 +43,10 @@ class PickupsTest {
         }
     }
 
-    // --- DropBox.attach ---
+    // --- Deliveries.forwardTo(DropBox) ---
 
     @Test
-    fun dropBoxAttach_forwardsEachBox() = runTest {
+    fun forwardToDropBox_forwardsEachBox() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
         val scope = CoroutineScope(SupervisorJob())
         val received = mutableListOf<Box>()
@@ -56,7 +56,7 @@ class PickupsTest {
             }
         }
 
-        val job = flow.attach(dropBox, scope)
+        val job = flow.forwardTo(dropBox, scope)
         assertTrue(job.isActive)
 
         flow.emit(box(message = "a"))
@@ -71,22 +71,22 @@ class PickupsTest {
     }
 
     @Test
-    fun dropBoxAttach_jobIsActiveAfterLaunch() = runTest {
+    fun forwardToDropBox_jobIsActiveAfterLaunch() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
         val scope = CoroutineScope(SupervisorJob())
         val dropBox = object : DropBox {
             override suspend fun log(logEvent: Box) {}
         }
-        val job = flow.attach(dropBox, scope)
+        val job = flow.forwardTo(dropBox, scope)
         assertTrue(job.isActive)
         job.cancel()
         scope.cancel()
     }
 
-    // --- LoadingDock.attach ---
+    // --- Deliveries.forwardTo(LoadingDock) ---
 
     @Test
-    fun loadingDockAttach_forwardsPalettes() = runTest {
+    fun forwardToLoadingDock_forwardsPalettes() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
         val scope = CoroutineScope(SupervisorJob())
         val received = mutableListOf<Palette>()
@@ -98,7 +98,7 @@ class PickupsTest {
 
         // Small palette size so size-based flush triggers. Long interval to avoid timer-based.
         val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
-        val job = flow.attach(dock, scope, rates)
+        val job = flow.forwardTo(dock, scope, rates)
         assertTrue(job.isActive)
 
         flow.emit(box(message = "x"))
@@ -113,7 +113,7 @@ class PickupsTest {
     }
 
     @Test
-    fun loadingDockAttach_respectsPaletteSize() = runTest {
+    fun forwardToLoadingDock_respectsPaletteSize() = runTest {
         val flow = MutableSharedFlow<Box>(replay = 100)
         val scope = CoroutineScope(SupervisorJob())
         val received = mutableListOf<Palette>()
@@ -125,7 +125,7 @@ class PickupsTest {
 
         // Palette size = 3, long interval so only size triggers flush
         val rates = DeliveryRates(defaultPaletteSize = 3, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
-        val job = flow.attach(dock, scope, rates)
+        val job = flow.forwardTo(dock, scope, rates)
 
         flow.emit(box(message = "1"))
         flow.emit(box(message = "2"))

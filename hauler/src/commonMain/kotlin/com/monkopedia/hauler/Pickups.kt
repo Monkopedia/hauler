@@ -38,7 +38,7 @@ interface LoadingDock : RpcService {
 }
 
 /** Forward all deliveries to a [DropBox], one [Box] at a time. */
-suspend fun Deliveries.attach(
+suspend fun Deliveries.forwardTo(
     dropBox: DropBox,
     scope: CoroutineScope,
 ): Job {
@@ -55,10 +55,10 @@ suspend fun Deliveries.attach(
 }
 
 /** Forward all deliveries to a [LoadingDock], batching into [Palette]s per [deliveryRates]. */
-fun Deliveries.attach(
+fun Deliveries.forwardTo(
     dock: LoadingDock,
     scope: CoroutineScope,
-    deliveryRates: DeliveryRates = DeliveryRates(onDeliveryError = {}),
+    deliveryRates: DeliveryRates = DeliveryRates(),
 ): Job =
     scope.launch {
         pack(deliveryRates).collect(dock::bulkLog)

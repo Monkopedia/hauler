@@ -748,9 +748,9 @@ public final class com/monkopedia/hauler/Palette$Companion {
 }
 
 public final class com/monkopedia/hauler/PickupsKt {
-	public static final fun attach (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/DropBox;Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun attach (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lkotlinx/coroutines/Job;
-	public static synthetic fun attach$default (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
+	public static final fun forwardTo (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/DropBox;Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun forwardTo (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lkotlinx/coroutines/Job;
+	public static synthetic fun forwardTo$default (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
 }
 
 public abstract interface class com/monkopedia/hauler/Shipper : com/monkopedia/hauler/BasicShipper, com/monkopedia/ksrpc/RpcBidiService {
