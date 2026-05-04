@@ -16,6 +16,7 @@
 package com.monkopedia.hauler
 
 import com.monkopedia.ksrpc.RpcBidiService
+import com.monkopedia.ksrpc.RpcHostService
 import com.monkopedia.ksrpc.RpcService
 import com.monkopedia.ksrpc.annotation.KsMethod
 import com.monkopedia.ksrpc.annotation.KsService
@@ -24,17 +25,37 @@ import kotlinx.coroutines.flow.Flow
 /** A flow of individual log [Box]es. */
 typealias Deliveries = Flow<Box>
 
-/** Manages log observation via callbacks, batched callbacks, or polling. Supports filtering via [weighIn]. */
+/**
+ * Polling-only subset of [DeliveryService]: pull batches via [recurringCustomerPickup] /
+ * [dumpCustomerPickup], or filter the stream via [weighIn]. Hostable on simple transports
+ * (HTTP, JSON-RPC) — does not require bidirectional capability.
+ */
 @KsService
-interface DeliveryService : RpcBidiService {
+interface BasicDeliveryService : RpcHostService {
+    @KsMethod("/register_poll")
+    suspend fun recurringCustomerPickup(u: Unit = Unit): CustomerPickup
+
+    @KsMethod("/dump_poll")
+    suspend fun dumpCustomerPickup(u: Unit = Unit): CustomerPickup
+
+    @KsMethod("/filter")
+    suspend fun weighIn(filter: WeighStation): BasicDeliveryService
+}
+
+/**
+ * Full [BasicDeliveryService] plus callback-based subscriptions via [registerDelivery] /
+ * [registerDeliveryDay] / [dumpDelivery] / [dumpDeliveryDay]. [weighIn] is narrowed to return a
+ * full [DeliveryService] so chained filtering keeps the bidi capabilities.
+ */
+@KsService
+interface DeliveryService :
+    BasicDeliveryService,
+    RpcBidiService {
     @KsMethod("/register")
     suspend fun registerDelivery(receiver: AutomaticDelivery): Registration
 
     @KsMethod("/register_bulk")
     suspend fun registerDeliveryDay(receiver: DeliveryDay): Registration
-
-    @KsMethod("/register_poll")
-    suspend fun recurringCustomerPickup(u: Unit = Unit): CustomerPickup
 
     @KsMethod("/dump")
     suspend fun dumpDelivery(receiver: AutomaticDelivery)
@@ -42,11 +63,8 @@ interface DeliveryService : RpcBidiService {
     @KsMethod("/dump_bulk")
     suspend fun dumpDeliveryDay(receiver: DeliveryDay)
 
-    @KsMethod("/dump_poll")
-    suspend fun dumpCustomerPickup(u: Unit = Unit): CustomerPickup
-
     @KsMethod("/filter")
-    suspend fun weighIn(filter: WeighStation): DeliveryService
+    override suspend fun weighIn(filter: WeighStation): DeliveryService
 }
 
 /** Handle for an active delivery subscription. Use [ping] to check liveness and [unregister] to stop. */
