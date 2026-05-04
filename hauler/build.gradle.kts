@@ -108,7 +108,7 @@ mavenPublishing {
             url.set("https://github.com/Monkopedia/hauler/")
         }
     }
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
     signAllPublications()
 }
 
