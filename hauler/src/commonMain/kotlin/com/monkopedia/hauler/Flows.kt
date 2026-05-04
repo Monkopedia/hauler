@@ -23,44 +23,8 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-/** Convert a [DeliveryService] into a [Deliveries] flow using automatic delivery callbacks. */
-fun DeliveryService.deliveries(closeScope: CoroutineScope): Deliveries =
-    callbackFlow {
-        val observer =
-            object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    trySend(event)
-                }
-            }
-        val registration = registerDelivery(observer)
-        awaitClose {
-            closeScope.launch {
-                registration.unregister()
-            }
-        }
-    }
-
-/** Convert a [DeliveryService] into a [Deliveries] flow using batched delivery day callbacks. */
-fun DeliveryService.withDeliveryDay(closeScope: CoroutineScope): Deliveries =
-    callbackFlow {
-        val observer =
-            object : DeliveryDay {
-                override suspend fun onLogs(event: Palette) {
-                    event.forEach {
-                        trySend(it)
-                    }
-                }
-            }
-        val registration = registerDeliveryDay(observer)
-        awaitClose {
-            closeScope.launch {
-                registration.unregister()
-            }
-        }
-    }
-
-/** Convert a [DeliveryService] into a [Deliveries] flow by polling at the given [interval]. */
-fun DeliveryService.withPickup(
+/** Convert a [BasicDeliveryService] into a [Deliveries] flow by polling at the given [interval]. */
+fun BasicDeliveryService.withPickup(
     interval: Duration = 500.milliseconds,
     maxEntries: Int = 100,
     closeScope: CoroutineScope,
@@ -82,36 +46,8 @@ fun DeliveryService.withPickup(
         }
     }
 
-/** Drain the replay cache as a [Deliveries] flow, then close. */
-fun DeliveryService.dumpDeliveries(): Deliveries =
-    callbackFlow {
-        val observer =
-            object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    send(event)
-                }
-            }
-        dumpDelivery(observer)
-        close()
-    }
-
-/** Drain the replay cache as batched [Palette]s, unpacked into a [Deliveries] flow, then close. */
-fun DeliveryService.dumpWithDeliveryDay(): Deliveries =
-    callbackFlow {
-        val observer =
-            object : DeliveryDay {
-                override suspend fun onLogs(event: Palette) {
-                    event.forEach {
-                        send(it)
-                    }
-                }
-            }
-        dumpDeliveryDay(observer)
-        close()
-    }
-
 /** Drain the replay cache by polling, as a [Deliveries] flow. */
-fun DeliveryService.dumpWithPickup(
+fun BasicDeliveryService.dumpWithPickup(
     interval: Duration = 500.milliseconds,
     maxEntries: Int = 100,
     closeScope: CoroutineScope,

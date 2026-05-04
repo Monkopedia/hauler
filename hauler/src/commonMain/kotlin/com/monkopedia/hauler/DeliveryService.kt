@@ -43,52 +43,33 @@ interface BasicDeliveryService : RpcHostService {
 }
 
 /**
- * Full [BasicDeliveryService] plus callback-based subscriptions via [registerDelivery] /
- * [registerDeliveryDay] / [dumpDelivery] / [dumpDeliveryDay]. [weighIn] is narrowed to return a
- * full [DeliveryService] so chained filtering keeps the bidi capabilities.
+ * Full [BasicDeliveryService] plus streaming subscriptions via [streamDeliveries] and friends.
+ * Each stream method returns a fresh single-use [Flow]; cancel collection to stop the stream.
+ * [weighIn] is narrowed to return a full [DeliveryService] so chained filtering keeps streams
+ * available.
  */
 @KsService
 interface DeliveryService :
     BasicDeliveryService,
     RpcBidiService {
-    @KsMethod("/register")
-    suspend fun registerDelivery(receiver: AutomaticDelivery): Registration
+    /** Live stream of incoming [Box]es. Single-use; cancel collection to unsubscribe. */
+    @KsMethod("/stream")
+    suspend fun streamDeliveries(): Flow<Box>
 
-    @KsMethod("/register_bulk")
-    suspend fun registerDeliveryDay(receiver: DeliveryDay): Registration
+    /** Live stream of incoming [Box]es batched into [Palette]s per the configured rates. */
+    @KsMethod("/stream_bulk")
+    suspend fun streamDeliveriesPacked(): Flow<Palette>
 
+    /** Replay-only stream of buffered [Box]es. Completes after replay is exhausted. */
     @KsMethod("/dump")
-    suspend fun dumpDelivery(receiver: AutomaticDelivery)
+    suspend fun dumpDeliveries(): Flow<Box>
 
+    /** Replay-only stream batched into [Palette]s. Completes after replay is exhausted. */
     @KsMethod("/dump_bulk")
-    suspend fun dumpDeliveryDay(receiver: DeliveryDay)
+    suspend fun dumpDeliveriesPacked(): Flow<Palette>
 
     @KsMethod("/filter")
     override suspend fun weighIn(filter: WeighStation): DeliveryService
-}
-
-/** Handle for an active delivery subscription. Use [ping] to check liveness and [unregister] to stop. */
-@KsService
-interface Registration : RpcService {
-    @KsMethod("/ping")
-    suspend fun ping(u: Unit = Unit)
-
-    @KsMethod("/unregister")
-    suspend fun unregister(u: Unit = Unit)
-}
-
-/** Callback interface for receiving individual log [Box]es as they arrive. */
-@KsService
-interface AutomaticDelivery : RpcService {
-    @KsMethod("/logs")
-    suspend fun onLogEvent(event: Box)
-}
-
-/** Callback interface for receiving batched log [Palette]s. */
-@KsService
-interface DeliveryDay : RpcService {
-    @KsMethod("/logs")
-    suspend fun onLogs(event: Palette)
 }
 
 /** Polling interface for pulling log batches on demand. */

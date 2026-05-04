@@ -62,6 +62,7 @@ kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt"}
 ksrpc = { module = "com.monkopedia.ksrpc:ksrpc-core", version.ref = "ksrpc"}
+ksrpc-flow = { module = "com.monkopedia.ksrpc:ksrpc-flow", version.ref = "ksrpc"}
 ksrpc-sockets = { module = "com.monkopedia.ksrpc:ksrpc-sockets", version.ref = "ksrpc"}
 ksrpc-ktor-client = { module = "com.monkopedia.ksrpc:ksrpc-ktor-client", version.ref = "ksrpc"}
 ksrpc-ktor-websocket-client = { module = "com.monkopedia.ksrpc:ksrpc-ktor-websocket-client", version.ref = "ksrpc"}

@@ -50,6 +50,7 @@ kotlin {
 
     sourceSets["commonMain"].dependencies {
         api(libs.ksrpc)
+        api(libs.ksrpc.flow)
         implementation(libs.kotlinx.serialization)
         implementation(libs.kotlinx.serialization.json)
         implementation(libs.kotlinx.coroutines)

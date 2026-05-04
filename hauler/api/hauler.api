@@ -32,41 +32,6 @@ public abstract interface class com/monkopedia/hauler/AsyncHauler {
 	public abstract fun emit (Lcom/monkopedia/hauler/Box;)V
 }
 
-public abstract interface class com/monkopedia/hauler/AutomaticDelivery : com/monkopedia/ksrpc/RpcService {
-	public static final field Companion Lcom/monkopedia/hauler/AutomaticDelivery$Companion;
-	public abstract fun onLogEvent (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/AutomaticDelivery$Companion : com/monkopedia/ksrpc/RpcObject {
-	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/AutomaticDelivery;
-	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
-	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
-	public final fun getEndpoints ()Ljava/util/List;
-	public final fun getServiceName ()Ljava/lang/String;
-	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
-}
-
-public final class com/monkopedia/hauler/AutomaticDelivery$DefaultImpls {
-	public static fun close (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/AutomaticDelivery$Stub : com/monkopedia/hauler/AutomaticDelivery, com/monkopedia/ksrpc/RpcService {
-	public static final field Companion Lcom/monkopedia/hauler/AutomaticDelivery$Stub$Companion;
-	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
-	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final synthetic fun onLogEvent (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/AutomaticDelivery$Stub$AnonymousOnLogEvent : com/monkopedia/ksrpc/internal/ServiceExecutor {
-	public fun <init> ()V
-	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final synthetic class com/monkopedia/hauler/AutomaticDelivery$Stub$Companion {
-	public fun <init> ()V
-	public final synthetic fun OnLogEvent$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-}
-
 public abstract interface class com/monkopedia/hauler/BasicDeliveryService : com/monkopedia/ksrpc/RpcHostService {
 	public static final field Companion Lcom/monkopedia/hauler/BasicDeliveryService$Companion;
 	public abstract fun dumpCustomerPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -275,41 +240,6 @@ public final synthetic class com/monkopedia/hauler/CustomerPickup$Stub$Companion
 	public final synthetic fun Get$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
-public abstract interface class com/monkopedia/hauler/DeliveryDay : com/monkopedia/ksrpc/RpcService {
-	public static final field Companion Lcom/monkopedia/hauler/DeliveryDay$Companion;
-	public abstract fun onLogs (Lcom/monkopedia/hauler/Palette;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/DeliveryDay$Companion : com/monkopedia/ksrpc/RpcObject {
-	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/DeliveryDay;
-	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
-	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
-	public final fun getEndpoints ()Ljava/util/List;
-	public final fun getServiceName ()Ljava/lang/String;
-	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
-}
-
-public final class com/monkopedia/hauler/DeliveryDay$DefaultImpls {
-	public static fun close (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/DeliveryDay$Stub : com/monkopedia/hauler/DeliveryDay, com/monkopedia/ksrpc/RpcService {
-	public static final field Companion Lcom/monkopedia/hauler/DeliveryDay$Stub$Companion;
-	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
-	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final synthetic fun onLogs (Lcom/monkopedia/hauler/Palette;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/DeliveryDay$Stub$AnonymousOnLogs : com/monkopedia/ksrpc/internal/ServiceExecutor {
-	public fun <init> ()V
-	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final synthetic class com/monkopedia/hauler/DeliveryDay$Stub$Companion {
-	public fun <init> ()V
-	public final synthetic fun OnLogs$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-}
-
 public final class com/monkopedia/hauler/DeliveryRates {
 	public synthetic fun <init> (IIJLkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> (IIJLkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -330,10 +260,10 @@ public final class com/monkopedia/hauler/DeliveryRates {
 
 public abstract interface class com/monkopedia/hauler/DeliveryService : com/monkopedia/hauler/BasicDeliveryService, com/monkopedia/ksrpc/RpcBidiService {
 	public static final field Companion Lcom/monkopedia/hauler/DeliveryService$Companion;
-	public abstract fun dumpDelivery (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun dumpDeliveryDay (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun registerDelivery (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun registerDeliveryDay (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun dumpDeliveries (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun dumpDeliveriesPacked (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun streamDeliveries (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun streamDeliveriesPacked (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun weighIn (Lcom/monkopedia/hauler/WeighStation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -355,11 +285,11 @@ public final class com/monkopedia/hauler/DeliveryService$Stub : com/monkopedia/h
 	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
 	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final synthetic fun dumpCustomerPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final synthetic fun dumpDelivery (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final synthetic fun dumpDeliveryDay (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun dumpDeliveries (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun dumpDeliveriesPacked (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final synthetic fun recurringCustomerPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final synthetic fun registerDelivery (Lcom/monkopedia/hauler/AutomaticDelivery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final synthetic fun registerDeliveryDay (Lcom/monkopedia/hauler/DeliveryDay;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun streamDeliveries (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final synthetic fun streamDeliveriesPacked (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final synthetic fun weighIn (Lcom/monkopedia/hauler/WeighStation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -368,12 +298,12 @@ public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpCusto
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDelivery : com/monkopedia/ksrpc/internal/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDeliveries : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDeliveryDay : com/monkopedia/ksrpc/internal/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDeliveriesPacked : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -383,12 +313,12 @@ public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRecurring
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRegisterDelivery : com/monkopedia/ksrpc/internal/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousStreamDeliveries : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRegisterDeliveryDay : com/monkopedia/ksrpc/internal/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousStreamDeliveriesPacked : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -401,11 +331,11 @@ public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousWeighIn :
 public final synthetic class com/monkopedia/hauler/DeliveryService$Stub$Companion {
 	public fun <init> ()V
 	public final synthetic fun DumpCustomerPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun DumpDelivery$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun DumpDeliveryDay$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun DumpDeliveries$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun DumpDeliveriesPacked$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 	public final synthetic fun RecurringCustomerPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun RegisterDelivery$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun RegisterDeliveryDay$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun StreamDeliveries$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun StreamDeliveriesPacked$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 	public final synthetic fun WeighIn$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
@@ -452,14 +382,10 @@ public abstract interface annotation class com/monkopedia/hauler/FilterDsl : jav
 }
 
 public final class com/monkopedia/hauler/FlowsKt {
-	public static final fun deliveries (Lcom/monkopedia/hauler/DeliveryService;Lkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
-	public static final fun dumpDeliveries (Lcom/monkopedia/hauler/DeliveryService;)Lkotlinx/coroutines/flow/Flow;
-	public static final fun dumpWithDeliveryDay (Lcom/monkopedia/hauler/DeliveryService;)Lkotlinx/coroutines/flow/Flow;
-	public static final fun dumpWithPickup-dWUq8MI (Lcom/monkopedia/hauler/DeliveryService;JILkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
-	public static synthetic fun dumpWithPickup-dWUq8MI$default (Lcom/monkopedia/hauler/DeliveryService;JILkotlinx/coroutines/CoroutineScope;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
-	public static final fun withDeliveryDay (Lcom/monkopedia/hauler/DeliveryService;Lkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
-	public static final fun withPickup-dWUq8MI (Lcom/monkopedia/hauler/DeliveryService;JILkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
-	public static synthetic fun withPickup-dWUq8MI$default (Lcom/monkopedia/hauler/DeliveryService;JILkotlinx/coroutines/CoroutineScope;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun dumpWithPickup-dWUq8MI (Lcom/monkopedia/hauler/BasicDeliveryService;JILkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun dumpWithPickup-dWUq8MI$default (Lcom/monkopedia/hauler/BasicDeliveryService;JILkotlinx/coroutines/CoroutineScope;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun withPickup-dWUq8MI (Lcom/monkopedia/hauler/BasicDeliveryService;JILkotlinx/coroutines/CoroutineScope;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun withPickup-dWUq8MI$default (Lcom/monkopedia/hauler/BasicDeliveryService;JILkotlinx/coroutines/CoroutineScope;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
 }
 
 public final class com/monkopedia/hauler/Garage {
@@ -825,53 +751,6 @@ public final class com/monkopedia/hauler/PickupsKt {
 	public static final fun attach (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/DropBox;Lkotlinx/coroutines/CoroutineScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun attach (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;)Lkotlinx/coroutines/Job;
 	public static synthetic fun attach$default (Lkotlinx/coroutines/flow/Flow;Lcom/monkopedia/hauler/LoadingDock;Lkotlinx/coroutines/CoroutineScope;Lcom/monkopedia/hauler/DeliveryRates;ILjava/lang/Object;)Lkotlinx/coroutines/Job;
-}
-
-public abstract interface class com/monkopedia/hauler/Registration : com/monkopedia/ksrpc/RpcService {
-	public static final field Companion Lcom/monkopedia/hauler/Registration$Companion;
-	public abstract fun ping (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun ping$default (Lcom/monkopedia/hauler/Registration;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public abstract fun unregister (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun unregister$default (Lcom/monkopedia/hauler/Registration;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/Registration$Companion : com/monkopedia/ksrpc/RpcObject {
-	public final fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/hauler/Registration;
-	public synthetic fun createStub (Lcom/monkopedia/ksrpc/channels/SerializedService;)Lcom/monkopedia/ksrpc/RpcService;
-	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
-	public final fun getEndpoints ()Ljava/util/List;
-	public final fun getServiceName ()Ljava/lang/String;
-	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
-}
-
-public final class com/monkopedia/hauler/Registration$DefaultImpls {
-	public static fun close (Lcom/monkopedia/hauler/Registration;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun ping$default (Lcom/monkopedia/hauler/Registration;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static synthetic fun unregister$default (Lcom/monkopedia/hauler/Registration;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/Registration$Stub : com/monkopedia/hauler/Registration, com/monkopedia/ksrpc/RpcService {
-	public static final field Companion Lcom/monkopedia/hauler/Registration$Stub$Companion;
-	public fun <init> (Lcom/monkopedia/ksrpc/channels/SerializedService;)V
-	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final synthetic fun ping (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final synthetic fun unregister (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/Registration$Stub$AnonymousPing : com/monkopedia/ksrpc/internal/ServiceExecutor {
-	public fun <init> ()V
-	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class com/monkopedia/hauler/Registration$Stub$AnonymousUnregister : com/monkopedia/ksrpc/internal/ServiceExecutor {
-	public fun <init> ()V
-	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final synthetic class com/monkopedia/hauler/Registration$Stub$Companion {
-	public fun <init> ()V
-	public final synthetic fun Ping$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun Unregister$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
 public abstract interface class com/monkopedia/hauler/Shipper : com/monkopedia/hauler/BasicShipper, com/monkopedia/ksrpc/RpcBidiService {

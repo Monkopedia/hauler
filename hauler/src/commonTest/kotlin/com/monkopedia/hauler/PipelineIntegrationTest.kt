@@ -15,9 +15,11 @@
  */
 package com.monkopedia.hauler
 
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -47,28 +49,23 @@ class PipelineIntegrationTest {
     }
 
     @Test
-    fun dropBox_to_automaticDelivery() = runTest {
+    fun dropBox_to_streamDeliveries() = runTest {
         withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
+            val warehouse = Warehouse(DeliveryRates())
             val dropBox = warehouse.requestPickup()
             val service = warehouse.deliveries()
 
             val received = mutableListOf<Box>()
-            val done = CompletableDeferred<Unit>()
-            val receiver = object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    received.add(event)
-                    if (received.size >= 3) done.complete(Unit)
-                }
+            val collectJob = launch {
+                service.streamDeliveries().collect { received.add(it) }
             }
-            service.registerDelivery(receiver)
             delay(50)
 
             dropBox.log(box(level = Level.INFO, message = "first"))
             dropBox.log(box(level = Level.WARN, message = "second"))
             dropBox.log(box(level = Level.ERROR, message = "third"))
 
-            withTimeout(5.seconds) { done.await() }
+            awaitCondition { received.size >= 3 }
 
             assertEquals(3, received.size)
             assertEquals(Level.INFO, received[0].level)
@@ -77,26 +74,22 @@ class PipelineIntegrationTest {
             assertEquals("second", received[1].message)
             assertEquals(Level.ERROR, received[2].level)
             assertEquals("third", received[2].message)
+            collectJob.cancelAndJoin()
             warehouse.close()
         }
     }
 
     @Test
-    fun loadingDock_to_automaticDelivery() = runTest {
+    fun loadingDock_to_streamDeliveries() = runTest {
         withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
+            val warehouse = Warehouse(DeliveryRates())
             val dock = warehouse.requestDockPickup()
             val service = warehouse.deliveries()
 
             val received = mutableListOf<Box>()
-            val done = CompletableDeferred<Unit>()
-            val receiver = object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    received.add(event)
-                    if (received.size >= 3) done.complete(Unit)
-                }
+            val collectJob = launch {
+                service.streamDeliveries().collect { received.add(it) }
             }
-            service.registerDelivery(receiver)
             delay(50)
 
             val boxes = listOf(
@@ -106,12 +99,13 @@ class PipelineIntegrationTest {
             )
             dock.bulkLog(boxes.pack())
 
-            withTimeout(5.seconds) { done.await() }
+            awaitCondition { received.size >= 3 }
 
             assertEquals(3, received.size)
             assertEquals("bulk1", received[0].message)
             assertEquals("bulk2", received[1].message)
             assertEquals("bulk3", received[2].message)
+            collectJob.cancelAndJoin()
             warehouse.close()
         }
     }
@@ -119,21 +113,16 @@ class PipelineIntegrationTest {
     @Test
     fun multipleSources_mergeIntoSingleDelivery() = runTest {
         withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
+            val warehouse = Warehouse(DeliveryRates())
             val drop1 = warehouse.requestPickup()
             val drop2 = warehouse.requestPickup()
             val dock = warehouse.requestDockPickup()
             val service = warehouse.deliveries()
 
             val received = mutableListOf<Box>()
-            val done = CompletableDeferred<Unit>()
-            val receiver = object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    received.add(event)
-                    if (received.size >= 4) done.complete(Unit)
-                }
+            val collectJob = launch {
+                service.streamDeliveries().collect { received.add(it) }
             }
-            service.registerDelivery(receiver)
             delay(50)
 
             drop1.log(box(loggerName = "Source1", message = "from-drop1"))
@@ -145,12 +134,13 @@ class PipelineIntegrationTest {
                 ).pack(),
             )
 
-            withTimeout(5.seconds) { done.await() }
+            awaitCondition { received.size >= 4 }
 
             assertEquals(4, received.size)
             assertTrue(received.any { it.loggerName == "Source1" })
             assertTrue(received.any { it.loggerName == "Source2" })
             assertEquals(2, received.count { it.loggerName == "Source3" })
+            collectJob.cancelAndJoin()
             warehouse.close()
         }
     }
@@ -158,18 +148,15 @@ class PipelineIntegrationTest {
     @Test
     fun pipeline_withFiltering() = runTest {
         withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
+            val warehouse = Warehouse(DeliveryRates())
             val dropBox = warehouse.requestPickup()
             val service = warehouse.deliveries()
             val filtered = service.weighIn(LevelFilter(LevelMatchMode.GT, Level.INFO))
 
             val received = mutableListOf<Box>()
-            val receiver = object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    received.add(event)
-                }
+            val collectJob = launch {
+                filtered.streamDeliveries().collect { received.add(it) }
             }
-            filtered.registerDelivery(receiver)
             delay(50)
 
             dropBox.log(box(level = Level.DEBUG, message = "skip-debug"))
@@ -182,6 +169,7 @@ class PipelineIntegrationTest {
             assertEquals(2, received.size)
             assertEquals("keep-warn", received[0].message)
             assertEquals("keep-error", received[1].message)
+            collectJob.cancelAndJoin()
             warehouse.close()
         }
     }
@@ -192,19 +180,15 @@ class PipelineIntegrationTest {
             val rates = DeliveryRates(
                 defaultPaletteSize = 2,
                 defaultPaletteInterval = 100.seconds,
-                onDeliveryError = {},
             )
             val warehouse = Warehouse(rates)
             val dropBox = warehouse.requestPickup()
             val service = warehouse.deliveries()
 
             val received = mutableListOf<Palette>()
-            val receiver = object : DeliveryDay {
-                override suspend fun onLogs(event: Palette) {
-                    received.add(event)
-                }
+            val collectJob = launch {
+                service.streamDeliveriesPacked().collect { received.add(it) }
             }
-            service.registerDeliveryDay(receiver)
             delay(50)
 
             dropBox.log(box(message = "batch-a"))
@@ -218,6 +202,7 @@ class PipelineIntegrationTest {
             val allBoxes = received.flatMap { it.unpack() }
             assertTrue(allBoxes.any { it.message == "batch-a" })
             assertTrue(allBoxes.any { it.message == "batch-b" })
+            collectJob.cancelAndJoin()
             warehouse.close()
         }
     }
@@ -225,28 +210,24 @@ class PipelineIntegrationTest {
     @Test
     fun pipeline_metadataPreservedEndToEnd() = runTest {
         withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
+            val warehouse = Warehouse(DeliveryRates())
             val dropBox = warehouse.requestPickup()
             val service = warehouse.deliveries()
 
             val received = mutableListOf<Box>()
-            val done = CompletableDeferred<Unit>()
-            val receiver = object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    received.add(event)
-                    done.complete(Unit)
-                }
+            val collectJob = launch {
+                service.streamDeliveries().collect { received.add(it) }
             }
-            service.registerDelivery(receiver)
             delay(50)
 
             val meta = mapOf("requestId" to "abc-123", "userId" to "42")
             dropBox.log(box(message = "with-meta").copy(metadata = meta))
 
-            withTimeout(5.seconds) { done.await() }
+            awaitCondition { received.isNotEmpty() }
 
             assertEquals(1, received.size)
             assertEquals(meta, received[0].metadata)
+            collectJob.cancelAndJoin()
             warehouse.close()
         }
     }
@@ -254,7 +235,7 @@ class PipelineIntegrationTest {
     @Test
     fun pipeline_replayAndLiveDelivery() = runTest {
         withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100, onDeliveryError = {}))
+            val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100))
             val dropBox = warehouse.requestPickup()
 
             // Emit before subscribing — goes to replay cache
@@ -262,25 +243,16 @@ class PipelineIntegrationTest {
 
             val service = warehouse.deliveries()
 
-            // Dump replay cache
-            val dumped = mutableListOf<Box>()
-            val dumpReceiver = object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    dumped.add(event)
-                }
-            }
-            service.dumpDelivery(dumpReceiver)
+            // Dump replay cache as a finite flow
+            val dumped = service.dumpDeliveries().toList()
             assertEquals(1, dumped.size)
             assertEquals("historical", dumped[0].message)
 
             // Subscribe — SharedFlow replay means subscriber also gets cached events
             val live = mutableListOf<Box>()
-            val liveReceiver = object : AutomaticDelivery {
-                override suspend fun onLogEvent(event: Box) {
-                    live.add(event)
-                }
+            val collectJob = launch {
+                service.streamDeliveries().collect { live.add(it) }
             }
-            service.registerDelivery(liveReceiver)
             delay(50)
 
             dropBox.log(box(message = "live"))
@@ -292,6 +264,7 @@ class PipelineIntegrationTest {
             // Subscriber receives replayed "historical" + new "live"
             assertTrue(live.any { it.message == "historical" })
             assertTrue(live.any { it.message == "live" })
+            collectJob.cancelAndJoin()
             warehouse.close()
         }
     }

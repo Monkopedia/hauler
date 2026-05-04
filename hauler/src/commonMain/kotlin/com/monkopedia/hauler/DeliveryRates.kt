@@ -20,10 +20,14 @@ import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Options specifying how often deliveries will happen and how they will perform.
+ *
+ * [onDeliveryError] is retained for source compatibility but is no longer invoked since the
+ * register/dump callback paths were replaced with Flow returns; client-side collection errors
+ * propagate through the flow and are the consumer's responsibility to handle.
  */
 data class DeliveryRates(
     val defaultBoxRetention: Int = 1000,
     val defaultPaletteSize: Int = 500,
     val defaultPaletteInterval: Duration = 500.milliseconds,
-    val onDeliveryError: (Throwable) -> Unit,
+    val onDeliveryError: (Throwable) -> Unit = {},
 )

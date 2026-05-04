@@ -15,18 +15,20 @@
  */
 package com.monkopedia.hauler
 
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 class DeliveryServiceTest {
@@ -42,7 +44,7 @@ class DeliveryServiceTest {
     private fun createDeliveryService(): Triple<MutableSharedFlow<Box>, DeliveryService, CoroutineScope> {
         val flow = MutableSharedFlow<Box>(replay = 100)
         val scope = CoroutineScope(SupervisorJob())
-        val service = flow.deliveries(scope, DeliveryRates(onDeliveryError = {}))
+        val service = flow.deliveries(scope, DeliveryRates())
         return Triple(flow, service, scope)
     }
 
@@ -53,204 +55,140 @@ class DeliveryServiceTest {
         }
     }
 
-    // --- registerDelivery ---
+    // --- streamDeliveries ---
 
     @Test
-    fun registerDelivery_receivesEvents() = runTest {
-        val (flow, service, scope) = createDeliveryService()
-        val received = mutableListOf<Box>()
-        val receiver = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {
-                received.add(event)
+    fun streamDeliveries_receivesEvents() = runTest {
+        withContext(Dispatchers.Default) {
+            val (flow, service, scope) = createDeliveryService()
+            val received = mutableListOf<Box>()
+            val collectJob = launch {
+                service.streamDeliveries().collect { received.add(it) }
             }
-        }
-        service.registerDelivery(receiver)
+            delay(50)
 
-        flow.emit(box(message = "a"))
-        flow.emit(box(message = "b"))
-        awaitCondition { received.size >= 2 }
-        assertEquals(2, received.size)
-        assertEquals("a", received[0].message)
-        assertEquals("b", received[1].message)
-        scope.cancel()
+            flow.emit(box(message = "a"))
+            flow.emit(box(message = "b"))
+            awaitCondition { received.size >= 2 }
+            assertEquals(2, received.size)
+            assertEquals("a", received[0].message)
+            assertEquals("b", received[1].message)
+            collectJob.cancelAndJoin()
+            scope.cancel()
+        }
     }
 
     @Test
-    fun registerDelivery_unregisterStopsDelivery() = runTest {
-        val (flow, service, scope) = createDeliveryService()
-        val received = mutableListOf<Box>()
-        val receiver = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {
-                received.add(event)
+    fun streamDeliveries_cancellationStopsDelivery() = runTest {
+        withContext(Dispatchers.Default) {
+            val (flow, service, scope) = createDeliveryService()
+            val received = mutableListOf<Box>()
+            val collectJob = launch {
+                service.streamDeliveries().collect { received.add(it) }
             }
+            delay(50)
+
+            flow.emit(box(message = "before"))
+            awaitCondition { received.size >= 1 }
+            collectJob.cancelAndJoin()
+
+            flow.emit(box(message = "after"))
+            // Brief wait to verify "after" does NOT arrive
+            repeat(50) { delay(1) }
+
+            assertEquals(1, received.size)
+            assertEquals("before", received[0].message)
+            scope.cancel()
         }
-        val registration = service.registerDelivery(receiver)
-
-        flow.emit(box(message = "before"))
-        awaitCondition { received.size >= 1 }
-        registration.unregister()
-        // Give unregister time to take effect
-        awaitCondition { true }
-        flow.emit(box(message = "after"))
-        // Brief wait to verify "after" does NOT arrive
-        repeat(100) { delay(1) }
-
-        assertEquals(1, received.size)
-        assertEquals("before", received[0].message)
-        scope.cancel()
     }
 
-    @Test
-    fun registration_pingSucceedsWhileActive() = runTest {
-        val (_, service, scope) = createDeliveryService()
-        val receiver = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {}
-        }
-        val registration = service.registerDelivery(receiver)
-        registration.ping() // should not throw
-        scope.cancel()
-    }
+    // --- streamDeliveriesPacked ---
 
     @Test
-    fun registration_pingFailsAfterUnregister() = runTest {
-        val (_, service, scope) = createDeliveryService()
-        val receiver = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {}
-        }
-        val registration = service.registerDelivery(receiver)
-        registration.unregister()
-        withTimeout(5.seconds) {
-            var failed = false
-            while (!failed) {
-                failed = try { registration.ping(); false } catch (_: IllegalArgumentException) { true }
-                if (!failed) delay(1)
+    fun streamDeliveriesPacked_receivesPalettes() = runTest {
+        withContext(Dispatchers.Default) {
+            val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds)
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val scope = CoroutineScope(SupervisorJob())
+            val service = flow.deliveries(scope, rates)
+
+            val received = mutableListOf<Palette>()
+            val collectJob = launch {
+                service.streamDeliveriesPacked().collect { received.add(it) }
             }
+            delay(50)
+
+            flow.emit(box(message = "a"))
+            flow.emit(box(message = "b"))
+            awaitCondition { received.isNotEmpty() }
+            collectJob.cancelAndJoin()
+            scope.cancel()
         }
-        assertFailsWith<IllegalArgumentException> {
-            registration.ping()
-        }
-        scope.cancel()
-    }
-
-    // --- registerDeliveryDay ---
-
-    @Test
-    fun registerDeliveryDay_receivesPalettes() = runTest {
-        val received = mutableListOf<Palette>()
-        val done = CompletableDeferred<Unit>()
-        val receiver = object : DeliveryDay {
-            override suspend fun onLogs(event: Palette) {
-                received.add(event)
-                done.complete(Unit)
-            }
-        }
-
-        // Use small palette size so size-based flush triggers
-        val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val scope = CoroutineScope(SupervisorJob())
-        val service = flow.deliveries(scope, rates)
-
-        service.registerDeliveryDay(receiver)
-
-        flow.emit(box(message = "a"))
-        flow.emit(box(message = "b"))
-        awaitCondition { received.isNotEmpty() }
-        assertTrue(received.isNotEmpty())
-        scope.cancel()
     }
 
     // --- weighIn (filtering) ---
 
     @Test
     fun weighIn_filtersEvents() = runTest {
-        val (flow, service, scope) = createDeliveryService()
-        val filtered = service.weighIn(LevelFilter(LevelMatchMode.EQ, Level.ERROR))
+        withContext(Dispatchers.Default) {
+            val (flow, service, scope) = createDeliveryService()
+            val filtered = service.weighIn(LevelFilter(LevelMatchMode.EQ, Level.ERROR))
 
-        val received = mutableListOf<Box>()
-        val receiver = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {
-                received.add(event)
+            val received = mutableListOf<Box>()
+            val collectJob = launch {
+                filtered.streamDeliveries().collect { received.add(it) }
             }
-        }
-        filtered.registerDelivery(receiver)
+            delay(50)
 
-        flow.emit(box(level = Level.INFO, message = "info"))
-        flow.emit(box(level = Level.ERROR, message = "error"))
-        awaitCondition { received.size >= 1 }
-        assertEquals(1, received.size)
-        assertEquals("error", received[0].message)
-        scope.cancel()
+            flow.emit(box(level = Level.INFO, message = "info"))
+            flow.emit(box(level = Level.ERROR, message = "error"))
+            awaitCondition { received.size >= 1 }
+            assertEquals(1, received.size)
+            assertEquals("error", received[0].message)
+            collectJob.cancelAndJoin()
+            scope.cancel()
+        }
     }
 
     @Test
     fun weighIn_chainedFilters() = runTest {
-        val (flow, service, scope) = createDeliveryService()
-        val filtered = service
-            .weighIn(LevelFilter(LevelMatchMode.GT, Level.DEBUG))
-            .weighIn(LoggerNameFilter(LoggerMatchMode.PREFIX, "com"))
+        withContext(Dispatchers.Default) {
+            val (flow, service, scope) = createDeliveryService()
+            val filtered = service
+                .weighIn(LevelFilter(LevelMatchMode.GT, Level.DEBUG))
+                .weighIn(LoggerNameFilter(LoggerMatchMode.PREFIX, "com"))
 
-        val received = mutableListOf<Box>()
-        val receiver = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {
-                received.add(event)
+            val received = mutableListOf<Box>()
+            val collectJob = launch {
+                filtered.streamDeliveries().collect { received.add(it) }
             }
-        }
-        filtered.registerDelivery(receiver)
+            delay(50)
 
-        flow.emit(box(level = Level.INFO, loggerName = "com.example", message = "yes"))
-        flow.emit(box(level = Level.INFO, loggerName = "org.other", message = "no"))
-        flow.emit(box(level = Level.DEBUG, loggerName = "com.example", message = "no2"))
-        awaitCondition { received.size >= 1 }
-        // Brief extra wait to verify no others arrive
-        repeat(50) { delay(1) }
-        assertEquals(1, received.size)
-        assertEquals("yes", received[0].message)
-        scope.cancel()
+            flow.emit(box(level = Level.INFO, loggerName = "com.example", message = "yes"))
+            flow.emit(box(level = Level.INFO, loggerName = "org.other", message = "no"))
+            flow.emit(box(level = Level.DEBUG, loggerName = "com.example", message = "no2"))
+            awaitCondition { received.size >= 1 }
+            // Brief extra wait to verify no others arrive
+            repeat(50) { delay(1) }
+            assertEquals(1, received.size)
+            assertEquals("yes", received[0].message)
+            collectJob.cancelAndJoin()
+            scope.cancel()
+        }
     }
 
-    // --- dumpDelivery ---
+    // --- dumpDeliveries ---
 
     @Test
-    fun dumpDelivery_returnsReplayedEvents() = runTest {
+    fun dumpDeliveries_returnsReplayedEvents() = runTest {
         val (flow, service, scope) = createDeliveryService()
         flow.emit(box(message = "replayed1"))
         flow.emit(box(message = "replayed2"))
 
-        val received = mutableListOf<Box>()
-        val receiver = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {
-                received.add(event)
-            }
-        }
-        service.dumpDelivery(receiver)
+        val received = service.dumpDeliveries().toList()
         assertEquals(2, received.size)
         assertEquals("replayed1", received[0].message)
         assertEquals("replayed2", received[1].message)
-        scope.cancel()
-    }
-
-    // --- onDeliveryError callback ---
-
-    @Test
-    fun onDeliveryError_calledOnReceiverFailure() = runTest {
-        val errors = mutableListOf<Throwable>()
-        val rates = DeliveryRates(onDeliveryError = { errors.add(it) })
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val scope = CoroutineScope(SupervisorJob())
-        val service = flow.deliveries(scope, rates)
-
-        val receiver = object : AutomaticDelivery {
-            override suspend fun onLogEvent(event: Box) {
-                throw RuntimeException("boom")
-            }
-        }
-        service.registerDelivery(receiver)
-
-        flow.emit(box(message = "trigger"))
-        awaitCondition { errors.isNotEmpty() }
-        assertEquals(1, errors.size)
-        assertEquals("boom", errors[0].message)
         scope.cancel()
     }
 

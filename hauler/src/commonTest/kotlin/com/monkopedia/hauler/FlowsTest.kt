@@ -16,15 +16,12 @@
 package com.monkopedia.hauler
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -33,6 +30,11 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Tests for the polling helpers in [Flows.kt] (BasicDeliveryService.withPickup /
+ * dumpWithPickup). The streaming Flow paths on DeliveryService are exercised directly in
+ * DeliveryServiceTest / PipelineIntegrationTest.
+ */
 class FlowsTest {
 
     private fun box(
@@ -43,152 +45,10 @@ class FlowsTest {
         threadName: String? = "main",
     ) = Box(level, loggerName, message, timestamp, threadName)
 
-    // --- DeliveryService.deliveries() (callbackFlow) ---
-
-    @Test
-    fun deliveries_receivesLiveEvents() = runTest {
-        withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
-            val dropBox = warehouse.requestPickup()
-            val service = warehouse.deliveries()
-            val scope = CoroutineScope(SupervisorJob())
-
-            val result = mutableListOf<Box>()
-            val collectJob = launch {
-                service.deliveries(scope).take(2).collect { result.add(it) }
-            }
-            delay(100) // let callbackFlow setup
-
-            dropBox.log(box(message = "live1"))
-            dropBox.log(box(message = "live2"))
-
-            // Poll for results — each delay(1) yields to real scheduler
-            withTimeout(5.seconds) {
-                while (result.size < 2) delay(1)
-            }
-            assertEquals(2, result.size)
-            assertEquals("live1", result[0].message)
-            assertEquals("live2", result[1].message)
-            collectJob.cancel()
-            scope.cancel()
-            warehouse.close()
-        }
-    }
-
-    // --- DeliveryService.dumpDeliveries() ---
-
-    @Test
-    fun dumpDeliveries_returnsReplayCache() = runTest {
-        val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100, onDeliveryError = {}))
-        val dropBox = warehouse.requestPickup()
-        dropBox.log(box(message = "cached1"))
-        dropBox.log(box(message = "cached2"))
-
-        val service = warehouse.deliveries()
-        val result = service.dumpDeliveries().toList()
-        assertEquals(2, result.size)
-        assertEquals("cached1", result[0].message)
-        assertEquals("cached2", result[1].message)
-        warehouse.close()
-    }
-
-    // --- DeliveryService.dumpCustomerPickup() ---
-
-    @Test
-    fun dumpCustomerPickup_returnsReplayedBoxes() = runTest {
-        val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100, onDeliveryError = {}))
-        val dropBox = warehouse.requestPickup()
-        dropBox.log(box(message = "poll1"))
-        dropBox.log(box(message = "poll2"))
-
-        val service = warehouse.deliveries()
-        val pickup = service.dumpCustomerPickup()
-        val allBoxes = mutableListOf<Box>()
-        withTimeout(5.seconds) {
-            while (allBoxes.size < 2) {
-                allBoxes.addAll(pickup.get().unpack())
-                if (allBoxes.size < 2) delay(1)
-            }
-        }
-        assertEquals(2, allBoxes.size)
-        pickup.close()
-        warehouse.close()
-    }
-
-    // --- DeliveryService.withDeliveryDay() (uses pack() with timer-based flushing) ---
-    // Uses UnconfinedTestDispatcher so that pack()'s delay() runs on virtual time.
-
-    @Test
-    fun withDeliveryDay_receivesLiveEvents() = runTest {
-        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val scope = CoroutineScope(SupervisorJob() + testDispatcher)
-        val rates = DeliveryRates(
-            defaultPaletteSize = 500,
-            defaultPaletteInterval = 1.seconds,
-            onDeliveryError = {},
-        )
-        val service = flow.deliveries(scope, rates)
-
-        val result = mutableListOf<Box>()
-        backgroundScope.launch(testDispatcher) {
-            service.withDeliveryDay(scope).take(2).collect { result.add(it) }
-        }
-        testScheduler.runCurrent()
-
-        flow.emit(box(message = "a"))
-        flow.emit(box(message = "b"))
-        testScheduler.runCurrent()
-
-        testScheduler.advanceTimeBy(1100)
-        testScheduler.runCurrent()
-
-        assertEquals(2, result.size)
-        assertEquals("a", result[0].message)
-        assertEquals("b", result[1].message)
-        scope.cancel()
-    }
-
-    // --- DeliveryService.dumpWithDeliveryDay() ---
-
-    @Test
-    fun dumpWithDeliveryDay_returnsReplayCache() = runTest {
-        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
-        val sharedFlow = MutableSharedFlow<Box>(replay = 100)
-        val scope = CoroutineScope(SupervisorJob() + testDispatcher)
-        val rates = DeliveryRates(
-            defaultPaletteSize = 500,
-            defaultPaletteInterval = 500.milliseconds,
-            onDeliveryError = {},
-        )
-        val service = sharedFlow.deliveries(scope, rates)
-
-        sharedFlow.emit(box(message = "cached1"))
-        sharedFlow.emit(box(message = "cached2"))
-
-        val result = mutableListOf<Box>()
-        backgroundScope.launch(testDispatcher) {
-            service.dumpWithDeliveryDay().collect { result.add(it) }
-        }
-
-        testScheduler.advanceTimeBy(600)
-        testScheduler.runCurrent()
-
-        assertEquals(2, result.size)
-        assertEquals("cached1", result[0].message)
-        assertEquals("cached2", result[1].message)
-        scope.cancel()
-    }
-
-    // --- DeliveryService.withPickup() ---
-    // Uses withContext(Dispatchers.Default) for real-time execution because withPickup
-    // wraps a polling loop inside callbackFlow + coroutineScope — the layered
-    // producer/consumer doesn't propagate items within a single test scheduler tick.
-
     @Test
     fun withPickup_receivesLiveEvents() = runTest {
         withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(onDeliveryError = {}))
+            val warehouse = Warehouse(DeliveryRates())
             val dropBox = warehouse.requestPickup()
             val service = warehouse.deliveries()
             val scope = CoroutineScope(SupervisorJob())
@@ -210,18 +70,16 @@ class FlowsTest {
             assertEquals("a", result[0].message)
             assertEquals("b", result[1].message)
 
-            collectJob.cancel()
+            collectJob.cancelAndJoin()
             scope.cancel()
             warehouse.close()
         }
     }
 
-    // --- DeliveryService.dumpWithPickup() ---
-
     @Test
     fun dumpWithPickup_returnsReplayedBoxes() = runTest {
         withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100, onDeliveryError = {}))
+            val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100))
             val dropBox = warehouse.requestPickup()
             dropBox.log(box(message = "r1"))
             dropBox.log(box(message = "r2"))
@@ -242,7 +100,7 @@ class FlowsTest {
             assertEquals("r1", result[0].message)
             assertEquals("r2", result[1].message)
 
-            collectJob.cancel()
+            collectJob.cancelAndJoin()
             scope.cancel()
             warehouse.close()
         }
