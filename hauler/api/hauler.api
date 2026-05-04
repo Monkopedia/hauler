@@ -43,6 +43,7 @@ public final class com/monkopedia/hauler/AutomaticDelivery$Companion : com/monko
 	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
 }
 
 public final class com/monkopedia/hauler/AutomaticDelivery$DefaultImpls {
@@ -56,7 +57,7 @@ public final class com/monkopedia/hauler/AutomaticDelivery$Stub : com/monkopedia
 	public final synthetic fun onLogEvent (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/AutomaticDelivery$Stub$AnonymousOnLogEvent : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/AutomaticDelivery$Stub$AnonymousOnLogEvent : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -147,6 +148,7 @@ public final class com/monkopedia/hauler/CustomerPickup$Companion : com/monkoped
 	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
 }
 
 public final class com/monkopedia/hauler/CustomerPickup$DefaultImpls {
@@ -161,7 +163,7 @@ public final class com/monkopedia/hauler/CustomerPickup$Stub : com/monkopedia/ha
 	public final synthetic fun get (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/CustomerPickup$Stub$AnonymousGet : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/CustomerPickup$Stub$AnonymousGet : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -182,6 +184,7 @@ public final class com/monkopedia/hauler/DeliveryDay$Companion : com/monkopedia/
 	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
 }
 
 public final class com/monkopedia/hauler/DeliveryDay$DefaultImpls {
@@ -195,7 +198,7 @@ public final class com/monkopedia/hauler/DeliveryDay$Stub : com/monkopedia/haule
 	public final synthetic fun onLogs (Lcom/monkopedia/hauler/Palette;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryDay$Stub$AnonymousOnLogs : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryDay$Stub$AnonymousOnLogs : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -223,7 +226,7 @@ public final class com/monkopedia/hauler/DeliveryRates {
 	public fun toString ()Ljava/lang/String;
 }
 
-public abstract interface class com/monkopedia/hauler/DeliveryService : com/monkopedia/ksrpc/RpcService {
+public abstract interface class com/monkopedia/hauler/DeliveryService : com/monkopedia/ksrpc/RpcBidiService {
 	public static final field Companion Lcom/monkopedia/hauler/DeliveryService$Companion;
 	public abstract fun dumpCustomerPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun dumpCustomerPickup$default (Lcom/monkopedia/hauler/DeliveryService;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
@@ -242,6 +245,7 @@ public final class com/monkopedia/hauler/DeliveryService$Companion : com/monkope
 	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
 }
 
 public final class com/monkopedia/hauler/DeliveryService$DefaultImpls {
@@ -263,37 +267,37 @@ public final class com/monkopedia/hauler/DeliveryService$Stub : com/monkopedia/h
 	public final synthetic fun weighIn (Lcom/monkopedia/hauler/WeighStation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpCustomerPickup : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpCustomerPickup : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDelivery : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDelivery : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDeliveryDay : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousDumpDeliveryDay : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRecurringCustomerPickup : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRecurringCustomerPickup : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRegisterDelivery : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRegisterDelivery : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRegisterDeliveryDay : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousRegisterDeliveryDay : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousWeighIn : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousWeighIn : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -320,6 +324,7 @@ public final class com/monkopedia/hauler/DropBox$Companion : com/monkopedia/ksrp
 	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
 }
 
 public final class com/monkopedia/hauler/DropBox$DefaultImpls {
@@ -333,7 +338,7 @@ public final class com/monkopedia/hauler/DropBox$Stub : com/monkopedia/hauler/Dr
 	public final synthetic fun log (Lcom/monkopedia/hauler/Box;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/DropBox$Stub$AnonymousLog : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/DropBox$Stub$AnonymousLog : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -489,6 +494,7 @@ public final class com/monkopedia/hauler/LoadingDock$Companion : com/monkopedia/
 	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
 }
 
 public final class com/monkopedia/hauler/LoadingDock$DefaultImpls {
@@ -502,7 +508,7 @@ public final class com/monkopedia/hauler/LoadingDock$Stub : com/monkopedia/haule
 	public final synthetic fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/LoadingDock$Stub$AnonymousBulkLog : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/LoadingDock$Stub$AnonymousBulkLog : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -739,6 +745,7 @@ public final class com/monkopedia/hauler/Registration$Companion : com/monkopedia
 	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
 }
 
 public final class com/monkopedia/hauler/Registration$DefaultImpls {
@@ -755,12 +762,12 @@ public final class com/monkopedia/hauler/Registration$Stub : com/monkopedia/haul
 	public final synthetic fun unregister (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/Registration$Stub$AnonymousPing : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/Registration$Stub$AnonymousPing : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/Registration$Stub$AnonymousUnregister : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/Registration$Stub$AnonymousUnregister : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -771,7 +778,7 @@ public final synthetic class com/monkopedia/hauler/Registration$Stub$Companion {
 	public final synthetic fun Unregister$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
-public abstract interface class com/monkopedia/hauler/Shipper : com/monkopedia/ksrpc/RpcService {
+public abstract interface class com/monkopedia/hauler/Shipper : com/monkopedia/ksrpc/RpcHostService {
 	public static final field Companion Lcom/monkopedia/hauler/Shipper$Companion;
 	public abstract fun deliveries (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun deliveries$default (Lcom/monkopedia/hauler/Shipper;Lkotlin/Unit;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
@@ -787,6 +794,7 @@ public final class com/monkopedia/hauler/Shipper$Companion : com/monkopedia/ksrp
 	public final fun findEndpoint (Ljava/lang/String;)Lcom/monkopedia/ksrpc/RpcMethod;
 	public final fun getEndpoints ()Ljava/util/List;
 	public final fun getServiceName ()Ljava/lang/String;
+	public final fun getServiceTier ()Lcom/monkopedia/ksrpc/ServiceTier;
 }
 
 public final class com/monkopedia/hauler/Shipper$DefaultImpls {
@@ -805,17 +813,17 @@ public final class com/monkopedia/hauler/Shipper$Stub : com/monkopedia/hauler/Sh
 	public final synthetic fun requestPickup (Lkotlin/Unit;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/Shipper$Stub$AnonymousDeliveries : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/Shipper$Stub$AnonymousDeliveries : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/Shipper$Stub$AnonymousRequestDockPickup : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/Shipper$Stub$AnonymousRequestDockPickup : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
-public final class com/monkopedia/hauler/Shipper$Stub$AnonymousRequestPickup : com/monkopedia/ksrpc/ServiceExecutor {
+public final class com/monkopedia/hauler/Shipper$Stub$AnonymousRequestPickup : com/monkopedia/ksrpc/internal/ServiceExecutor {
 	public fun <init> ()V
 	public final synthetic fun invoke (Lcom/monkopedia/ksrpc/RpcService;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }

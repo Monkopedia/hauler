@@ -15,6 +15,7 @@
  */
 package com.monkopedia.hauler
 
+import com.monkopedia.ksrpc.RpcBidiService
 import com.monkopedia.ksrpc.RpcService
 import com.monkopedia.ksrpc.annotation.KsMethod
 import com.monkopedia.ksrpc.annotation.KsService
@@ -25,7 +26,7 @@ typealias Deliveries = Flow<Box>
 
 /** Manages log observation via callbacks, batched callbacks, or polling. Supports filtering via [weighIn]. */
 @KsService
-interface DeliveryService : RpcService {
+interface DeliveryService : RpcBidiService {
     @KsMethod("/register")
     suspend fun registerDelivery(receiver: AutomaticDelivery): Registration
 

@@ -28,7 +28,8 @@ import com.monkopedia.hauler.hauler
 import com.monkopedia.hauler.info
 import com.monkopedia.hauler.warn
 import com.monkopedia.ksrpc.ksrpcEnvironment
-import com.monkopedia.ksrpc.ktor.asConnection
+import com.monkopedia.ksrpc.ktor.asHttpChannelClient
+import com.monkopedia.ksrpc.ktor.websocket.asWebsocketConnection
 import com.monkopedia.ksrpc.toStub
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
@@ -98,7 +99,7 @@ suspend fun createShipper(
 
         HTTPS -> {
             HttpClient()
-                .asConnection(exec.endpoint!!, ksrpcEnvironment { })
+                .asHttpChannelClient(exec.endpoint!!, ksrpcEnvironment { })
                 .defaultChannel()
                 .toStub()
         }
@@ -106,7 +107,7 @@ suspend fun createShipper(
         WSS -> {
             HttpClient {
                 install(WebSockets)
-            }.asConnection(exec.endpoint!!, ksrpcEnvironment { })
+            }.asWebsocketConnection(exec.endpoint!!, ksrpcEnvironment { })
                 .defaultChannel()
                 .toStub()
         }

@@ -15,13 +15,13 @@
  */
 package com.monkopedia.hauler
 
-import com.monkopedia.ksrpc.RpcService
+import com.monkopedia.ksrpc.RpcHostService
 import com.monkopedia.ksrpc.annotation.KsMethod
 import com.monkopedia.ksrpc.annotation.KsService
 
 /** Central dispatch for log transport. Request a [DropBox] for single messages, a [LoadingDock] for batches, or [DeliveryService] for observing. */
 @KsService
-interface Shipper : RpcService {
+interface Shipper : RpcHostService {
     @KsMethod("/pickup")
     suspend fun requestPickup(u: Unit = Unit): DropBox
 

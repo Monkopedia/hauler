@@ -16,12 +16,12 @@
 package com.monkopedia.hauler.benchmark
 
 import com.monkopedia.hauler.Shipper
-import com.monkopedia.ksrpc.RpcService
+import com.monkopedia.ksrpc.RpcBidiService
 import com.monkopedia.ksrpc.annotation.KsMethod
 import com.monkopedia.ksrpc.annotation.KsService
 
 @KsService
-interface HarnessProtocol : RpcService {
+interface HarnessProtocol : RpcBidiService {
     @KsMethod("/platform")
     suspend fun getPlatform(controller: String): String
 
