@@ -182,12 +182,12 @@ in scope, the spelled-out type is `suspend FlowCollector<String>.(Box) -> Unit`.
 
 ## ksrpc dependency
 
-`hauler` 0.4.x depends on `com.monkopedia.ksrpc:ksrpc-core:1.0.0-RC2`.
+`hauler` 0.4.x depends on `com.monkopedia.ksrpc:ksrpc-core:1.0.0-RC4`.
 Consumers transitively inherit a pre-release dependency. `hauler` 0.4.0 final
 will follow `ksrpc` 1.0.0 final as a one-line bump.
 
 If your project applies the `com.monkopedia.ksrpc.plugin` Gradle plugin
-directly, also bump it to `1.0.0-RC2`. If you reference `ksrpc-sockets` /
+directly, also bump it to `1.0.0-RC4`. If you reference `ksrpc-sockets` /
 `ksrpc-ktor-client` / `ksrpc-ktor-websocket-client` directly, the entry-point
 names changed in ksrpc 1.0:
 
