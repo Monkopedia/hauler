@@ -23,7 +23,7 @@ buildconfig = "6.0.7"
 logback = "1.5.32"
 kotlinx-benchmark = "0.4.14"
 binary-compatibility-validator = "0.18.1"
-vannik = "0.35.0"
+vannik = "0.36.0"
 
 [libraries]
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
