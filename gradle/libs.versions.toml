@@ -1,10 +1,9 @@
 [versions]
-kotlin = "2.3.20"
+kotlin = "2.4.0"
 kotlin-coroutines = "1.10.2"
 kotlin-serialization = "1.10.0"
 kotlin-datetime = "0.7.1"
 kotlin-nodejs = "0.0.7"
-ksp = "2.3.6"
 ktor = "3.4.1"
 slf4j = "2.0.17"
 clikt = "5.1.0"
@@ -12,10 +11,8 @@ gradleplugin = "9.1.0"
 kotlin-atomicfu = "0.31.0"
 kotlin-compiletesting = "1.6.0"
 dokka = "2.1.0"
-googleautoservice = "1.1.1"
-autoservice-ksp = "1.2.0"
 jnanoid = "2.0.0"
-ksrpc = "1.0.0"
+ksrpc = "1.1.1"
 hierynomus = "0.16.1"
 ktlint-formatter = "1.8.0"
 ktlint-plugin = "14.2.0"
@@ -29,8 +26,6 @@ vannik = "0.36.0"
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
 dokka-gradle = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-autoservice = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoservice-ksp" }
-autoservice-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "googleautoservice" }
 kotlin-compiletesting = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlin-compiletesting"}
 ktor-io = { module = "io.ktor:ktor-io", version.ref = "ktor" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlin-serialization"}
@@ -81,7 +76,6 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 hierynomus-license = { id = "com.github.hierynomus.license", version.ref = "hierynomus" }
 jlleitschuh-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 kotlinx-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinx-benchmark" }
 gmazzo-buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
