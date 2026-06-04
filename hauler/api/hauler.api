@@ -82,9 +82,9 @@ public final class com/monkopedia/hauler/BasicDeliveryService$Stub$AnonymousWeig
 
 public final synthetic class com/monkopedia/hauler/BasicDeliveryService$Stub$Companion {
 	public fun <init> ()V
-	public final synthetic fun DumpCustomerPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun RecurringCustomerPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun WeighIn$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun DumpCustomerPickup$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RecurringCustomerPickup$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun WeighIn$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
 public abstract interface class com/monkopedia/hauler/BasicShipper : com/monkopedia/ksrpc/RpcHostService {
@@ -130,8 +130,8 @@ public final class com/monkopedia/hauler/BasicShipper$Stub$AnonymousRequestPicku
 
 public final synthetic class com/monkopedia/hauler/BasicShipper$Stub$Companion {
 	public fun <init> ()V
-	public final synthetic fun RequestDockPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun RequestPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RequestDockPickup$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RequestPickup$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
 public final class com/monkopedia/hauler/Box {
@@ -237,7 +237,7 @@ public final class com/monkopedia/hauler/CustomerPickup$Stub$AnonymousGet : com/
 
 public final synthetic class com/monkopedia/hauler/CustomerPickup$Stub$Companion {
 	public fun <init> ()V
-	public final synthetic fun Get$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun Get$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
 public final class com/monkopedia/hauler/DeliveryRates {
@@ -330,13 +330,13 @@ public final class com/monkopedia/hauler/DeliveryService$Stub$AnonymousWeighIn :
 
 public final synthetic class com/monkopedia/hauler/DeliveryService$Stub$Companion {
 	public fun <init> ()V
-	public final synthetic fun DumpCustomerPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun DumpDeliveries$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun DumpDeliveriesPacked$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun RecurringCustomerPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun StreamDeliveries$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun StreamDeliveriesPacked$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun WeighIn$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun DumpCustomerPickup$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun DumpDeliveries$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun DumpDeliveriesPacked$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RecurringCustomerPickup$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun StreamDeliveries$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun StreamDeliveriesPacked$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun WeighIn$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
 public abstract interface class com/monkopedia/hauler/DropBox : com/monkopedia/ksrpc/RpcService {
@@ -371,7 +371,7 @@ public final class com/monkopedia/hauler/DropBox$Stub$AnonymousLog : com/monkope
 
 public final synthetic class com/monkopedia/hauler/DropBox$Stub$Companion {
 	public fun <init> ()V
-	public final synthetic fun Log$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun Log$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
 public final class com/monkopedia/hauler/FilterBuilderKt {
@@ -537,7 +537,7 @@ public final class com/monkopedia/hauler/LoadingDock$Stub$AnonymousBulkLog : com
 
 public final synthetic class com/monkopedia/hauler/LoadingDock$Stub$Companion {
 	public fun <init> ()V
-	public final synthetic fun BulkLog$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun BulkLog$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
 public abstract class com/monkopedia/hauler/LoggerMatchMode : java/lang/Enum {
@@ -799,9 +799,9 @@ public final class com/monkopedia/hauler/Shipper$Stub$AnonymousRequestPickup : c
 
 public final synthetic class com/monkopedia/hauler/Shipper$Stub$Companion {
 	public fun <init> ()V
-	public final synthetic fun Deliveries$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun RequestDockPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
-	public final synthetic fun RequestPickup$hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun Deliveries$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RequestDockPickup$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
+	public final synthetic fun RequestPickup$com_monkopedia_hauler ()Lcom/monkopedia/ksrpc/RpcMethod;
 }
 
 public final class com/monkopedia/hauler/TerminatorsKt {
