@@ -61,14 +61,10 @@ kotlin {
     }
     sourceSets["jvmMain"].dependencies {
         implementation(kotlin("stdlib"))
-        implementation(kotlin("reflect"))
-        implementation(libs.slf4j.api)
         compileOnly(libs.ktor.server)
         compileOnly(libs.ktor.server.host.common)
         compileOnly(libs.ktor.server.netty)
         compileOnly(libs.ktor.client)
-        implementation(libs.clikt)
-        implementation(libs.logback.classic)
     }
     sourceSets["commonTest"].dependencies {
         implementation(kotlin("test"))
