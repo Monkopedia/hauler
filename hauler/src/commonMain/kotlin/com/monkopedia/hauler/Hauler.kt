@@ -112,38 +112,38 @@ interface AsyncHauler {
  */
 expect fun loggingName(): String?
 
-inline fun AsyncHauler.ship(
+fun AsyncHauler.ship(
     level: Level,
     message: String,
     throwable: Throwable? = null,
     metadata: Map<String, String>? = null,
 ) = emit(convert(level, message, throwable, loggingName(), metadata))
 
-inline fun AsyncHauler.error(
+fun AsyncHauler.error(
     message: String,
     throwable: Throwable? = null,
     metadata: Map<String, String>? = null,
 ) = ship(ERROR, message, throwable, metadata)
 
-inline fun AsyncHauler.warn(
+fun AsyncHauler.warn(
     message: String,
     throwable: Throwable? = null,
     metadata: Map<String, String>? = null,
 ) = ship(WARN, message, throwable, metadata)
 
-inline fun AsyncHauler.info(
+fun AsyncHauler.info(
     message: String,
     throwable: Throwable? = null,
     metadata: Map<String, String>? = null,
 ) = ship(INFO, message, throwable, metadata)
 
-inline fun AsyncHauler.debug(
+fun AsyncHauler.debug(
     message: String,
     throwable: Throwable? = null,
     metadata: Map<String, String>? = null,
 ) = ship(DEBUG, message, throwable, metadata)
 
-inline fun AsyncHauler.trace(
+fun AsyncHauler.trace(
     message: String,
     throwable: Throwable? = null,
     metadata: Map<String, String>? = null,

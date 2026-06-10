@@ -45,7 +45,7 @@ object Garage {
 }
 
 /** Create a [Hauler] that tags all emitted [Box]es with the given [loggerName]. */
-inline fun Hauler.named(loggerName: String): Hauler =
+fun Hauler.named(loggerName: String): Hauler =
     Hauler { box ->
         this@named.emit(
             Box(box.level, loggerName, box.message, box.timestamp, box.threadName, box.metadata),
@@ -53,29 +53,29 @@ inline fun Hauler.named(loggerName: String): Hauler =
     }
 
 /** Create a [Hauler] that only emits [Box]es at or above the given [level]. */
-inline fun Hauler.level(level: Level): Hauler =
+fun Hauler.level(level: Level): Hauler =
     Hauler { box ->
         if (box.level.intLevel >= level.intLevel) {
             this@level.emit(box)
         }
     }
 
-inline fun Deliveries.level(level: Level): Deliveries =
+fun Deliveries.level(level: Level): Deliveries =
     filter { box ->
         box.level.intLevel >= level.intLevel
     }
 
 /** Create a named [Hauler] that routes through the global [Garage]. */
-inline fun hauler(name: String): Hauler = Garage.rootHauler.named(name)
+fun hauler(name: String): Hauler = Garage.rootHauler.named(name)
 
 inline fun <reified T> T.hauler(): Hauler = createHauler<T>()
 
 inline fun <reified T> createHauler(): Hauler = hauler(T::class.simpleName ?: T::class.toString())
 
-inline fun route(
+fun route(
     scope: CoroutineScope,
     display: Display,
-    noinline formatter: Formatter = FlowCollector<String>::defaultFormat,
+    formatter: Formatter = FlowCollector<String>::defaultFormat,
 ): Job =
     scope.launch {
         Garage.deliveries.route(display, formatter)
