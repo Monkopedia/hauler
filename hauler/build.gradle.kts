@@ -76,7 +76,7 @@ kotlin {
     }
 
     compilerOptions {
-        freeCompilerArgs.addAll("-Xskip-prerelease-check")
+        freeCompilerArgs.addAll("-Xskip-prerelease-check", "-Xexpect-actual-classes")
     }
 }
 
