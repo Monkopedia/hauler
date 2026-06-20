@@ -33,14 +33,16 @@ fun List<Box>.pack(): Palette {
     val threadsList = mutableListOf<String>()
     val packages = ArrayList<Package>(size)
     for (box in this) {
-        val tagIdx = tagsIndex.getOrPut(box.loggerName) {
-            tagsList.size.also { tagsList.add(box.loggerName) }
-        }
-        val threadIdx = box.threadName?.let { name ->
-            threadsIndex.getOrPut(name) {
-                threadsList.size.also { threadsList.add(name) }
+        val tagIdx =
+            tagsIndex.getOrPut(box.loggerName) {
+                tagsList.size.also { tagsList.add(box.loggerName) }
             }
-        }
+        val threadIdx =
+            box.threadName?.let { name ->
+                threadsIndex.getOrPut(name) {
+                    threadsList.size.also { threadsList.add(name) }
+                }
+            }
         packages.add(
             Package(box.level.intLevel, tagIdx, box.message, box.timestamp, threadIdx, box.metadata),
         )

@@ -28,7 +28,6 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 class PickupsTest {
-
     private fun box(
         level: Level = Level.INFO,
         loggerName: String = "com.example.Test",
@@ -46,95 +45,103 @@ class PickupsTest {
     // --- Deliveries.forwardTo(DropBox) ---
 
     @Test
-    fun forwardToDropBox_forwardsEachBox() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val scope = CoroutineScope(SupervisorJob())
-        val received = mutableListOf<Box>()
-        val dropBox = object : DropBox {
-            override suspend fun log(logEvent: Box) {
-                received.add(logEvent)
-            }
+    fun forwardToDropBox_forwardsEachBox() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val scope = CoroutineScope(SupervisorJob())
+            val received = mutableListOf<Box>()
+            val dropBox =
+                object : DropBox {
+                    override suspend fun log(logEvent: Box) {
+                        received.add(logEvent)
+                    }
+                }
+
+            val job = flow.forwardTo(dropBox, scope)
+            assertTrue(job.isActive)
+
+            flow.emit(box(message = "a"))
+            flow.emit(box(message = "b"))
+            awaitCondition { received.size >= 2 }
+
+            assertEquals(2, received.size)
+            assertEquals("a", received[0].message)
+            assertEquals("b", received[1].message)
+            job.cancel()
+            scope.cancel()
         }
-
-        val job = flow.forwardTo(dropBox, scope)
-        assertTrue(job.isActive)
-
-        flow.emit(box(message = "a"))
-        flow.emit(box(message = "b"))
-        awaitCondition { received.size >= 2 }
-
-        assertEquals(2, received.size)
-        assertEquals("a", received[0].message)
-        assertEquals("b", received[1].message)
-        job.cancel()
-        scope.cancel()
-    }
 
     @Test
-    fun forwardToDropBox_jobIsActiveAfterLaunch() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val scope = CoroutineScope(SupervisorJob())
-        val dropBox = object : DropBox {
-            override suspend fun log(logEvent: Box) {}
+    fun forwardToDropBox_jobIsActiveAfterLaunch() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val scope = CoroutineScope(SupervisorJob())
+            val dropBox =
+                object : DropBox {
+                    override suspend fun log(logEvent: Box) {}
+                }
+            val job = flow.forwardTo(dropBox, scope)
+            assertTrue(job.isActive)
+            job.cancel()
+            scope.cancel()
         }
-        val job = flow.forwardTo(dropBox, scope)
-        assertTrue(job.isActive)
-        job.cancel()
-        scope.cancel()
-    }
 
     // --- Deliveries.forwardTo(LoadingDock) ---
 
     @Test
-    fun forwardToLoadingDock_forwardsPalettes() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val scope = CoroutineScope(SupervisorJob())
-        val received = mutableListOf<Palette>()
-        val dock = object : LoadingDock {
-            override suspend fun bulkLog(logs: Palette) {
-                received.add(logs)
-            }
+    fun forwardToLoadingDock_forwardsPalettes() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val scope = CoroutineScope(SupervisorJob())
+            val received = mutableListOf<Palette>()
+            val dock =
+                object : LoadingDock {
+                    override suspend fun bulkLog(logs: Palette) {
+                        received.add(logs)
+                    }
+                }
+
+            // Small palette size so size-based flush triggers. Long interval to avoid timer-based.
+            val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
+            val job = flow.forwardTo(dock, scope, rates)
+            assertTrue(job.isActive)
+
+            flow.emit(box(message = "x"))
+            flow.emit(box(message = "y"))
+            awaitCondition { received.isNotEmpty() }
+
+            val allBoxes = received.flatMap { it.unpack() }
+            assertTrue(allBoxes.any { it.message == "x" })
+            assertTrue(allBoxes.any { it.message == "y" })
+            job.cancel()
+            scope.cancel()
         }
-
-        // Small palette size so size-based flush triggers. Long interval to avoid timer-based.
-        val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
-        val job = flow.forwardTo(dock, scope, rates)
-        assertTrue(job.isActive)
-
-        flow.emit(box(message = "x"))
-        flow.emit(box(message = "y"))
-        awaitCondition { received.isNotEmpty() }
-
-        val allBoxes = received.flatMap { it.unpack() }
-        assertTrue(allBoxes.any { it.message == "x" })
-        assertTrue(allBoxes.any { it.message == "y" })
-        job.cancel()
-        scope.cancel()
-    }
 
     @Test
-    fun forwardToLoadingDock_respectsPaletteSize() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val scope = CoroutineScope(SupervisorJob())
-        val received = mutableListOf<Palette>()
-        val dock = object : LoadingDock {
-            override suspend fun bulkLog(logs: Palette) {
-                received.add(logs)
-            }
+    fun forwardToLoadingDock_respectsPaletteSize() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val scope = CoroutineScope(SupervisorJob())
+            val received = mutableListOf<Palette>()
+            val dock =
+                object : LoadingDock {
+                    override suspend fun bulkLog(logs: Palette) {
+                        received.add(logs)
+                    }
+                }
+
+            // Palette size = 3, long interval so only size triggers flush
+            val rates = DeliveryRates(defaultPaletteSize = 3, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
+            val job = flow.forwardTo(dock, scope, rates)
+
+            flow.emit(box(message = "1"))
+            flow.emit(box(message = "2"))
+            flow.emit(box(message = "3"))
+            awaitCondition { received.isNotEmpty() }
+
+            val allBoxes = received.flatMap { it.unpack() }
+            assertEquals(3, allBoxes.size)
+            job.cancel()
+            scope.cancel()
         }
-
-        // Palette size = 3, long interval so only size triggers flush
-        val rates = DeliveryRates(defaultPaletteSize = 3, defaultPaletteInterval = 100.seconds, onDeliveryError = {})
-        val job = flow.forwardTo(dock, scope, rates)
-
-        flow.emit(box(message = "1"))
-        flow.emit(box(message = "2"))
-        flow.emit(box(message = "3"))
-        awaitCondition { received.isNotEmpty() }
-
-        val allBoxes = received.flatMap { it.unpack() }
-        assertEquals(3, allBoxes.size)
-        job.cancel()
-        scope.cancel()
-    }
 }

@@ -20,7 +20,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SerializationTest {
-
     private val json = Json { encodeDefaults = true }
     private val jsonNoDefaults = Json { encodeDefaults = false }
 
@@ -101,14 +100,16 @@ class SerializationTest {
 
     @Test
     fun palette_roundtrip() {
-        val palette = Palette(
-            loggerNames = listOf("A", "B"),
-            threadNames = listOf("main"),
-            messages = listOf(
-                Package(20, 0, "msg1", 100L, 0),
-                Package(30, 1, "msg2", 200L, 0),
-            ),
-        )
+        val palette =
+            Palette(
+                loggerNames = listOf("A", "B"),
+                threadNames = listOf("main"),
+                messages =
+                    listOf(
+                        Package(20, 0, "msg1", 100L, 0),
+                        Package(30, 1, "msg2", 200L, 0),
+                    ),
+            )
         val encoded = json.encodeToString(Palette.serializer(), palette)
         val decoded = json.decodeFromString(Palette.serializer(), encoded)
         assertEquals(palette, decoded)
@@ -116,10 +117,11 @@ class SerializationTest {
 
     @Test
     fun palette_emptyThreadNames_defaultOnDecode() {
-        val palette = Palette(
-            loggerNames = listOf("A"),
-            messages = listOf(Package(20, 0, "msg", 100L, null)),
-        )
+        val palette =
+            Palette(
+                loggerNames = listOf("A"),
+                messages = listOf(Package(20, 0, "msg", 100L, null)),
+            )
         val encoded = jsonNoDefaults.encodeToString(Palette.serializer(), palette)
         val decoded = jsonNoDefaults.decodeFromString(Palette.serializer(), encoded)
         assertEquals(palette, decoded)
@@ -129,10 +131,11 @@ class SerializationTest {
 
     @Test
     fun palette_jsonRoundtrip_matchesPackUnpack() {
-        val boxes = listOf(
-            Box(Level.INFO, "com.example.A", "hello", 1000L, "main"),
-            Box(Level.ERROR, "com.example.B", "fail", 2000L, "worker"),
-        )
+        val boxes =
+            listOf(
+                Box(Level.INFO, "com.example.A", "hello", 1000L, "main"),
+                Box(Level.ERROR, "com.example.B", "fail", 2000L, "worker"),
+            )
         val palette = boxes.pack()
         val encoded = json.encodeToString(Palette.serializer(), palette)
         val decoded = json.decodeFromString(Palette.serializer(), encoded)
@@ -183,10 +186,11 @@ class SerializationTest {
 
     @Test
     fun andFilter_roundtrip() {
-        val filter: WeighStation = AndFilter(
-            LevelFilter(LevelMatchMode.GT, Level.DEBUG),
-            LoggerNameFilter(LoggerMatchMode.PREFIX, "com"),
-        )
+        val filter: WeighStation =
+            AndFilter(
+                LevelFilter(LevelMatchMode.GT, Level.DEBUG),
+                LoggerNameFilter(LoggerMatchMode.PREFIX, "com"),
+            )
         val encoded = json.encodeToString(WeighStation.serializer(), filter)
         val decoded = json.decodeFromString(WeighStation.serializer(), encoded)
         assertEquals(filter, decoded)
@@ -194,10 +198,11 @@ class SerializationTest {
 
     @Test
     fun orFilter_roundtrip() {
-        val filter: WeighStation = OrFilter(
-            LevelFilter(LevelMatchMode.EQ, Level.ERROR),
-            MessageFilter(LoggerMatchMode.EXACT, "critical"),
-        )
+        val filter: WeighStation =
+            OrFilter(
+                LevelFilter(LevelMatchMode.EQ, Level.ERROR),
+                MessageFilter(LoggerMatchMode.EXACT, "critical"),
+            )
         val encoded = json.encodeToString(WeighStation.serializer(), filter)
         val decoded = json.decodeFromString(WeighStation.serializer(), encoded)
         assertEquals(filter, decoded)
@@ -213,13 +218,14 @@ class SerializationTest {
 
     @Test
     fun nestedFilter_roundtrip() {
-        val filter: WeighStation = AndFilter(
-            OrFilter(
-                LevelFilter(LevelMatchMode.GT, Level.INFO),
-                LoggerNameFilter(LoggerMatchMode.PREFIX, "com.example"),
-            ),
-            NotFilter(MessageFilter(LoggerMatchMode.REGEX, ".*ignore.*")),
-        )
+        val filter: WeighStation =
+            AndFilter(
+                OrFilter(
+                    LevelFilter(LevelMatchMode.GT, Level.INFO),
+                    LoggerNameFilter(LoggerMatchMode.PREFIX, "com.example"),
+                ),
+                NotFilter(MessageFilter(LoggerMatchMode.REGEX, ".*ignore.*")),
+            )
         val encoded = json.encodeToString(WeighStation.serializer(), filter)
         val decoded = json.decodeFromString(WeighStation.serializer(), encoded)
         assertEquals(filter, decoded)

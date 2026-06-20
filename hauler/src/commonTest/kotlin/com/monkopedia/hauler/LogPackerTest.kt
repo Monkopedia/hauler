@@ -19,7 +19,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class LogPackerTest {
-
     private fun box(
         level: Level = Level.INFO,
         loggerName: String = "com.example.Test",

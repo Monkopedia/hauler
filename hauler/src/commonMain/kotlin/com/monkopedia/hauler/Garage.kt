@@ -41,7 +41,6 @@ object Garage {
             sharedFlow.tryEmit(box)
         }
     val deliveries: Deliveries = sharedFlow
-
 }
 
 /** Create a [Hauler] that tags all emitted [Box]es with the given [loggerName]. */

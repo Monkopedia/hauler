@@ -20,7 +20,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TrucksTest {
-
     private fun box(
         level: Level = Level.INFO,
         loggerName: String = "com.example.Test",
@@ -30,29 +29,32 @@ class TrucksTest {
     ) = Box(level, loggerName, message, timestamp, threadName)
 
     @Test
-    fun container_silentlyDiscardsBoxes() = runTest {
-        // Container should not throw; it just discards
-        Container.emit(box(message = "discarded"))
-        Container.emit(box(message = "also discarded"))
-    }
-
-    @Test
-    fun container_multipleEmitsNoEffect() = runTest {
-        // Emitting many boxes should still be a no-op
-        repeat(1000) {
-            Container.emit(box(message = "msg$it"))
+    fun container_silentlyDiscardsBoxes() =
+        runTest {
+            // Container should not throw; it just discards
+            Container.emit(box(message = "discarded"))
+            Container.emit(box(message = "also discarded"))
         }
-        // No assertions needed — just verifying it doesn't throw or leak
-    }
 
     @Test
-    fun flatbed_emitsToStdout() = runTest {
-        // Flatbed wraps println; just verify it doesn't throw
-        // We can't easily capture stdout in common code, so just verify the contract
-        val collected = mutableListOf<String>()
-        val testDisplay: Display = Display { collected.add(it) }
-        testDisplay.emit("hello")
-        assertEquals(1, collected.size)
-        assertEquals("hello", collected[0])
-    }
+    fun container_multipleEmitsNoEffect() =
+        runTest {
+            // Emitting many boxes should still be a no-op
+            repeat(1000) {
+                Container.emit(box(message = "msg$it"))
+            }
+            // No assertions needed — just verifying it doesn't throw or leak
+        }
+
+    @Test
+    fun flatbed_emitsToStdout() =
+        runTest {
+            // Flatbed wraps println; just verify it doesn't throw
+            // We can't easily capture stdout in common code, so just verify the contract
+            val collected = mutableListOf<String>()
+            val testDisplay: Display = Display { collected.add(it) }
+            testDisplay.emit("hello")
+            assertEquals(1, collected.size)
+            assertEquals("hello", collected[0])
+        }
 }

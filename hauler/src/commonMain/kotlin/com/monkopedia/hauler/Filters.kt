@@ -15,8 +15,8 @@
  */
 package com.monkopedia.hauler
 
-import kotlin.concurrent.Volatile
 import kotlinx.serialization.Serializable
+import kotlin.concurrent.Volatile
 
 /**
  * Monitors truck contents, regulates what gets through.

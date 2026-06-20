@@ -20,7 +20,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class FilterTest {
-
     private fun box(
         level: Level = Level.INFO,
         loggerName: String = "com.example.Test",
@@ -189,37 +188,41 @@ class FilterTest {
 
     @Test
     fun andFilter_bothTrue() {
-        val filter = AndFilter(
-            LevelFilter(LevelMatchMode.EQ, Level.INFO),
-            LoggerNameFilter(LoggerMatchMode.PREFIX, "com.example"),
-        )
+        val filter =
+            AndFilter(
+                LevelFilter(LevelMatchMode.EQ, Level.INFO),
+                LoggerNameFilter(LoggerMatchMode.PREFIX, "com.example"),
+            )
         assertTrue(box() in filter)
     }
 
     @Test
     fun andFilter_oneFalse() {
-        val filter = AndFilter(
-            LevelFilter(LevelMatchMode.EQ, Level.ERROR),
-            LoggerNameFilter(LoggerMatchMode.PREFIX, "com.example"),
-        )
+        val filter =
+            AndFilter(
+                LevelFilter(LevelMatchMode.EQ, Level.ERROR),
+                LoggerNameFilter(LoggerMatchMode.PREFIX, "com.example"),
+            )
         assertFalse(box() in filter)
     }
 
     @Test
     fun orFilter_oneTrue() {
-        val filter = OrFilter(
-            LevelFilter(LevelMatchMode.EQ, Level.ERROR),
-            LoggerNameFilter(LoggerMatchMode.PREFIX, "com.example"),
-        )
+        val filter =
+            OrFilter(
+                LevelFilter(LevelMatchMode.EQ, Level.ERROR),
+                LoggerNameFilter(LoggerMatchMode.PREFIX, "com.example"),
+            )
         assertTrue(box() in filter)
     }
 
     @Test
     fun orFilter_bothFalse() {
-        val filter = OrFilter(
-            LevelFilter(LevelMatchMode.EQ, Level.ERROR),
-            LoggerNameFilter(LoggerMatchMode.EXACT, "org.other"),
-        )
+        val filter =
+            OrFilter(
+                LevelFilter(LevelMatchMode.EQ, Level.ERROR),
+                LoggerNameFilter(LoggerMatchMode.EXACT, "org.other"),
+            )
         assertFalse(box() in filter)
     }
 
@@ -245,13 +248,14 @@ class FilterTest {
     @Test
     fun deepComposition() {
         // (level > INFO by severity) AND (logger starts with "com" OR message matches ".*error.*")
-        val filter = AndFilter(
-            LevelFilter(LevelMatchMode.GT, Level.INFO),
-            OrFilter(
-                LoggerNameFilter(LoggerMatchMode.PREFIX, "com"),
-                MessageFilter(LoggerMatchMode.REGEX, ".*error.*"),
-            ),
-        )
+        val filter =
+            AndFilter(
+                LevelFilter(LevelMatchMode.GT, Level.INFO),
+                OrFilter(
+                    LoggerNameFilter(LoggerMatchMode.PREFIX, "com"),
+                    MessageFilter(LoggerMatchMode.REGEX, ".*error.*"),
+                ),
+            )
         assertTrue(box(level = Level.WARN) in filter)
         assertFalse(box(level = Level.DEBUG) in filter)
         assertTrue(box(level = Level.ERROR, loggerName = "org.other", message = "an error occurred") in filter)
