@@ -1,0 +1,46 @@
+# Pull-request / main CI gate.
+#
+# Until now hauler's only workflow was publish.yaml (release-triggered), so PRs
+# got no automated checks and style/build debt could accumulate silently. This
+# runs the verifiable gate on every PR and on pushes to main.
+#
+# Scope notes:
+#   * Runs on ubuntu-latest. The JVM/JS/WASM/Linux/MinGW targets build and test
+#     here; the Apple targets (macOS/iOS) are skipped on a non-mac host — they
+#     are still covered at release time by publish.yaml (macos-latest). Adding a
+#     dedicated macOS compile job for the Apple targets is a sensible follow-up.
+#   * `-x klibApiCheck`: BCV's native-klib ABI check needs all targets (incl.
+#     Apple) to build, so it only works on macOS, and no klib baseline is
+#     committed yet. The JVM `apiCheck` (run via :hauler:check) still gates the
+#     public API. Committing a macOS-generated klib baseline to enable
+#     klibApiCheck is a follow-up.
+#   * Only :hauler (the published library) is built. The :benchmark module is
+#     pre-existingly broken against the 0.4.x Flow API and is intentionally not
+#     part of the gate; ktlintCheck still covers its source style.
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Assemble, test, apiCheck, ktlint
+        run: ./gradlew :hauler:assemble :hauler:check ktlintCheck -x klibApiCheck
