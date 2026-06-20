@@ -24,7 +24,6 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.seconds
 
 class CustomerPickupImplTest {
-
     private fun box(
         level: Level = Level.INFO,
         loggerName: String = "com.example.Test",
@@ -34,7 +33,10 @@ class CustomerPickupImplTest {
     ) = Box(level, loggerName, message, timestamp, threadName)
 
     /** Poll get() accumulating results until expected count, yielding to let external scopes run. */
-    private suspend fun pollBoxes(pickup: CustomerPickup, expected: Int): List<Box> {
+    private suspend fun pollBoxes(
+        pickup: CustomerPickup,
+        expected: Int,
+    ): List<Box> {
         val all = mutableListOf<Box>()
         withTimeout(5.seconds) {
             while (all.size < expected) {
@@ -46,126 +48,133 @@ class CustomerPickupImplTest {
     }
 
     @Test
-    fun get_returnsCollectedBoxes() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
+    fun get_returnsCollectedBoxes() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
 
-        flow.emit(box(message = "a"))
-        flow.emit(box(message = "b"))
+            flow.emit(box(message = "a"))
+            flow.emit(box(message = "b"))
 
-        val boxes = pollBoxes(pickup, 2)
-        assertEquals(2, boxes.size)
-        assertEquals("a", boxes[0].message)
-        assertEquals("b", boxes[1].message)
-        pickup.close()
-    }
-
-    @Test
-    fun get_clearsBufferAfterRead() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
-
-        flow.emit(box(message = "first"))
-        val first = pollBoxes(pickup, 1)
-        assertEquals(1, first.size)
-
-        // Buffer was cleared, second get should be empty
-        val palette2 = pickup.get()
-        assertEquals(0, palette2.unpack().size)
-        pickup.close()
-    }
-
-    @Test
-    fun get_respectsCircularBufferSize() = runTest {
-        val rates = DeliveryRates(defaultPaletteSize = 3, onDeliveryError = {})
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, rates, this)
-
-        for (i in 1..5) {
-            flow.emit(box(message = "msg$i"))
+            val boxes = pollBoxes(pickup, 2)
+            assertEquals(2, boxes.size)
+            assertEquals("a", boxes[0].message)
+            assertEquals("b", boxes[1].message)
+            pickup.close()
         }
 
-        val boxes = pollBoxes(pickup, 3)
-        // CircularBuffer(3) keeps last 3 items
-        assertEquals(3, boxes.size)
-        assertEquals("msg3", boxes[0].message)
-        assertEquals("msg4", boxes[1].message)
-        assertEquals("msg5", boxes[2].message)
-        pickup.close()
-    }
-
     @Test
-    fun get_emptyWhenNothingEmitted() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
+    fun get_clearsBufferAfterRead() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
 
-        val palette = pickup.get()
-        assertEquals(0, palette.unpack().size)
-        pickup.close()
-    }
+            flow.emit(box(message = "first"))
+            val first = pollBoxes(pickup, 1)
+            assertEquals(1, first.size)
 
-    @Test
-    fun get_multiplePollingCycles() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
-
-        flow.tryEmit(box(message = "batch1"))
-        val p1 = pollBoxes(pickup, 1)
-        assertEquals(1, p1.size)
-
-        flow.tryEmit(box(message = "batch2a"))
-        flow.tryEmit(box(message = "batch2b"))
-        val p2 = pollBoxes(pickup, 2)
-        assertEquals(2, p2.size)
-
-        pickup.close()
-    }
-
-    @Test
-    fun get_respectsMaxEntries() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates(defaultPaletteSize = 100, onDeliveryError = {}), this)
-
-        for (i in 1..5) {
-            flow.emit(box(message = "msg$i"))
+            // Buffer was cleared, second get should be empty
+            val palette2 = pickup.get()
+            assertEquals(0, palette2.unpack().size)
+            pickup.close()
         }
-        // Wait for all 5 to buffer
-        pollBoxes(pickup, 5).also { assertEquals(5, it.size) }
 
-        // Emit 5 more and wait for them to buffer
-        for (i in 6..10) {
-            flow.emit(box(message = "msg$i"))
-        }
-        // Poll with maxEntries=3 — should return at most 3
-        withTimeout(5.seconds) {
-            while (true) {
-                val batch = pickup.get(maxEntries = 3).unpack()
-                if (batch.isNotEmpty()) {
-                    assertEquals(3, batch.size)
-                    assertEquals("msg6", batch[0].message)
-                    assertEquals("msg7", batch[1].message)
-                    assertEquals("msg8", batch[2].message)
-                    // Remaining 2 should still be available
-                    val rest = pollBoxes(pickup, 2)
-                    assertEquals(2, rest.size)
-                    assertEquals("msg9", rest[0].message)
-                    assertEquals("msg10", rest[1].message)
-                    break
-                }
-                delay(1)
+    @Test
+    fun get_respectsCircularBufferSize() =
+        runTest {
+            val rates = DeliveryRates(defaultPaletteSize = 3, onDeliveryError = {})
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val pickup = CustomerPickupImpl(flow, rates, this)
+
+            for (i in 1..5) {
+                flow.emit(box(message = "msg$i"))
             }
+
+            val boxes = pollBoxes(pickup, 3)
+            // CircularBuffer(3) keeps last 3 items
+            assertEquals(3, boxes.size)
+            assertEquals("msg3", boxes[0].message)
+            assertEquals("msg4", boxes[1].message)
+            assertEquals("msg5", boxes[2].message)
+            pickup.close()
         }
-        pickup.close()
-    }
 
     @Test
-    fun close_stopsCollection() = runTest {
-        val flow = MutableSharedFlow<Box>(replay = 100)
-        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
+    fun get_emptyWhenNothingEmitted() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
 
-        flow.emit(box(message = "before"))
-        pollBoxes(pickup, 1)
-        pickup.close()
-        // Verifies close() doesn't throw
-    }
+            val palette = pickup.get()
+            assertEquals(0, palette.unpack().size)
+            pickup.close()
+        }
+
+    @Test
+    fun get_multiplePollingCycles() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
+
+            flow.tryEmit(box(message = "batch1"))
+            val p1 = pollBoxes(pickup, 1)
+            assertEquals(1, p1.size)
+
+            flow.tryEmit(box(message = "batch2a"))
+            flow.tryEmit(box(message = "batch2b"))
+            val p2 = pollBoxes(pickup, 2)
+            assertEquals(2, p2.size)
+
+            pickup.close()
+        }
+
+    @Test
+    fun get_respectsMaxEntries() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val pickup = CustomerPickupImpl(flow, DeliveryRates(defaultPaletteSize = 100, onDeliveryError = {}), this)
+
+            for (i in 1..5) {
+                flow.emit(box(message = "msg$i"))
+            }
+            // Wait for all 5 to buffer
+            pollBoxes(pickup, 5).also { assertEquals(5, it.size) }
+
+            // Emit 5 more and wait for them to buffer
+            for (i in 6..10) {
+                flow.emit(box(message = "msg$i"))
+            }
+            // Poll with maxEntries=3 — should return at most 3
+            withTimeout(5.seconds) {
+                while (true) {
+                    val batch = pickup.get(maxEntries = 3).unpack()
+                    if (batch.isNotEmpty()) {
+                        assertEquals(3, batch.size)
+                        assertEquals("msg6", batch[0].message)
+                        assertEquals("msg7", batch[1].message)
+                        assertEquals("msg8", batch[2].message)
+                        // Remaining 2 should still be available
+                        val rest = pollBoxes(pickup, 2)
+                        assertEquals(2, rest.size)
+                        assertEquals("msg9", rest[0].message)
+                        assertEquals("msg10", rest[1].message)
+                        break
+                    }
+                    delay(1)
+                }
+            }
+            pickup.close()
+        }
+
+    @Test
+    fun close_stopsCollection() =
+        runTest {
+            val flow = MutableSharedFlow<Box>(replay = 100)
+            val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
+
+            flow.emit(box(message = "before"))
+            pollBoxes(pickup, 1)
+            pickup.close()
+            // Verifies close() doesn't throw
+        }
 }

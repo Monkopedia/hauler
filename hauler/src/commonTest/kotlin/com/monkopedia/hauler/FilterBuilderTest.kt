@@ -23,7 +23,6 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class FilterBuilderTest {
-
     private fun box(
         level: Level = Level.INFO,
         loggerName: String = "com.example.Test",
@@ -34,9 +33,10 @@ class FilterBuilderTest {
 
     @Test
     fun singleFilter_passthrough() {
-        val filter = weighStation {
-            level(LevelMatchMode.EQ, Level.INFO)
-        }
+        val filter =
+            weighStation {
+                level(LevelMatchMode.EQ, Level.INFO)
+            }
         assertIs<LevelFilter>(filter)
         assertTrue(box() in filter)
         assertFalse(box(level = Level.WARN) in filter)
@@ -44,10 +44,11 @@ class FilterBuilderTest {
 
     @Test
     fun multipleFilters_implicitAnd() {
-        val filter = weighStation {
-            level(LevelMatchMode.GT, Level.DEBUG)
-            logger(LoggerMatchMode.PREFIX, "com.example")
-        }
+        val filter =
+            weighStation {
+                level(LevelMatchMode.GT, Level.DEBUG)
+                logger(LoggerMatchMode.PREFIX, "com.example")
+            }
         assertIs<AndFilter>(filter)
         assertTrue(box(level = Level.INFO) in filter)
         assertFalse(box(level = Level.TRACE) in filter)
@@ -56,12 +57,13 @@ class FilterBuilderTest {
 
     @Test
     fun orBlock() {
-        val filter = weighStation {
-            or {
-                logger(LoggerMatchMode.PREFIX, "com.example")
-                message(LoggerMatchMode.REGEX, ".*error.*")
+        val filter =
+            weighStation {
+                or {
+                    logger(LoggerMatchMode.PREFIX, "com.example")
+                    message(LoggerMatchMode.REGEX, ".*error.*")
+                }
             }
-        }
         assertTrue(box() in filter)
         assertTrue(box(loggerName = "org.other", message = "an error occurred") in filter)
         assertFalse(box(loggerName = "org.other", message = "all good") in filter)
@@ -69,11 +71,12 @@ class FilterBuilderTest {
 
     @Test
     fun notBlock() {
-        val filter = weighStation {
-            not {
-                level(LevelMatchMode.EQ, Level.DEBUG)
+        val filter =
+            weighStation {
+                not {
+                    level(LevelMatchMode.EQ, Level.DEBUG)
+                }
             }
-        }
         assertIs<NotFilter>(filter)
         assertTrue(box(level = Level.INFO) in filter)
         assertFalse(box(level = Level.DEBUG) in filter)
@@ -81,13 +84,14 @@ class FilterBuilderTest {
 
     @Test
     fun nestedComposition() {
-        val filter = weighStation {
-            level(LevelMatchMode.GT, Level.INFO)
-            or {
-                logger(LoggerMatchMode.PREFIX, "com.example")
-                message(LoggerMatchMode.REGEX, ".*error.*")
+        val filter =
+            weighStation {
+                level(LevelMatchMode.GT, Level.INFO)
+                or {
+                    logger(LoggerMatchMode.PREFIX, "com.example")
+                    message(LoggerMatchMode.REGEX, ".*error.*")
+                }
             }
-        }
         // WARN + com.example -> true
         assertTrue(box(level = Level.WARN) in filter)
         // ERROR + message matches -> true
@@ -100,12 +104,13 @@ class FilterBuilderTest {
 
     @Test
     fun explicitAndBlock() {
-        val filter = weighStation {
-            and {
-                level(LevelMatchMode.GT, Level.DEBUG)
-                logger(LoggerMatchMode.PREFIX, "com")
+        val filter =
+            weighStation {
+                and {
+                    level(LevelMatchMode.GT, Level.DEBUG)
+                    logger(LoggerMatchMode.PREFIX, "com")
+                }
             }
-        }
         assertTrue(box(level = Level.INFO) in filter)
         assertFalse(box(level = Level.TRACE) in filter)
     }
@@ -119,10 +124,11 @@ class FilterBuilderTest {
 
     @Test
     fun threadAndTimeFilters() {
-        val filter = weighStation {
-            thread(LoggerMatchMode.EXACT, "main")
-            time(LevelMatchMode.GT, 500L)
-        }
+        val filter =
+            weighStation {
+                thread(LoggerMatchMode.EXACT, "main")
+                time(LevelMatchMode.GT, 500L)
+            }
         assertTrue(box() in filter)
         assertFalse(box(threadName = "worker") in filter)
         assertFalse(box(timestamp = 100L) in filter)

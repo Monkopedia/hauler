@@ -24,7 +24,6 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 class AsyncHaulerTest {
-
     private fun box(
         level: Level = Level.INFO,
         loggerName: String = "com.example.Test",
@@ -34,95 +33,101 @@ class AsyncHaulerTest {
     ) = Box(level, loggerName, message, timestamp, threadName)
 
     @Test
-    fun asyncHauler_emitsToUnderlying() = runTest {
-        val collected = mutableListOf<Box>()
-        val hauler = Hauler { collected.add(it) }
-        val async = hauler.asAsync(this)
+    fun asyncHauler_emitsToUnderlying() =
+        runTest {
+            val collected = mutableListOf<Box>()
+            val hauler = Hauler { collected.add(it) }
+            val async = hauler.asAsync(this)
 
-        val testBox = box(message = "async test")
-        async.emit(testBox)
-        withTimeout(2.seconds) {
-            while (collected.isEmpty()) delay(10)
+            val testBox = box(message = "async test")
+            async.emit(testBox)
+            withTimeout(2.seconds) {
+                while (collected.isEmpty()) delay(10)
+            }
+            assertEquals(1, collected.size)
+            assertEquals("async test", collected[0].message)
         }
-        assertEquals(1, collected.size)
-        assertEquals("async test", collected[0].message)
-    }
 
     @Test
-    fun asyncHauler_multipleEmissions() = runTest {
-        val collected = mutableListOf<Box>()
-        val hauler = Hauler { collected.add(it) }
-        val async = hauler.asAsync(this)
+    fun asyncHauler_multipleEmissions() =
+        runTest {
+            val collected = mutableListOf<Box>()
+            val hauler = Hauler { collected.add(it) }
+            val async = hauler.asAsync(this)
 
-        repeat(5) { i ->
-            async.emit(box(message = "msg$i"))
+            repeat(5) { i ->
+                async.emit(box(message = "msg$i"))
+            }
+            withTimeout(2.seconds) {
+                while (collected.size < 5) delay(10)
+            }
+            assertEquals(5, collected.size)
         }
-        withTimeout(2.seconds) {
-            while (collected.size < 5) delay(10)
-        }
-        assertEquals(5, collected.size)
-    }
 
     @Test
-    fun asyncHauler_shipSetsLevel() = runTest {
-        val collected = mutableListOf<Box>()
-        val hauler = Hauler { collected.add(it) }
-        val async = hauler.asAsync(this)
+    fun asyncHauler_shipSetsLevel() =
+        runTest {
+            val collected = mutableListOf<Box>()
+            val hauler = Hauler { collected.add(it) }
+            val async = hauler.asAsync(this)
 
-        async.ship(Level.ERROR, "error msg")
-        withTimeout(2.seconds) {
-            while (collected.isEmpty()) delay(10)
+            async.ship(Level.ERROR, "error msg")
+            withTimeout(2.seconds) {
+                while (collected.isEmpty()) delay(10)
+            }
+            assertEquals(Level.ERROR, collected[0].level)
+            assertTrue(collected[0].message.contains("error msg"))
         }
-        assertEquals(Level.ERROR, collected[0].level)
-        assertTrue(collected[0].message.contains("error msg"))
-    }
 
     @Test
-    fun asyncHauler_levelShortcuts() = runTest {
-        val collected = mutableListOf<Box>()
-        val hauler = Hauler { collected.add(it) }
-        val async = hauler.asAsync(this)
+    fun asyncHauler_levelShortcuts() =
+        runTest {
+            val collected = mutableListOf<Box>()
+            val hauler = Hauler { collected.add(it) }
+            val async = hauler.asAsync(this)
 
-        async.error("e")
-        async.warn("w")
-        async.info("i")
-        async.debug("d")
-        async.trace("t")
+            async.error("e")
+            async.warn("w")
+            async.info("i")
+            async.debug("d")
+            async.trace("t")
 
-        withTimeout(2.seconds) {
-            while (collected.size < 5) delay(10)
+            withTimeout(2.seconds) {
+                while (collected.size < 5) delay(10)
+            }
+            assertEquals(Level.ERROR, collected[0].level)
+            assertEquals(Level.WARN, collected[1].level)
+            assertEquals(Level.INFO, collected[2].level)
+            assertEquals(Level.DEBUG, collected[3].level)
+            assertEquals(Level.TRACE, collected[4].level)
         }
-        assertEquals(Level.ERROR, collected[0].level)
-        assertEquals(Level.WARN, collected[1].level)
-        assertEquals(Level.INFO, collected[2].level)
-        assertEquals(Level.DEBUG, collected[3].level)
-        assertEquals(Level.TRACE, collected[4].level)
-    }
 
     @Test
-    fun asyncHauler_shipWithMetadata() = runTest {
-        val collected = mutableListOf<Box>()
-        val hauler = Hauler { collected.add(it) }
-        val async = hauler.asAsync(this)
+    fun asyncHauler_shipWithMetadata() =
+        runTest {
+            val collected = mutableListOf<Box>()
+            val hauler = Hauler { collected.add(it) }
+            val async = hauler.asAsync(this)
 
-        async.ship(Level.INFO, "meta", metadata = mapOf("key" to "val"))
-        withTimeout(2.seconds) {
-            while (collected.isEmpty()) delay(10)
+            async.ship(Level.INFO, "meta", metadata = mapOf("key" to "val"))
+            withTimeout(2.seconds) {
+                while (collected.isEmpty()) delay(10)
+            }
+            assertEquals(mapOf("key" to "val"), collected[0].metadata)
         }
-        assertEquals(mapOf("key" to "val"), collected[0].metadata)
-    }
 
     @Test
-    fun asyncHauler_shipWithThrowable() = runTest {
-        val collected = mutableListOf<Box>()
-        val hauler = Hauler { collected.add(it) }
-        val async = hauler.asAsync(this)
+    fun asyncHauler_shipWithThrowable() =
+        runTest {
+            val collected = mutableListOf<Box>()
+            val hauler = Hauler { collected.add(it) }
+            val async = hauler.asAsync(this)
 
-        async.ship(Level.ERROR, "oops", RuntimeException("boom"))
-        withTimeout(2.seconds) {
-            while (collected.isEmpty()) delay(10)
+            async.ship(Level.ERROR, "oops", RuntimeException("boom"))
+            withTimeout(2.seconds) {
+                while (collected.isEmpty()) delay(10)
+            }
+            assertTrue(collected[0].message.contains("oops"))
+            assertTrue(collected[0].message.contains("boom"))
         }
-        assertTrue(collected[0].message.contains("oops"))
-        assertTrue(collected[0].message.contains("boom"))
-    }
 }

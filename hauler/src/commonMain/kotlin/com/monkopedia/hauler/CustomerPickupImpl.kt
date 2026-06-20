@@ -45,15 +45,16 @@ internal class CustomerPickupImpl(
     }
 
     override suspend fun get(maxEntries: Int): Palette {
-        val items = lock.withLock {
-            val all = circBuffer.toListAndClear()
-            if (all.size > maxEntries) {
-                all.drop(maxEntries).forEach { circBuffer.add(it) }
-                all.take(maxEntries)
-            } else {
-                all
+        val items =
+            lock.withLock {
+                val all = circBuffer.toListAndClear()
+                if (all.size > maxEntries) {
+                    all.drop(maxEntries).forEach { circBuffer.add(it) }
+                    all.take(maxEntries)
+                } else {
+                    all
+                }
             }
-        }
         return items.pack()
     }
 

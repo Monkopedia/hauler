@@ -28,7 +28,9 @@ repositories {
     mavenCentral()
 }
 
-val ktlintCoreVersion = libs.versions.ktlint.formatter.get()
+val ktlintCoreVersion =
+    libs.versions.ktlint.formatter
+        .get()
 
 subprojects {
     repositories {

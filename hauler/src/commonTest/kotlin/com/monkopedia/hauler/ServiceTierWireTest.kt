@@ -42,89 +42,95 @@ import kotlin.time.Duration.Companion.seconds
  * Also exercises the Flow<T> auto-detection in @KsService methods (streamDeliveries).
  */
 class ServiceTierWireTest {
-
-    private fun box(level: Level = Level.INFO, message: String = "msg") =
-        Box(level, "logger", message, 0L, "main")
-
-    @Test
-    fun shipperOverWire_pickupAndStream() = runTest {
-        withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates())
-            val (shipper, channel) = hostShipper(warehouse)
-            try {
-                val dropBox = shipper.requestPickup()
-                val service = shipper.deliveries()
-                val received = mutableListOf<Box>()
-                val collectJob = launch {
-                    service.streamDeliveries().collect { received.add(it) }
-                }
-                delay(100)
-                dropBox.log(box(message = "hi"))
-                withTimeout(5.seconds) {
-                    while (received.isEmpty()) delay(5)
-                }
-                assertEquals(1, received.size)
-                assertEquals("hi", received[0].message)
-                collectJob.cancelAndJoin()
-            } finally {
-                runCatching { channel.close() }
-                warehouse.close()
-            }
-        }
-    }
+    private fun box(
+        level: Level = Level.INFO,
+        message: String = "msg",
+    ) = Box(level, "logger", message, 0L, "main")
 
     @Test
-    fun weighInOverWire_filteredViewKeepsBidiCapability() = runTest {
-        withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates())
-            val (shipper, channel) = hostShipper(warehouse)
-            try {
-                val dropBox = shipper.requestPickup()
-                val service = shipper.deliveries()
-                val filtered: DeliveryService =
-                    service.weighIn(LevelFilter(LevelMatchMode.GT, Level.INFO))
-
-                val received = mutableListOf<Box>()
-                val collectJob = launch {
-                    filtered.streamDeliveries().collect { received.add(it) }
+    fun shipperOverWire_pickupAndStream() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val warehouse = Warehouse(DeliveryRates())
+                val (shipper, channel) = hostShipper(warehouse)
+                try {
+                    val dropBox = shipper.requestPickup()
+                    val service = shipper.deliveries()
+                    val received = mutableListOf<Box>()
+                    val collectJob =
+                        launch {
+                            service.streamDeliveries().collect { received.add(it) }
+                        }
+                    delay(100)
+                    dropBox.log(box(message = "hi"))
+                    withTimeout(5.seconds) {
+                        while (received.isEmpty()) delay(5)
+                    }
+                    assertEquals(1, received.size)
+                    assertEquals("hi", received[0].message)
+                    collectJob.cancelAndJoin()
+                } finally {
+                    runCatching { channel.close() }
+                    warehouse.close()
                 }
-                delay(100)
-                dropBox.log(box(level = Level.DEBUG, message = "skip-debug"))
-                dropBox.log(box(level = Level.INFO, message = "skip-info"))
-                dropBox.log(box(level = Level.WARN, message = "keep-warn"))
-                dropBox.log(box(level = Level.ERROR, message = "keep-error"))
-
-                withTimeout(5.seconds) {
-                    while (received.size < 2) delay(5)
-                }
-                assertEquals(2, received.size)
-                assertEquals("keep-warn", received[0].message)
-                assertEquals("keep-error", received[1].message)
-                collectJob.cancelAndJoin()
-            } finally {
-                runCatching { channel.close() }
-                warehouse.close()
             }
         }
-    }
 
     @Test
-    fun basicShipperStubExposesOnlyHostMethods() = runTest {
-        withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates())
-            val (basic, channel) = hostBasicShipper(warehouse)
-            try {
-                val dropBox = basic.requestPickup()
-                val dock = basic.requestDockPickup()
-                assertTrue(true, "BasicShipper round-trip OK; both methods callable")
-                dropBox.log(box(message = "via basic"))
-                dock.bulkLog(Palette(loggerNames = emptyList(), messages = emptyList()))
-            } finally {
-                runCatching { channel.close() }
-                warehouse.close()
+    fun weighInOverWire_filteredViewKeepsBidiCapability() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val warehouse = Warehouse(DeliveryRates())
+                val (shipper, channel) = hostShipper(warehouse)
+                try {
+                    val dropBox = shipper.requestPickup()
+                    val service = shipper.deliveries()
+                    val filtered: DeliveryService =
+                        service.weighIn(LevelFilter(LevelMatchMode.GT, Level.INFO))
+
+                    val received = mutableListOf<Box>()
+                    val collectJob =
+                        launch {
+                            filtered.streamDeliveries().collect { received.add(it) }
+                        }
+                    delay(100)
+                    dropBox.log(box(level = Level.DEBUG, message = "skip-debug"))
+                    dropBox.log(box(level = Level.INFO, message = "skip-info"))
+                    dropBox.log(box(level = Level.WARN, message = "keep-warn"))
+                    dropBox.log(box(level = Level.ERROR, message = "keep-error"))
+
+                    withTimeout(5.seconds) {
+                        while (received.size < 2) delay(5)
+                    }
+                    assertEquals(2, received.size)
+                    assertEquals("keep-warn", received[0].message)
+                    assertEquals("keep-error", received[1].message)
+                    collectJob.cancelAndJoin()
+                } finally {
+                    runCatching { channel.close() }
+                    warehouse.close()
+                }
             }
         }
-    }
+
+    @Test
+    fun basicShipperStubExposesOnlyHostMethods() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val warehouse = Warehouse(DeliveryRates())
+                val (basic, channel) = hostBasicShipper(warehouse)
+                try {
+                    val dropBox = basic.requestPickup()
+                    val dock = basic.requestDockPickup()
+                    assertTrue(true, "BasicShipper round-trip OK; both methods callable")
+                    dropBox.log(box(message = "via basic"))
+                    dock.bulkLog(Palette(loggerNames = emptyList(), messages = emptyList()))
+                } finally {
+                    runCatching { channel.close() }
+                    warehouse.close()
+                }
+            }
+        }
 
     private suspend fun hostShipper(warehouse: Warehouse): Pair<Shipper, HostSerializedChannelImpl<String>> {
         val channel = HostSerializedChannelImpl(ksrpcEnvironment { })
@@ -133,9 +139,7 @@ class ServiceTierWireTest {
         return stub to channel
     }
 
-    private suspend fun hostBasicShipper(
-        warehouse: Warehouse,
-    ): Pair<BasicShipper, HostSerializedChannelImpl<String>> {
+    private suspend fun hostBasicShipper(warehouse: Warehouse): Pair<BasicShipper, HostSerializedChannelImpl<String>> {
         val channel = HostSerializedChannelImpl(ksrpcEnvironment { })
         channel.registerDefault(warehouse, BasicShipper)
         val stub: BasicShipper = channel.asClient.defaultChannel().toStub()

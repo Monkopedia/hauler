@@ -22,23 +22,38 @@ annotation class FilterDsl
 class WeighStationBuilder internal constructor() {
     private val filters = mutableListOf<WeighStation>()
 
-    fun level(mode: LevelMatchMode, level: Level) {
+    fun level(
+        mode: LevelMatchMode,
+        level: Level,
+    ) {
         filters.add(LevelFilter(mode, level))
     }
 
-    fun logger(mode: LoggerMatchMode, query: String) {
+    fun logger(
+        mode: LoggerMatchMode,
+        query: String,
+    ) {
         filters.add(LoggerNameFilter(mode, query))
     }
 
-    fun thread(mode: LoggerMatchMode, query: String) {
+    fun thread(
+        mode: LoggerMatchMode,
+        query: String,
+    ) {
         filters.add(ThreadNameFilter(mode, query))
     }
 
-    fun message(mode: LoggerMatchMode, query: String) {
+    fun message(
+        mode: LoggerMatchMode,
+        query: String,
+    ) {
         filters.add(MessageFilter(mode, query))
     }
 
-    fun time(mode: LevelMatchMode, timestamp: Long) {
+    fun time(
+        mode: LevelMatchMode,
+        timestamp: Long,
+    ) {
         filters.add(TimeFilter(mode, timestamp))
     }
 
@@ -65,5 +80,4 @@ class WeighStationBuilder internal constructor() {
     }
 }
 
-fun weighStation(block: WeighStationBuilder.() -> Unit): WeighStation =
-    WeighStationBuilder().apply(block).build()
+fun weighStation(block: WeighStationBuilder.() -> Unit): WeighStation = WeighStationBuilder().apply(block).build()

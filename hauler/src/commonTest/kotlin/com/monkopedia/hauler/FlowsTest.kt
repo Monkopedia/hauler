@@ -36,7 +36,6 @@ import kotlin.time.Duration.Companion.seconds
  * DeliveryServiceTest / PipelineIntegrationTest.
  */
 class FlowsTest {
-
     private fun box(
         level: Level = Level.INFO,
         loggerName: String = "com.example.Test",
@@ -46,63 +45,69 @@ class FlowsTest {
     ) = Box(level, loggerName, message, timestamp, threadName)
 
     @Test
-    fun withPickup_receivesLiveEvents() = runTest {
-        withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates())
-            val dropBox = warehouse.requestPickup()
-            val service = warehouse.deliveries()
-            val scope = CoroutineScope(SupervisorJob())
+    fun withPickup_receivesLiveEvents() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val warehouse = Warehouse(DeliveryRates())
+                val dropBox = warehouse.requestPickup()
+                val service = warehouse.deliveries()
+                val scope = CoroutineScope(SupervisorJob())
 
-            val result = mutableListOf<Box>()
-            val collectJob = launch {
-                service.withPickup(interval = 50.milliseconds, closeScope = scope)
-                    .collect { result.add(it) }
+                val result = mutableListOf<Box>()
+                val collectJob =
+                    launch {
+                        service
+                            .withPickup(interval = 50.milliseconds, closeScope = scope)
+                            .collect { result.add(it) }
+                    }
+                delay(200)
+
+                dropBox.log(box(message = "a"))
+                dropBox.log(box(message = "b"))
+
+                withTimeout(5.seconds) {
+                    while (result.size < 2) delay(50)
+                }
+                assertEquals(2, result.size)
+                assertEquals("a", result[0].message)
+                assertEquals("b", result[1].message)
+
+                collectJob.cancelAndJoin()
+                scope.cancel()
+                warehouse.close()
             }
-            delay(200)
-
-            dropBox.log(box(message = "a"))
-            dropBox.log(box(message = "b"))
-
-            withTimeout(5.seconds) {
-                while (result.size < 2) delay(50)
-            }
-            assertEquals(2, result.size)
-            assertEquals("a", result[0].message)
-            assertEquals("b", result[1].message)
-
-            collectJob.cancelAndJoin()
-            scope.cancel()
-            warehouse.close()
         }
-    }
 
     @Test
-    fun dumpWithPickup_returnsReplayedBoxes() = runTest {
-        withContext(Dispatchers.Default) {
-            val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100))
-            val dropBox = warehouse.requestPickup()
-            dropBox.log(box(message = "r1"))
-            dropBox.log(box(message = "r2"))
+    fun dumpWithPickup_returnsReplayedBoxes() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val warehouse = Warehouse(DeliveryRates(defaultBoxRetention = 100))
+                val dropBox = warehouse.requestPickup()
+                dropBox.log(box(message = "r1"))
+                dropBox.log(box(message = "r2"))
 
-            val service = warehouse.deliveries()
-            val scope = CoroutineScope(SupervisorJob())
+                val service = warehouse.deliveries()
+                val scope = CoroutineScope(SupervisorJob())
 
-            val result = mutableListOf<Box>()
-            val collectJob = launch {
-                service.dumpWithPickup(interval = 50.milliseconds, closeScope = scope)
-                    .collect { result.add(it) }
+                val result = mutableListOf<Box>()
+                val collectJob =
+                    launch {
+                        service
+                            .dumpWithPickup(interval = 50.milliseconds, closeScope = scope)
+                            .collect { result.add(it) }
+                    }
+
+                withTimeout(5.seconds) {
+                    while (result.size < 2) delay(50)
+                }
+                assertEquals(2, result.size)
+                assertEquals("r1", result[0].message)
+                assertEquals("r2", result[1].message)
+
+                collectJob.cancelAndJoin()
+                scope.cancel()
+                warehouse.close()
             }
-
-            withTimeout(5.seconds) {
-                while (result.size < 2) delay(50)
-            }
-            assertEquals(2, result.size)
-            assertEquals("r1", result[0].message)
-            assertEquals("r2", result[1].message)
-
-            collectJob.cancelAndJoin()
-            scope.cancel()
-            warehouse.close()
         }
-    }
 }

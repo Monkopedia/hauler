@@ -19,7 +19,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class CircularBufferTest {
-
     @Test
     fun emptyBuffer_returnsEmptyList() {
         val buffer = CircularBuffer<Int>(5)
