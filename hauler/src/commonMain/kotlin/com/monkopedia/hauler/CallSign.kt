@@ -28,8 +28,9 @@ import kotlin.coroutines.CoroutineContext.Key
  * }
  * ```
  *
- * On JVM, captures the thread name via ThreadLocal when no CallSign is in the
- * coroutine context. On JS/Native/WASM, relies on coroutine context only.
+ * On JVM, [Key.loggingName] falls back to the current thread name when no CallSign is
+ * present in the context, so log lines are still attributed. On JS/Native/WASM it relies
+ * on the coroutine context only and is null when no CallSign is present.
  */
 expect class CallSign(
     name: String,

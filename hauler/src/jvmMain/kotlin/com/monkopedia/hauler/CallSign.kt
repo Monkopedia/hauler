@@ -29,7 +29,7 @@ actual class CallSign actual constructor(
         val threadLoggingName: String?
             get() = currentName.get()
 
-        actual suspend fun loggingName(): String? = currentName.get() ?: coroutineContext[Key]?.name
+        actual suspend fun loggingName(): String? = currentName.get() ?: coroutineContext[Key]?.name ?: Thread.currentThread().name
     }
 
     actual override val key: Key
