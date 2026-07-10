@@ -28,32 +28,27 @@ fun BasicDeliveryService.withPickup(
     interval: Duration = 500.milliseconds,
     maxEntries: Int = 100,
     closeScope: CoroutineScope,
-): Deliveries =
-    callbackFlow {
-        val polling = recurringCustomerPickup()
-        launch {
-            while (true) {
-                polling.get(maxEntries = maxEntries).forEach {
-                    send(it)
-                }
-                delay(interval)
-            }
-        }
-        awaitClose {
-            closeScope.launch {
-                polling.close()
-            }
-        }
-    }
+): Deliveries = pollingDeliveries(interval, maxEntries, closeScope) { recurringCustomerPickup() }
 
 /** Drain the replay cache by polling, as a [Deliveries] flow. */
 fun BasicDeliveryService.dumpWithPickup(
     interval: Duration = 500.milliseconds,
     maxEntries: Int = 100,
     closeScope: CoroutineScope,
+): Deliveries = pollingDeliveries(interval, maxEntries, closeScope) { dumpCustomerPickup() }
+
+/**
+ * Poll [pickup] into a [Deliveries] flow, emitting up to [maxEntries] per [interval] and closing
+ * the pickup on [closeScope] when the flow is cancelled. Shared by [withPickup] and [dumpWithPickup].
+ */
+private fun pollingDeliveries(
+    interval: Duration,
+    maxEntries: Int,
+    closeScope: CoroutineScope,
+    pickup: suspend () -> CustomerPickup,
 ): Deliveries =
     callbackFlow {
-        val polling = dumpCustomerPickup()
+        val polling = pickup()
         launch {
             while (true) {
                 polling.get(maxEntries = maxEntries).forEach {
