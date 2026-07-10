@@ -17,7 +17,6 @@ package com.monkopedia.hauler
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -74,7 +73,7 @@ inline fun <reified T> createHauler(): Hauler = hauler(T::class.simpleName ?: T:
 fun route(
     scope: CoroutineScope,
     display: Display,
-    formatter: Formatter = FlowCollector<String>::defaultFormat,
+    formatter: Formatter = DefaultFormat,
 ): Job =
     scope.launch {
         Garage.deliveries.route(display, formatter)
