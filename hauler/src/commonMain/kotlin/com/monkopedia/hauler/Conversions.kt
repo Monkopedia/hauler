@@ -26,29 +26,7 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.transform
 
 /** Compress a list of [Box]es into a [Palette] for efficient transport, deduplicating logger and thread names. */
-fun List<Box>.pack(): Palette {
-    val tagsIndex = hashMapOf<String, Int>()
-    val tagsList = mutableListOf<String>()
-    val threadsIndex = hashMapOf<String, Int>()
-    val threadsList = mutableListOf<String>()
-    val packages = ArrayList<Package>(size)
-    for (box in this) {
-        val tagIdx =
-            tagsIndex.getOrPut(box.loggerName) {
-                tagsList.size.also { tagsList.add(box.loggerName) }
-            }
-        val threadIdx =
-            box.threadName?.let { name ->
-                threadsIndex.getOrPut(name) {
-                    threadsList.size.also { threadsList.add(name) }
-                }
-            }
-        packages.add(
-            Package(box.level.intLevel, tagIdx, box.message, box.timestamp, threadIdx, box.metadata),
-        )
-    }
-    return Palette(tagsList, threadsList, packages)
-}
+fun List<Box>.pack(): Palette = LogPacker().also { packer -> forEach(packer::log) }.dumpLogs()
 
 /** Batch a stream of [Box]es into [Palette]s, flushing by size or time interval. */
 fun Deliveries.pack(deliveryRates: DeliveryRates = DeliveryRates(onDeliveryError = {})): Flow<Palette> {
