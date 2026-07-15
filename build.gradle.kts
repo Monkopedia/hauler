@@ -1,3 +1,8 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsPlugin
+
 buildscript {
     repositories {
         mavenLocal()
@@ -18,6 +23,17 @@ plugins {
 }
 
 group = "com.monkopedia"
+
+// Kotlin 2.4.10 defaults the JS/Wasm toolchain's Node.js to 25.0.0, which the transitive
+// `nanoid` npm dependency rejects ("engine node incompatible: ^22 || ^24 || >=26"). Pin
+// Node to 24.10.0 (satisfies the constraint; the JS toolchain already resolves it) so the
+// Wasm npm install succeeds locally and in CI.
+plugins.withType<NodeJsPlugin> {
+    the<NodeJsEnvSpec>().version.set("24.10.0")
+}
+plugins.withType<WasmNodeJsPlugin> {
+    the<WasmNodeJsEnvSpec>().version.set("24.10.0")
+}
 
 apiValidation {
     ignoredProjects += listOf("benchmark", "microbenchmark")
