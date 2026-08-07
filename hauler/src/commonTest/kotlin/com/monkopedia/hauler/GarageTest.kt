@@ -129,14 +129,67 @@ class GarageTest {
 
     // --- hauler() factory ---
 
+    private class SampleComponent
+
     @Test
-    fun haulerFactory_setsName() =
+    fun haulerFactory_byName_setsLoggerNameAndRoutesToGarage() =
         runTest {
-            val collected = mutableListOf<Box>()
-            val base = Hauler { collected.add(it) }
-            val named = base.named("TestClass")
-            named.emit(box())
-            assertEquals("TestClass", collected[0].loggerName)
+            val result = mutableListOf<Box>()
+            val job =
+                launch {
+                    Garage.deliveries
+                        .take(1)
+                        .toList()
+                        .let { result.addAll(it) }
+                }
+            delay(50)
+
+            hauler("ByNameFactory").emit(box(message = "by name"))
+
+            withTimeout(2.seconds) { job.join() }
+            assertEquals(1, result.size)
+            assertEquals("ByNameFactory", result[0].loggerName)
+            assertEquals("by name", result[0].message)
+        }
+
+    @Test
+    fun haulerFactory_reifiedReceiver_usesSimpleName() =
+        runTest {
+            val result = mutableListOf<Box>()
+            val job =
+                launch {
+                    Garage.deliveries
+                        .take(1)
+                        .toList()
+                        .let { result.addAll(it) }
+                }
+            delay(50)
+
+            SampleComponent().hauler().emit(box(message = "from receiver"))
+
+            withTimeout(2.seconds) { job.join() }
+            assertEquals(1, result.size)
+            assertEquals("SampleComponent", result[0].loggerName)
+        }
+
+    @Test
+    fun createHauler_reified_usesSimpleName() =
+        runTest {
+            val result = mutableListOf<Box>()
+            val job =
+                launch {
+                    Garage.deliveries
+                        .take(1)
+                        .toList()
+                        .let { result.addAll(it) }
+                }
+            delay(50)
+
+            createHauler<SampleComponent>().emit(box(message = "from type"))
+
+            withTimeout(2.seconds) { job.join() }
+            assertEquals(1, result.size)
+            assertEquals("SampleComponent", result[0].loggerName)
         }
 
     // --- Garage global routing ---
