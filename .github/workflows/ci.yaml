@@ -44,3 +44,80 @@ jobs:
 
       - name: Assemble, test, apiCheck, ktlint
         run: ./gradlew :hauler:assemble :hauler:check ktlintCheck -x klibApiCheck
+
+  # ── Targets the ubuntu job compiles but never EXECUTES a test for (#22) ──
+  # `allTests` on a Linux host reports green while five per-target test tasks are
+  # `enabled = false`. These jobs exist to find out what those suites actually do
+  # the first time they run. Each prints its task list, because a SKIPPED task
+  # inside a passing job produces a green check — the same shape as the defect.
+
+  apple:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # macosX64Test is expected to report SKIPPED: GitHub's macOS images are
+      # Apple Silicon, so there is no x86 host to execute it on. Listed anyway so
+      # the job log records whether that is true for this repo.
+      - name: Apple tests
+        run: ./gradlew :hauler:macosArm64Test :hauler:macosX64Test :hauler:iosSimulatorArm64Test --console=plain
+      - name: Which Apple test tasks actually ran
+        if: always()
+        run: ./gradlew :hauler:macosArm64Test :hauler:macosX64Test :hauler:iosSimulatorArm64Test --dry-run --console=plain
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: mingwX64 tests
+        run: ./gradlew :hauler:mingwX64Test --console=plain
+
+  # linuxArm64 has no test task on an x86 host. Cross-compile the test binary
+  # here, hand it to a native ARM runner, and execute it there — the pattern
+  # Monkopedia/sdbus-kotlin uses in .github/workflows/arm-build-test.yaml.
+  linux-arm64-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Link linuxArm64 test binary
+        run: ./gradlew :hauler:linkDebugTestLinuxArm64 --console=plain
+      - name: Upload test binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: linuxarm64-test-binary
+          path: hauler/build/bin/linuxArm64/debugTest/test.kexe
+          if-no-files-found: error
+
+  linux-arm64-run:
+    needs: linux-arm64-build
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Download test binary
+        uses: actions/download-artifact@v4
+        with:
+          name: linuxarm64-test-binary
+      - name: Execute linuxArm64 tests on real ARM
+        run: |
+          chmod +x test.kexe
+          ./test.kexe
