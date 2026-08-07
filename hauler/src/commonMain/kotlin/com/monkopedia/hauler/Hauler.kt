@@ -114,9 +114,11 @@ interface AsyncHauler {
  * on JVM. On JS, Wasm and native it returns null; those platforms have no thread-local to
  * read and this is not a suspend function, so it cannot consult the coroutine context.
  *
- * Note this is the non-suspend path used by [AsyncHauler.ship]. The suspend
- * [CallSign.loggingName] additionally consults `coroutineContext`, so a [CallSign] installed
- * with `withContext` is visible there and not here.
+ * This is the non-suspend path used by [AsyncHauler.ship]. On JVM a [CallSign] installed
+ * with `withContext` IS visible here — [CallSign] is a `ThreadContextElement` and mirrors
+ * its name into a thread-local, which this reads. The suspend [CallSign.loggingName]
+ * additionally falls back to reading the element out of `coroutineContext`, which only
+ * differs when the element is present but the thread-local is not.
  */
 expect fun loggingName(): String?
 
