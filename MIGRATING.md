@@ -131,20 +131,30 @@ to the global `Garage` feed."
 ## `Flows.kt` extensions removed
 
 The `DeliveryService.deliveries(scope)` / `withDeliveryDay(scope)` /
-`dumpDeliveries(scope)` / `dumpWithDeliveryDay(scope)` extensions on
+`dumpDeliveries()` / `dumpWithDeliveryDay()` extensions on
 `DeliveryService` are gone — they were callback-flow shims around the old
 `register*` / `dump*` methods, which now return `Flow<T>` directly.
+
+Note the two `dump*` extensions took **no** parameters in 0.3.x; only the two
+live ones took a `scope`.
 
 | 0.3.x | 0.4.x |
 |---|---|
 | `service.deliveries(scope).collect { ... }` | `service.streamDeliveries().collect { ... }` |
 | `service.withDeliveryDay(scope).collect { ... }` | `service.streamDeliveriesPacked().unpack().collect { ... }` |
-| `service.dumpDeliveries(scope).collect { ... }` | `service.dumpDeliveries().collect { ... }` (now an interface method) |
-| `service.dumpWithDeliveryDay(scope).collect { ... }` | `service.dumpDeliveriesPacked().unpack().collect { ... }` |
+| `service.dumpDeliveries().collect { ... }` | `service.dumpDeliveries().collect { ... }` (same spelling — now an interface method, not an extension) |
+| `service.dumpWithDeliveryDay().collect { ... }` | `service.dumpDeliveriesPacked().unpack().collect { ... }` |
 
-The polling helpers `BasicDeliveryService.withPickup(...)` and
-`dumpWithPickup(...)` are unchanged — they still bridge polling
-`CustomerPickup` into a `Deliveries` flow.
+⚠️ `dumpDeliveries()` is the one call that looks unchanged and is not:
+the spelling is identical, but it moved from an extension function to an
+interface method. That is source-compatible and **binary**-incompatible —
+recompile rather than swapping the jar.
+
+The polling helpers `withPickup(...)` and `dumpWithPickup(...)` keep the same
+parameters, but their **receiver widened** from `DeliveryService` to
+`BasicDeliveryService`. Source-compatible, since `DeliveryService` extends
+`BasicDeliveryService` — but the JVM descriptor changed, so this too needs a
+recompile rather than a jar swap.
 
 ---
 
@@ -192,9 +202,12 @@ names changed in ksrpc 1.0:
 
 | 0.11.x | 1.0 |
 |---|---|
-| `HttpClient.asConnection(url, env).defaultChannel()` | `HttpClient.asHttpChannelClient(url, env).defaultChannel()` |
-| `HttpClient.asConnection(url, env)` (websocket) | `HttpClient.asWebsocketConnection(url, env)` |
+| HTTP `HttpClient.asConnection(url, env).defaultChannel()` | `HttpClient.asHttpChannelClient(url, env).defaultChannel()` |
+| Websocket `HttpClient.asWebsocketConnection(url, env)` | unchanged |
 | Sockets `(input to output).asConnection(env)` | unchanged |
+
+Only the **HTTP** entry point was renamed. `asWebsocketConnection` has had that
+name since 0.11.x and did not change in 1.0.
 
 See the [ksrpc 0.11.x → 1.0 migration guide](https://github.com/Monkopedia/ksrpc/blob/main/dokka/guides/migration-1.0.md)
 for the full ksrpc story.
