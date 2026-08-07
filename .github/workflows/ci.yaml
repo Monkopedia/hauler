@@ -9,11 +9,13 @@
 #     here; the Apple targets (macOS/iOS) are skipped on a non-mac host — they
 #     are still covered at release time by publish.yaml (macos-latest). Adding a
 #     dedicated macOS compile job for the Apple targets is a sensible follow-up.
-#   * `-x klibApiCheck`: BCV's native-klib ABI check needs all targets (incl.
-#     Apple) to build, so it only works on macOS, and no klib baseline is
-#     committed yet. The JVM `apiCheck` (run via :hauler:check) still gates the
-#     public API. Committing a macOS-generated klib baseline to enable
-#     klibApiCheck is a follow-up.
+#   * `klibApiCheck` now runs. It validates the native/JS/Wasm ABI against the
+#     committed `hauler/api/hauler.klib.api` baseline, covering the 10 published
+#     platform artifacts the JVM `apiCheck` does not reach. The previous comment
+#     here claimed it "only works on macOS" and that the exclusion was waiting on
+#     a macOS-generated baseline; both were wrong. Kotlin cross-compiles every
+#     target's klib on Linux, and the task was SKIPPED because BCV's klib
+#     validation defaults to off -- not because of the host. See #21.
 #   * Only :hauler (the published library) is built. The :benchmark module is
 #     pre-existingly broken against the 0.4.x Flow API and is intentionally not
 #     part of the gate; ktlintCheck still covers its source style.
@@ -43,4 +45,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Assemble, test, apiCheck, ktlint
-        run: ./gradlew :hauler:assemble :hauler:check ktlintCheck -x klibApiCheck
+        run: ./gradlew :hauler:assemble :hauler:check ktlintCheck
