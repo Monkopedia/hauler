@@ -11,11 +11,15 @@
 #     execute. publish.yaml does NOT cover them: it runs `./gradlew publish` and
 #     no test task at all (#50). The apple/windows/linux-arm64 jobs below exist
 #     to close that gap (#22) — do not re-describe it as covered elsewhere.
-#   * `-x klibApiCheck`: BCV's native-klib ABI check needs all targets (incl.
-#     Apple) to build, so it only works on macOS, and no klib baseline is
-#     committed yet. The JVM `apiCheck` (run via :hauler:check) still gates the
-#     public API. Committing a macOS-generated klib baseline to enable
-#     klibApiCheck is a follow-up.
+#   * `klibApiCheck` now runs. It validates the native/JS/Wasm ABI against the
+#     committed `hauler/api/hauler.klib.api` baseline, covering the 10 published
+#     platform artifacts the JVM `apiCheck` does not reach. An earlier version of
+#     this comment claimed it "only works on macOS" and that the exclusion was
+#     waiting on a macOS-generated baseline; both were wrong. Kotlin
+#     cross-compiles every target's klib on Linux, and the task was SKIPPED
+#     because BCV's klib validation defaults to OFF — not because of the host.
+#     Measured 2026-09-17: it passed with all ten *ApiBuild tasks disabled,
+#     having compared nothing. See #21.
 #   * Only :hauler (the published library) is built. The :benchmark module is
 #     pre-existingly broken against the 0.4.x Flow API and is intentionally not
 #     part of the gate; ktlintCheck still covers its source style.
@@ -50,7 +54,7 @@ jobs:
       - name: Clear stale test results
         run: rm -rf hauler/build/test-results
       - name: Assemble, test, apiCheck, ktlint
-        run: ./gradlew :hauler:assemble :hauler:check ktlintCheck -x klibApiCheck
+        run: ./gradlew :hauler:assemble :hauler:check ktlintCheck
 
       - name: Assert the ubuntu suites executed
         if: always()

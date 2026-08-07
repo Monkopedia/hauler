@@ -37,6 +37,13 @@ plugins.withType<WasmNodeJsPlugin> {
 
 apiValidation {
     ignoredProjects += listOf("benchmark", "microbenchmark")
+
+    // BCV's klib (native/JS/Wasm) ABI validation is OFF by default. Without this, `klibApiCheck`
+    // is wired into `check` and reports BUILD SUCCESSFUL while every *ApiBuild task is SKIPPED --
+    // so 10 of the 11 published platform artifacts had no ABI gate at all. See #21.
+    klib {
+        enabled = true
+    }
 }
 
 repositories {
