@@ -59,8 +59,15 @@ All notable changes to `hauler` are documented here. This project adheres to
   succeeds locally and in CI.
 
 _No source-level API changes in this release, and the JVM ABI dump (`hauler/api/hauler.api`)
-is unchanged from 0.4.1. Two caveats keep this short of a drop-in replacement: the published
-`hauler-jvm` POM dropped four runtime dependencies (see **Removed** above), and the
-native/JS/Wasm ABI was **not** verified across the Kotlin 2.4.0 → 2.4.10 bump — `klibApiCheck`
-is not currently an effective gate, so no klib baseline was compared. Recompiling against
-0.4.2 is safe; swapping the jar without re-resolving dependencies may not be._
+is unchanged from 0.4.1. Two caveats keep this short of a drop-in replacement._
+
+_First, the published `hauler-jvm` POM dropped four runtime dependencies (see **Removed**
+above). **Re-resolving your dependencies against 0.4.2 is what surfaces that loss** — if you
+were relying on any of the four transitively, they leave your runtime classpath at the point
+your build tool reads the new POM. A build that reuses an already-resolved classpath will not
+notice._
+
+_Second, the native/JS/Wasm ABI was **not** verified across the Kotlin 2.4.0 → 2.4.10 bump:
+`klibApiCheck` is not currently an effective gate, so no klib baseline was compared. The JVM
+surface is unchanged and checked; the other ten published artifacts are unverified rather
+than known-good._
