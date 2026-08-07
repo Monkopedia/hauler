@@ -36,7 +36,11 @@ interface BasicShipper : RpcHostService {
 
 /**
  * Full [BasicShipper] plus observation via [deliveries]. Requires a bidirectional transport
- * (websocket, sockets, JNI) because [DeliveryService] accepts callback sub-services.
+ * (websocket, sockets, JNI) because [DeliveryService] returns `Flow<T>` streams.
+ *
+ * Returning a sub-service is not what forces bidi — [BasicShipper] returns [DropBox] and
+ * [LoadingDock] and is hostable on plain HTTP. It is the streaming returns that need a
+ * transport which can push.
  */
 @KsService
 interface Shipper :

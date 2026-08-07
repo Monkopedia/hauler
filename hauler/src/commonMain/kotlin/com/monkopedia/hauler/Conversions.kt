@@ -91,8 +91,13 @@ fun Flow<Palette>.unpack(): Deliveries =
  * Streaming packer that incrementally builds a [Palette] from individual [Box] emissions.
  *
  * Uses double-buffering: two sets of lists/maps are maintained so that [dumpLogs] can
- * return the current batch as a [Palette] and immediately swap to the alternate buffer,
- * avoiding allocation of new collections on each flush.
+ * swap to the alternate buffer immediately, rather than clearing and re-allocating the
+ * working collections on every flush.
+ *
+ * Note [dumpLogs] still copies via `toList()` when it builds the [Palette], and that copy
+ * is required for correctness — a returned [Palette] must not be mutated by subsequent
+ * packing. So the double-buffering saves re-allocating the *working* containers, not the
+ * per-flush allocation of the palette's own lists.
  *
  * Not thread-safe: callers must ensure sequential access (e.g. within a flow [transform]).
  */
