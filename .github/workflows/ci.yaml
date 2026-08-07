@@ -117,7 +117,41 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: linuxarm64-test-binary
+      # Two checks, not one. The equality assertion alone is green in the exact
+      # failure it exists to catch: if the binary contains no tests, `ran` is 0 --
+      # and an `expected` derived from the same run is 0 too, so 0 == 0 passes.
+      # The pre-flight derives `expected` from an UNFILTERED listing instead, so
+      # an empty binary fails there. Counts are derived, never hardcoded: a
+      # literal would be wrong the first time the suite grows, and then edited
+      # downward by whoever hits it, which is how a floor becomes a rubber stamp.
       - name: Execute linuxArm64 tests on real ARM
         run: |
+          set -euo pipefail
           chmod +x test.kexe
-          ./test.kexe
+
+          # pre-flight: does this binary contain any tests at all?
+          ./test.kexe --ktest_list_tests > listing.txt 2>&1 || \
+            ./test.kexe --gtest_list_tests > listing.txt 2>&1 || true
+          # sed, not grep: a grep matching nothing exits 1, and under `set -e`
+          # that reddens the job with a message about the wrong step.
+          expected=$(sed -n 's/^[[:space:]][[:space:]][A-Za-z_].*$/&/p' listing.txt | wc -l)
+          echo "pre-flight: binary lists $expected test(s)"
+          if [ "$expected" -eq 0 ]; then
+            echo "::error::Test binary lists ZERO tests. Either the suite is empty, or the"
+            echo "::error::listing flag is unsupported and the guard cannot derive a count."
+            echo "::error::Do not weaken this check - fix the derivation."
+            sed -n '1,20p' listing.txt
+            exit 1
+          fi
+
+          # the run, plus an equality assertion against the derived count
+          ./test.kexe | tee run.txt
+          ran=$(sed -n 's/^\[  PASSED  \] \([0-9][0-9]*\) test.*/\1/p' run.txt | tail -1)
+          echo "executed: ${ran:-0}   expected: $expected"
+          if [ "${ran:-0}" -ne "$expected" ]; then
+            echo "::error::Executed ${ran:-0} tests but the binary lists $expected."
+            echo "::error::A suite running fewer tests than it contains is the failure this"
+            echo "::error::job exists to catch. Do not adjust the expectation to match."
+            exit 1
+          fi
+          echo "linuxArm64: $ran tests executed on real ARM hardware"
