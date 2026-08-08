@@ -2,7 +2,7 @@
 kotlin = "2.4.10"
 kotlin-coroutines = "1.11.0"
 kotlin-serialization = "1.11.0"
-kotlin-datetime = "0.7.1"
+kotlin-datetime = "0.8.0"
 kotlin-nodejs = "0.0.7"
 ktor = "3.5.2"
 slf4j = "2.0.17"
