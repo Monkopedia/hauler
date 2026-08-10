@@ -45,7 +45,27 @@ fun main(args: Array<String>): Unit =
 
         resultReport(result)
 
-        exitProcess(0)
+        // The exit code IS the gate. Two ways to fail, and the second one matters as much as
+        // the first: a run that executes ZERO tests must not be reported as success. Every
+        // harness here spawns an external process, so "nothing ran" is a realistic outcome of
+        // a broken binary path -- and it is indistinguishable from "everything passed" unless
+        // the count is checked.
+        exitProcess(
+            when {
+                result.runCount == 0 -> {
+                    System.err.println(
+                        "FAILED: zero tests executed. Expected the six harness suites; a " +
+                            "zero-count run means the suites never started, not that they passed.",
+                    )
+                    1
+                }
+                !result.wasSuccessful() -> {
+                    System.err.println("FAILED: ${result.failureCount} of ${result.runCount} test(s) failed.")
+                    1
+                }
+                else -> 0
+            },
+        )
     }
 
 fun resultReport(result: Result) {

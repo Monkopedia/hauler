@@ -19,7 +19,6 @@ import com.monkopedia.ksrpc.channels.Connection
 import com.monkopedia.ksrpc.channels.registerDefault
 import com.monkopedia.ksrpc.ksrpcEnvironment
 import com.monkopedia.ksrpc.sockets.asConnection
-import com.monkopedia.ksrpc.sockets.internal.swallow
 import com.monkopedia.ksrpc.toStub
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
