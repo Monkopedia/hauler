@@ -235,21 +235,31 @@ class DeliveryServiceTest {
     @Test
     fun recurringCustomerPickup_collectsFromFlow() =
         runTest {
-            val (flow, service, scope) = createDeliveryService()
-            val pickup = service.recurringCustomerPickup()
+            // MUST run on a real dispatcher. createDeliveryService() builds a bare
+            // CoroutineScope(SupervisorJob()), which resolves to Dispatchers.Default, and
+            // CustomerPickupImpl launches its collector there -- on real threads. Left on
+            // runTest's virtual clock, the withTimeout below expires after five VIRTUAL
+            // seconds, which pass in a few thousand instantaneous delay(1) iterations, so
+            // the real-time budget the collector gets is only incidental thread-yield time.
+            // That failed 3 of 50 runs under CPU contention, and the runtime says so:
+            // "Timed out after 5s of _virtual_ (kotlinx.coroutines.test) time."
+            withContext(Dispatchers.Default) {
+                val (flow, service, scope) = createDeliveryService()
+                val pickup = service.recurringCustomerPickup()
 
-            flow.emit(box(message = "poll1"))
-            flow.emit(box(message = "poll2"))
+                flow.emit(box(message = "poll1"))
+                flow.emit(box(message = "poll2"))
 
-            val allBoxes = mutableListOf<Box>()
-            withTimeout(5.seconds) {
-                while (allBoxes.size < 2) {
-                    allBoxes.addAll(pickup.get().unpack())
-                    if (allBoxes.size < 2) delay(1)
+                val allBoxes = mutableListOf<Box>()
+                withTimeout(5.seconds) {
+                    while (allBoxes.size < 2) {
+                        allBoxes.addAll(pickup.get().unpack())
+                        if (allBoxes.size < 2) delay(1)
+                    }
                 }
+                assertEquals(2, allBoxes.size)
+                pickup.close()
+                scope.cancel()
             }
-            assertEquals(2, allBoxes.size)
-            pickup.close()
-            scope.cancel()
         }
 }
