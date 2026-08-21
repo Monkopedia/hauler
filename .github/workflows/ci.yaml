@@ -5,10 +5,12 @@
 # runs the verifiable gate on every PR and on pushes to main.
 #
 # Scope notes:
-#   * Runs on ubuntu-latest. The JVM/JS/WASM/Linux/MinGW targets build and test
-#     here; the Apple targets (macOS/iOS) are skipped on a non-mac host — they
-#     are still covered at release time by publish.yaml (macos-latest). Adding a
-#     dedicated macOS compile job for the Apple targets is a sensible follow-up.
+#   * The `check` job runs on ubuntu-latest. Only FOUR targets execute tests
+#     there — jvm, js, wasmJs, linuxX64. MinGW compiles but `mingwX64Test` is
+#     disabled on a Linux host, and the Apple targets neither compile-test nor
+#     execute. publish.yaml does NOT cover them: it runs `./gradlew publish` and
+#     no test task at all (#50). The apple/windows/linux-arm64 jobs below exist
+#     to close that gap (#22) — do not re-describe it as covered elsewhere.
 #   * `-x klibApiCheck`: BCV's native-klib ABI check needs all targets (incl.
 #     Apple) to build, so it only works on macOS, and no klib baseline is
 #     committed yet. The JVM `apiCheck` (run via :hauler:check) still gates the
@@ -45,6 +47,18 @@ jobs:
       - name: Assemble, test, apiCheck, ktlint
         run: ./gradlew :hauler:assemble :hauler:check ktlintCheck -x klibApiCheck
 
+      - name: Assert the ubuntu suites executed
+        if: always()
+        run: ./.github/assert-tests-executed.sh jvmTest jsNodeTest wasmJsNodeTest linuxX64Test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-ubuntu
+          path: hauler/build/test-results/**/*.xml
+          if-no-files-found: warn
+
   # ── Targets the ubuntu job compiles but never EXECUTES a test for (#22) ──
   # `allTests` on a Linux host reports green while five per-target test tasks are
   # `enabled = false`. These jobs exist to find out what those suites actually do
@@ -71,6 +85,20 @@ jobs:
       - name: Which Apple test tasks actually ran
         if: always()
         run: ./gradlew :hauler:macosArm64Test :hauler:macosX64Test :hauler:iosSimulatorArm64Test --dry-run --console=plain
+        # ⚠️ --dry-run: prints SKIPPED for EVERY task including ones that really
+        # ran. Readable task list, inert as evidence of execution. Do not cite it.
+
+      - name: Assert the Apple suites executed
+        if: always()
+        run: ./.github/assert-tests-executed.sh macosArm64Test iosSimulatorArm64Test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-apple
+          path: hauler/build/test-results/**/*.xml
+          if-no-files-found: warn
 
   windows:
     runs-on: windows-latest
@@ -85,6 +113,19 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: mingwX64 tests
         run: ./gradlew :hauler:mingwX64Test --console=plain
+
+      - name: Assert the mingwX64 suite executed
+        if: always()
+        shell: bash
+        run: ./.github/assert-tests-executed.sh mingwX64Test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-windows
+          path: hauler/build/test-results/**/*.xml
+          if-no-files-found: warn
 
   # linuxArm64 has no test task on an x86 host. Cross-compile the test binary
   # here, hand it to a native ARM runner, and execute it there — the pattern
