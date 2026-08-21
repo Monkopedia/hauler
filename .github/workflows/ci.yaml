@@ -44,6 +44,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Clear stale test results
+        run: rm -rf hauler/build/test-results
       - name: Assemble, test, apiCheck, ktlint
         run: ./gradlew :hauler:assemble :hauler:check ktlintCheck -x klibApiCheck
 
@@ -58,6 +60,12 @@ jobs:
           name: test-results-ubuntu
           path: hauler/build/test-results/**/*.xml
           if-no-files-found: warn
+
+  # Every leg wipes hauler/build/test-results before running. Without it the
+  # guard cannot tell "this run's results" from "a previous run's", and on a
+  # cached or persistent workspace "never ran" becomes byte-identical to
+  # "passed" — the exact defect these jobs exist to eliminate, reintroduced by
+  # their own instrument.
 
   # ── Targets the ubuntu job compiles but never EXECUTES a test for (#22) ──
   # `allTests` on a Linux host reports green while five per-target test tasks are
@@ -80,6 +88,8 @@ jobs:
       # macosX64Test is expected to report SKIPPED: GitHub's macOS images are
       # Apple Silicon, so there is no x86 host to execute it on. Listed anyway so
       # the job log records whether that is true for this repo.
+      - name: Clear stale test results
+        run: rm -rf hauler/build/test-results
       - name: Apple tests
         run: ./gradlew :hauler:macosArm64Test :hauler:macosX64Test :hauler:iosSimulatorArm64Test --console=plain
       - name: Which Apple test tasks actually ran
@@ -111,6 +121,9 @@ jobs:
           java-version: 21
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Clear stale test results
+        shell: bash
+        run: rm -rf hauler/build/test-results
       - name: mingwX64 tests
         run: ./gradlew :hauler:mingwX64Test --console=plain
 
