@@ -59,11 +59,15 @@ fun main(args: Array<String>): Unit =
                     )
                     1
                 }
+
                 !result.wasSuccessful() -> {
                     System.err.println("FAILED: ${result.failureCount} of ${result.runCount} test(s) failed.")
                     1
                 }
-                else -> 0
+
+                else -> {
+                    0
+                }
             },
         )
     }
