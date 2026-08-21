@@ -20,6 +20,8 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -41,9 +43,28 @@ class PipelineIntegrationTest {
         threadName: String? = "main",
     ) = Box(level, loggerName, message, timestamp, threadName)
 
+    /**
+     * A list written by a collector coroutine and read by the test body.
+     *
+     * Every test here runs on [Dispatchers.Default], so those are genuinely different threads: a
+     * bare `mutableListOf` appended inside `collect { }` and iterated by an assertion produced a
+     * `ConcurrentModificationException` in 8 of 100 runs. Reads take a snapshot under the same
+     * lock the writer uses, so an assertion always sees a consistent list.
+     */
+    private class Collected<T> {
+        private val lock = Mutex()
+        private val items = mutableListOf<T>()
+
+        suspend fun add(item: T) {
+            lock.withLock { items.add(item) }
+        }
+
+        suspend fun snapshot(): List<T> = lock.withLock { items.toList() }
+    }
+
     private suspend fun awaitCondition(
         description: String = "",
-        check: () -> Boolean,
+        check: suspend () -> Boolean,
     ) {
         withTimeout(5.seconds) {
             while (!check()) delay(1)
@@ -58,7 +79,7 @@ class PipelineIntegrationTest {
                 val dropBox = warehouse.requestPickup()
                 val service = warehouse.deliveries()
 
-                val received = mutableListOf<Box>()
+                val received = Collected<Box>()
                 val collectJob =
                     launch {
                         service.streamDeliveries().collect { received.add(it) }
@@ -69,15 +90,16 @@ class PipelineIntegrationTest {
                 dropBox.log(box(level = Level.WARN, message = "second"))
                 dropBox.log(box(level = Level.ERROR, message = "third"))
 
-                awaitCondition { received.size >= 3 }
+                awaitCondition { received.snapshot().size >= 3 }
 
-                assertEquals(3, received.size)
-                assertEquals(Level.INFO, received[0].level)
-                assertEquals("first", received[0].message)
-                assertEquals(Level.WARN, received[1].level)
-                assertEquals("second", received[1].message)
-                assertEquals(Level.ERROR, received[2].level)
-                assertEquals("third", received[2].message)
+                assertEquals(3, received.snapshot().size)
+                val snap = received.snapshot()
+                assertEquals(Level.INFO, snap[0].level)
+                assertEquals("first", snap[0].message)
+                assertEquals(Level.WARN, snap[1].level)
+                assertEquals("second", snap[1].message)
+                assertEquals(Level.ERROR, snap[2].level)
+                assertEquals("third", snap[2].message)
                 collectJob.cancelAndJoin()
                 warehouse.close()
             }
@@ -91,7 +113,7 @@ class PipelineIntegrationTest {
                 val dock = warehouse.requestDockPickup()
                 val service = warehouse.deliveries()
 
-                val received = mutableListOf<Box>()
+                val received = Collected<Box>()
                 val collectJob =
                     launch {
                         service.streamDeliveries().collect { received.add(it) }
@@ -106,12 +128,13 @@ class PipelineIntegrationTest {
                     )
                 dock.bulkLog(boxes.pack())
 
-                awaitCondition { received.size >= 3 }
+                awaitCondition { received.snapshot().size >= 3 }
 
-                assertEquals(3, received.size)
-                assertEquals("bulk1", received[0].message)
-                assertEquals("bulk2", received[1].message)
-                assertEquals("bulk3", received[2].message)
+                assertEquals(3, received.snapshot().size)
+                val snap = received.snapshot()
+                assertEquals("bulk1", snap[0].message)
+                assertEquals("bulk2", snap[1].message)
+                assertEquals("bulk3", snap[2].message)
                 collectJob.cancelAndJoin()
                 warehouse.close()
             }
@@ -127,7 +150,7 @@ class PipelineIntegrationTest {
                 val dock = warehouse.requestDockPickup()
                 val service = warehouse.deliveries()
 
-                val received = mutableListOf<Box>()
+                val received = Collected<Box>()
                 val collectJob =
                     launch {
                         service.streamDeliveries().collect { received.add(it) }
@@ -143,12 +166,12 @@ class PipelineIntegrationTest {
                     ).pack(),
                 )
 
-                awaitCondition { received.size >= 4 }
+                awaitCondition { received.snapshot().size >= 4 }
 
-                assertEquals(4, received.size)
-                assertTrue(received.any { it.loggerName == "Source1" })
-                assertTrue(received.any { it.loggerName == "Source2" })
-                assertEquals(2, received.count { it.loggerName == "Source3" })
+                assertEquals(4, received.snapshot().size)
+                assertTrue(received.snapshot().any { it.loggerName == "Source1" })
+                assertTrue(received.snapshot().any { it.loggerName == "Source2" })
+                assertEquals(2, received.snapshot().count { it.loggerName == "Source3" })
                 collectJob.cancelAndJoin()
                 warehouse.close()
             }
@@ -163,7 +186,7 @@ class PipelineIntegrationTest {
                 val service = warehouse.deliveries()
                 val filtered = service.weighIn(LevelFilter(LevelMatchMode.GT, Level.INFO))
 
-                val received = mutableListOf<Box>()
+                val received = Collected<Box>()
                 val collectJob =
                     launch {
                         filtered.streamDeliveries().collect { received.add(it) }
@@ -175,11 +198,12 @@ class PipelineIntegrationTest {
                 dropBox.log(box(level = Level.WARN, message = "keep-warn"))
                 dropBox.log(box(level = Level.ERROR, message = "keep-error"))
 
-                awaitCondition { received.size >= 2 }
+                awaitCondition { received.snapshot().size >= 2 }
 
-                assertEquals(2, received.size)
-                assertEquals("keep-warn", received[0].message)
-                assertEquals("keep-error", received[1].message)
+                assertEquals(2, received.snapshot().size)
+                val snap = received.snapshot()
+                assertEquals("keep-warn", snap[0].message)
+                assertEquals("keep-error", snap[1].message)
                 collectJob.cancelAndJoin()
                 warehouse.close()
             }
@@ -198,7 +222,7 @@ class PipelineIntegrationTest {
                 val dropBox = warehouse.requestPickup()
                 val service = warehouse.deliveries()
 
-                val received = mutableListOf<Palette>()
+                val received = Collected<Palette>()
                 val collectJob =
                     launch {
                         service.streamDeliveriesPacked().collect { received.add(it) }
@@ -209,11 +233,11 @@ class PipelineIntegrationTest {
                 dropBox.log(box(message = "batch-b"))
 
                 awaitCondition("batched delivery received") {
-                    val allBoxes = received.flatMap { it.unpack() }
+                    val allBoxes = received.snapshot().flatMap { it.unpack() }
                     allBoxes.size >= 2
                 }
 
-                val allBoxes = received.flatMap { it.unpack() }
+                val allBoxes = received.snapshot().flatMap { it.unpack() }
                 assertTrue(allBoxes.any { it.message == "batch-a" })
                 assertTrue(allBoxes.any { it.message == "batch-b" })
                 collectJob.cancelAndJoin()
@@ -229,7 +253,7 @@ class PipelineIntegrationTest {
                 val dropBox = warehouse.requestPickup()
                 val service = warehouse.deliveries()
 
-                val received = mutableListOf<Box>()
+                val received = Collected<Box>()
                 val collectJob =
                     launch {
                         service.streamDeliveries().collect { received.add(it) }
@@ -239,10 +263,11 @@ class PipelineIntegrationTest {
                 val meta = mapOf("requestId" to "abc-123", "userId" to "42")
                 dropBox.log(box(message = "with-meta").copy(metadata = meta))
 
-                awaitCondition { received.isNotEmpty() }
+                awaitCondition { received.snapshot().isNotEmpty() }
 
-                assertEquals(1, received.size)
-                assertEquals(meta, received[0].metadata)
+                assertEquals(1, received.snapshot().size)
+                val snap = received.snapshot()
+                assertEquals(meta, snap[0].metadata)
                 collectJob.cancelAndJoin()
                 warehouse.close()
             }
@@ -266,7 +291,7 @@ class PipelineIntegrationTest {
                 assertEquals("historical", dumped[0].message)
 
                 // Subscribe — SharedFlow replay means subscriber also gets cached events
-                val live = mutableListOf<Box>()
+                val live = Collected<Box>()
                 val collectJob =
                     launch {
                         service.streamDeliveries().collect { live.add(it) }
@@ -276,12 +301,12 @@ class PipelineIntegrationTest {
                 dropBox.log(box(message = "live"))
 
                 awaitCondition("live delivery received") {
-                    live.any { it.message == "live" }
+                    live.snapshot().any { it.message == "live" }
                 }
 
                 // Subscriber receives replayed "historical" + new "live"
-                assertTrue(live.any { it.message == "historical" })
-                assertTrue(live.any { it.message == "live" })
+                assertTrue(live.snapshot().any { it.message == "historical" })
+                assertTrue(live.snapshot().any { it.message == "live" })
                 collectJob.cancelAndJoin()
                 warehouse.close()
             }
