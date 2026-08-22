@@ -51,7 +51,7 @@ jobs:
 
       - name: Assert the ubuntu suites executed
         if: always()
-        run: ./.github/assert-tests-executed.sh jvmTest jsNodeTest wasmJsNodeTest linuxX64Test
+        run: ./.github/assert_tests_executed.py jvmTest jsNodeTest wasmJsNodeTest linuxX64Test
 
       - name: Upload test results
         if: always()
@@ -100,7 +100,7 @@ jobs:
 
       - name: Assert the Apple suites executed
         if: always()
-        run: ./.github/assert-tests-executed.sh macosArm64Test iosSimulatorArm64Test
+        run: ./.github/assert_tests_executed.py macosArm64Test iosSimulatorArm64Test
 
       - name: Upload test results
         if: always()
@@ -130,7 +130,7 @@ jobs:
       - name: Assert the mingwX64 suite executed
         if: always()
         shell: bash
-        run: ./.github/assert-tests-executed.sh mingwX64Test
+        run: ./.github/assert_tests_executed.py mingwX64Test
 
       - name: Upload test results
         if: always()
