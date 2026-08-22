@@ -18,7 +18,8 @@
 #   directory but no XML        RED  "did not report at all"
 #   some files unparseable      RED  "partial parse"        <- NOT a subtotal
 #   no file parseable           RED  "parser failure"       <- NOT "zero tests"
-#   total not a number          RED  "derivation failed"    <- NOT green
+#   a count with >9 digits      RED  "implausibly large"    <- would WRAP silently
+#   total not a number          IMPOSSIBLE by construction — see 10# below
 #   total == 0                  RED  "executed zero"
 #   total > 0                   green, count printed
 #
@@ -32,7 +33,13 @@
 #   v2  `[ "$total" -eq 0 ]` exits 2 on a NON-NUMERIC operand, so the `if` was
 #       false and control fell through to the success line: a failed awk
 #       printed a green with no number in it and exited 0. Fail-closed contract,
-#       fail-OPEN behaviour. Hence the explicit numeric check below.
+#       fail-OPEN behaviour.
+#   v3  `$((total + n))` reads a LEADING ZERO as octal. tests="008" is not valid
+#       octal, so the arithmetic aborted the whole script mid-loop and it
+#       exited 0 — with a second task's missing results directory never checked.
+#       Fail-OPEN again, and the quieter half is worse: tests="017" printed a
+#       green "15". The `case` filter accepts it because it IS all digits; base
+#       is a separate question from character class. Hence `10#` below.
 # Every one of those passed a review or a control set before it was found.
 set -uo pipefail
 
@@ -63,6 +70,7 @@ for task in "$@"; do
   # removed rather than argued about.
   files=0
   parsed=0
+  oversize=0
   total=0
   for f in "$dir"/*.xml; do
     [ -e "$f" ] || continue
@@ -74,9 +82,27 @@ for task in "$@"; do
     case "$n" in
       "" | *[!0-9]*) continue ;;
     esac
+    # ⚠️ bash arithmetic is 64-bit and WRAPS SILENTLY:
+    # tests="99999999999999999999" became 7766279631452241919. A plausible
+    # wrong number is worse than zero, because zero at least looks wrong.
+    # No suite has a billion tests; refuse rather than wrap.
+    if [ "${#n}" -gt 9 ]; then
+      oversize=$((oversize + 1))
+      continue
+    fi
     parsed=$((parsed + 1))
-    total=$((total + n))
+    # ⚠️ `10#` IS LOAD-BEARING. Without it bash reads a leading zero as octal:
+    # tests="008" aborts the script mid-loop (exit 0, later tasks unchecked)
+    # and tests="017" silently becomes 15. Both are fail-OPEN.
+    total=$((total + 10#$n))
   done
+
+  if [ "$oversize" -gt 0 ]; then
+    echo "::error::$task: $oversize file(s) report an implausibly large tests=\"N\" (>9 digits)."
+    echo "::error::Refusing rather than wrapping — bash arithmetic is 64-bit and wraps SILENTLY."
+    status=1
+    continue
+  fi
 
   if [ "$files" -eq 0 ]; then
     echo "::error::$task: results directory exists but contains NO XML — the task produced no report."
