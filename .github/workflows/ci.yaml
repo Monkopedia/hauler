@@ -49,6 +49,12 @@ jobs:
       - name: Assemble, test, apiCheck, ktlint
         run: ./gradlew :hauler:assemble :hauler:check ktlintCheck -x klibApiCheck
 
+      # TEMPORARY (#53 spike, do not merge): prove the guard's RED branches
+      # on THIS runner's interpreter, asserting the message not the exit code.
+      - name: Guard self-test (spike)
+        if: always()
+        run: ./.github/selftest-assert-guard.sh
+
       - name: Assert the ubuntu suites executed
         if: always()
         run: ./.github/assert-tests-executed.sh jvmTest jsNodeTest wasmJsNodeTest linuxX64Test
@@ -98,6 +104,12 @@ jobs:
         # ⚠️ --dry-run: prints SKIPPED for EVERY task including ones that really
         # ran. Readable task list, inert as evidence of execution. Do not cite it.
 
+      # TEMPORARY (#53 spike, do not merge): prove the guard's RED branches
+      # on THIS runner's interpreter, asserting the message not the exit code.
+      - name: Guard self-test (spike)
+        if: always()
+        run: ./.github/selftest-assert-guard.sh
+
       - name: Assert the Apple suites executed
         if: always()
         run: ./.github/assert-tests-executed.sh macosArm64Test iosSimulatorArm64Test
@@ -126,6 +138,13 @@ jobs:
         run: rm -rf hauler/build/test-results
       - name: mingwX64 tests
         run: ./gradlew :hauler:mingwX64Test --console=plain
+
+      # TEMPORARY (#53 spike, do not merge): prove the guard's RED branches
+      # on THIS runner's interpreter, asserting the message not the exit code.
+      - name: Guard self-test (spike)
+        if: always()
+        shell: bash
+        run: ./.github/selftest-assert-guard.sh
 
       - name: Assert the mingwX64 suite executed
         if: always()
