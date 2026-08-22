@@ -43,8 +43,35 @@
 # Every one of those passed a review or a control set before it was found.
 set -uo pipefail
 
+# ⚠️ C LOCALE IS LOAD-BEARING. The digit filter below is `case *[!0-9]*`, and
+# `[!0-9]` is a COLLATION range: under some locales it does not exclude
+# non-ASCII digits, and bash 3.2 — which is what the apple runner runs — has no
+# `globasciiranges` to force ASCII semantics. A Unicode digit slipping through
+# reaches `$(( ))` and detonates the same fatal-unwind as v3 below.
+export LC_ALL=C
+
 RESULTS_DIR="hauler/build/test-results"
 status=0
+
+# ⚠️ COMPLETENESS TRAP. v3 proved that a fatal arithmetic expansion unwinds out
+# of BOTH loops and exits 0, leaving every later task UNEXAMINED and reported as
+# a pass. No amount of per-branch care prevents that, because the script never
+# reaches its own checks. So the count of tasks actually examined is asserted on
+# the way out, from a trap that fires however we leave.
+#   Tasks not examined are NOT tasks that passed.
+TOTAL_TASKS=$#
+checked=0
+# shellcheck disable=SC2329  # invoked indirectly via `trap ... EXIT`
+on_exit() {
+  exit_rc=$?
+  if [ "$checked" -ne "$TOTAL_TASKS" ]; then
+    echo "::error::assert-tests-executed.sh examined only $checked of $TOTAL_TASKS task(s) before exiting."
+    echo "::error::The run did not complete. Tasks not examined are NOT tasks that passed."
+    exit 1
+  fi
+  exit "$exit_rc"
+}
+trap on_exit EXIT
 
 if [ "$#" -eq 0 ]; then
   echo "::error::assert-tests-executed.sh called with no task names — nothing was asserted."
@@ -53,6 +80,7 @@ if [ "$#" -eq 0 ]; then
 fi
 
 for task in "$@"; do
+  checked=$((checked + 1))
   dir="$RESULTS_DIR/$task"
 
   if [ ! -d "$dir" ]; then
@@ -78,7 +106,17 @@ for task in "$@"; do
     # head -1: Gradle writes exactly one <testsuite> per file, and it precedes
     # <system-out>. Without this, a test that LOGS a testsuite-shaped line gets
     # summed out of a CDATA block — reproduced: a real tests="0" reported 999.
-    n=$(sed -n 's/.*<testsuite [^>]*tests="\([0-9][0-9]*\)".*/\1/p' "$f" | head -1)
+    # ⚠️ TWO GREEDY-REGEX FAIL-OPENS LIVED HERE. BRE `.*` is greedy, so on a
+    # single line it matched the LAST candidate, not the opening tag:
+    #   <testsuite tests="0" othertests="777"/>            reported 777
+    #   <testsuite tests="3">...CDATA <testsuite tests="999"/>...   reported 999
+    # `head -1` only helped when the decoy was on a later LINE. Two defences:
+    #   s/>.*//          keep only the opening tag, killing same-line decoys
+    #   [[:space:]]tests= require an attribute boundary, killing `othertests`
+    #   NOTE the literal has NO trailing space: requiring `<testsuite ` and then
+    #   a separate [[:space:]] rejected `<testsuite tests="7" name="z"/>`, where
+    #   tests is the FIRST attribute. Caught by control, not by reading.
+    n=$(sed -n 's/>.*//; s/.*<testsuite[^>]*[[:space:]]tests="\([0-9][0-9]*\)".*/\1/p' "$f" | head -1)
     case "$n" in
       "" | *[!0-9]*) continue ;;
     esac
