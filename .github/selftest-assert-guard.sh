@@ -14,6 +14,14 @@ set -uo pipefail
 G=./.github/assert-tests-executed.sh
 D=hauler/build/test-results/zzSelfTest
 fails=0
+observed=0
+EXPECTED_STATES=9
+
+# ⚠️ COUNT WHAT WAS DRIVEN, DO NOT INFER IT. A state that never ran and a state
+# that ran and printed the right message produce the same output unless the
+# total is asserted. That is the `${total:-0}` defect one level up, inside the
+# instrument built to catch it — so this script refuses to report success
+# without having observed all EXPECTED_STATES.
 
 echo "interpreter: ${BASH_VERSION:-<not bash>}   ($(command -v bash))"
 bash --version | head -1
@@ -26,7 +34,7 @@ expect() {                       # expect <label> <want-rc> <want-substring>
     echo "FAIL  $label: rc=$rc want=$want_rc"; echo "      out: $out"; fails=$((fails + 1)); return
   fi
   case "$out" in
-    *"$want"*) echo "ok    $label  (rc=$rc)  <- $want" ;;
+    *"$want"*) observed=$((observed + 1)); echo "ok    $label  (rc=$rc)  <- $want" ;;
     *) echo "FAIL  $label: rc correct but WRONG MESSAGE"; echo "      want substring: $want"; echo "      got: $out"; fails=$((fails + 1)) ;;
   esac
 }
@@ -35,7 +43,7 @@ rm -rf "$D"
 # 1. no results directory
 out=$("$G" zzSelfTest 2>&1); rc=$?
 case "$rc:$out" in
-  1:*"cannot determine whether it ran"*) echo "ok    no-directory  (rc=1)" ;;
+  1:*"cannot determine whether it ran"*) observed=$((observed + 1)); echo "ok    no-directory  (rc=1)" ;;
   *) echo "FAIL  no-directory: rc=$rc out=$out"; fails=$((fails + 1)) ;;
 esac
 
@@ -70,14 +78,20 @@ expect "green" 0 "42 tests executed"
 # 9. no arguments
 out=$("$G" 2>&1); rc=$?
 case "$rc:$out" in
-  1:*"nothing was asserted"*) echo "ok    no-args  (rc=1)" ;;
+  1:*"nothing was asserted"*) observed=$((observed + 1)); echo "ok    no-args  (rc=1)" ;;
   *) echo "FAIL  no-args: rc=$rc out=$out"; fails=$((fails + 1)) ;;
 esac
 
 rm -rf "$D"
 echo
+echo "observed $observed of $EXPECTED_STATES states"
 if [ "$fails" -ne 0 ]; then
   echo "::error::guard self-test: $fails state(s) wrong on this runner."
   exit 1
 fi
-echo "guard self-test: all states correct on this runner"
+if [ "$observed" -ne "$EXPECTED_STATES" ]; then
+  echo "::error::guard self-test: only $observed of $EXPECTED_STATES states were OBSERVED."
+  echo "::error::Coverage is not silence. A state that did not run is not a state that passed."
+  exit 1
+fi
+echo "guard self-test: all $observed states observed and correct on this runner"
