@@ -18,10 +18,8 @@ package com.monkopedia.hauler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -35,12 +33,6 @@ class PickupsTest {
         timestamp: Long = 1000L,
         threadName: String? = "main",
     ) = Box(level, loggerName, message, timestamp, threadName)
-
-    private suspend fun awaitCondition(check: () -> Boolean) {
-        withTimeout(5.seconds) {
-            while (!check()) delay(1)
-        }
-    }
 
     // --- Deliveries.forwardTo(DropBox) ---
 

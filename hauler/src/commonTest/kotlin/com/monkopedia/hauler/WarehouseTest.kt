@@ -22,11 +22,9 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.seconds
 
 class WarehouseTest {
     private fun box(
@@ -36,12 +34,6 @@ class WarehouseTest {
         timestamp: Long = 1000L,
         threadName: String? = "main",
     ) = Box(level, loggerName, message, timestamp, threadName)
-
-    private suspend fun awaitCondition(check: () -> Boolean) {
-        withTimeout(5.seconds) {
-            while (!check()) delay(1)
-        }
-    }
 
     @Test
     fun dropBox_sendsToDelivery() =

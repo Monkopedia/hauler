@@ -24,7 +24,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -62,15 +61,6 @@ class PipelineIntegrationTest {
         suspend fun snapshot(): List<T> = lock.withLock { items.toList() }
     }
 
-    private suspend fun awaitCondition(
-        description: String = "",
-        check: suspend () -> Boolean,
-    ) {
-        withTimeout(5.seconds) {
-            while (!check()) delay(1)
-        }
-    }
-
     @Test
     fun dropBox_to_streamDeliveries() =
         runTest {
@@ -92,8 +82,8 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().size >= 3 }
 
-                assertEquals(3, received.snapshot().size)
                 val snap = received.snapshot()
+                assertEquals(3, snap.size)
                 assertEquals(Level.INFO, snap[0].level)
                 assertEquals("first", snap[0].message)
                 assertEquals(Level.WARN, snap[1].level)
@@ -130,8 +120,8 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().size >= 3 }
 
-                assertEquals(3, received.snapshot().size)
                 val snap = received.snapshot()
+                assertEquals(3, snap.size)
                 assertEquals("bulk1", snap[0].message)
                 assertEquals("bulk2", snap[1].message)
                 assertEquals("bulk3", snap[2].message)
@@ -168,10 +158,11 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().size >= 4 }
 
-                assertEquals(4, received.snapshot().size)
-                assertTrue(received.snapshot().any { it.loggerName == "Source1" })
-                assertTrue(received.snapshot().any { it.loggerName == "Source2" })
-                assertEquals(2, received.snapshot().count { it.loggerName == "Source3" })
+                val snap = received.snapshot()
+                assertEquals(4, snap.size)
+                assertTrue(snap.any { it.loggerName == "Source1" })
+                assertTrue(snap.any { it.loggerName == "Source2" })
+                assertEquals(2, snap.count { it.loggerName == "Source3" })
                 collectJob.cancelAndJoin()
                 warehouse.close()
             }
@@ -200,8 +191,8 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().size >= 2 }
 
-                assertEquals(2, received.snapshot().size)
                 val snap = received.snapshot()
+                assertEquals(2, snap.size)
                 assertEquals("keep-warn", snap[0].message)
                 assertEquals("keep-error", snap[1].message)
                 collectJob.cancelAndJoin()
@@ -265,8 +256,8 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().isNotEmpty() }
 
-                assertEquals(1, received.snapshot().size)
                 val snap = received.snapshot()
+                assertEquals(1, snap.size)
                 assertEquals(meta, snap[0].metadata)
                 collectJob.cancelAndJoin()
                 warehouse.close()
@@ -305,8 +296,9 @@ class PipelineIntegrationTest {
                 }
 
                 // Subscriber receives replayed "historical" + new "live"
-                assertTrue(live.snapshot().any { it.message == "historical" })
-                assertTrue(live.snapshot().any { it.message == "live" })
+                val snap = live.snapshot()
+                assertTrue(snap.any { it.message == "historical" })
+                assertTrue(snap.any { it.message == "live" })
                 collectJob.cancelAndJoin()
                 warehouse.close()
             }
