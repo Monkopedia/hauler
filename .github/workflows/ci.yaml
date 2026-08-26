@@ -44,6 +44,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: SPIKE — prove the guard's REFUSAL paths on this runner
+        run: ./.github/selftest_assert_guard.py
+
       - name: Clear stale test results
         run: rm -rf hauler/build/test-results
       - name: Assemble, test, apiCheck, ktlint
@@ -88,6 +91,9 @@ jobs:
       # macosX64Test is expected to report SKIPPED: GitHub's macOS images are
       # Apple Silicon, so there is no x86 host to execute it on. Listed anyway so
       # the job log records whether that is true for this repo.
+      - name: SPIKE — prove the guard's REFUSAL paths on this runner
+        run: ./.github/selftest_assert_guard.py
+
       - name: Clear stale test results
         run: rm -rf hauler/build/test-results
       - name: Apple tests
@@ -121,6 +127,10 @@ jobs:
           java-version: 21
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: SPIKE — prove the guard's REFUSAL paths on this runner
+        shell: bash
+        run: ./.github/selftest_assert_guard.py
+
       - name: Clear stale test results
         shell: bash
         run: rm -rf hauler/build/test-results
