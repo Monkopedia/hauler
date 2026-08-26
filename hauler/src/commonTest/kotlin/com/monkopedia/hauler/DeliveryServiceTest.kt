@@ -66,10 +66,10 @@ class DeliveryServiceTest {
                 flow.emit(box(message = "a"))
                 flow.emit(box(message = "b"))
                 awaitCondition { received.size >= 2 }
+                collectJob.cancelAndJoin()
                 assertEquals(2, received.size)
                 assertEquals("a", received[0].message)
                 assertEquals("b", received[1].message)
-                collectJob.cancelAndJoin()
                 scope.cancel()
             }
         }
@@ -145,9 +145,9 @@ class DeliveryServiceTest {
                 flow.emit(box(level = Level.INFO, message = "info"))
                 flow.emit(box(level = Level.ERROR, message = "error"))
                 awaitCondition { received.size >= 1 }
+                collectJob.cancelAndJoin()
                 assertEquals(1, received.size)
                 assertEquals("error", received[0].message)
-                collectJob.cancelAndJoin()
                 scope.cancel()
             }
         }
@@ -181,8 +181,14 @@ class DeliveryServiceTest {
                 // edge, a reader that has not observed the write sees size == 1 and passes even
                 // if the filter is broken: the right answer and the wrong answer are the same
                 // observation, so no repetition count can surface it. cancelAndJoin() supplies
-                // the edge and removes the writer. Its sibling
-                // streamDeliveries_cancellationStopsDelivery already gets this order right.
+                // the edge and removes the writer.
+                //
+                // NOTE the orderings are NOT the same as its sibling
+                // streamDeliveries_cancellationStopsDelivery, which joins FIRST and only then
+                // emits the box that must not arrive. That works there because the bad box is
+                // emitted after the collector is gone. Here the bad boxes must be emitted while
+                // the collector is LIVE -- otherwise the test proves nothing -- so the order is
+                // emit, wait, join, assert. Both are correct; do not "align" them.
                 collectJob.cancelAndJoin()
                 assertEquals(1, received.size)
                 assertEquals("yes", received[0].message)

@@ -25,15 +25,23 @@ import kotlin.time.Duration.Companion.seconds
  * Polls [check] until it returns true, failing the test after five seconds.
  *
  * [description] is REPORTED IN THE FAILURE. Four private copies of this helper
- * used to take a description and never read it, so a timeout named nothing and
- * seven tests polled through it -- exactly the tests that fail intermittently
- * (#51). A caller who supplies a description reasonably believes they have made
- * the failure diagnosable; that belief has to be true.
+ * took a description and never read it, so a timeout named no condition at all
+ * while seven tests polled through it -- exactly the tests that fail
+ * intermittently (#51). A caller who supplies a description reasonably believes
+ * they have made the failure diagnosable; that belief has to be true.
  *
- * The message also names the virtual-clock trap, because that is what the raw
- * timeout looked like during the #44 investigation and it cost hours to read:
- * inside `runTest`, five seconds of VIRTUAL time can elapse in milliseconds of
- * real time, so a collector on a real dispatcher gets almost no wall clock.
+ * ADDS to the runtime's message, never replaces it. Measured, not assumed:
+ *
+ *     Timed out after 5s of _virtual_ (kotlinx.coroutines.test) time. To use the
+ *     real time, wrap 'withTimeout' in
+ *     'withContext(Dispatchers.Default.limitedParallelism(1))'
+ *
+ * That already names WHICH CLOCK ran out and WHAT TO DO -- unconditionally, and
+ * it is the single most expensive thing the #44 investigation had to learn. #51
+ * quoted it truncated at "time." and concluded it "named nothing"; it named
+ * everything except the one thing this helper knows, which is what was being
+ * awaited. So the description is prepended and [e] is passed as the cause, which
+ * keeps the original message and its stack trace.
  */
 internal suspend fun awaitCondition(
     description: String = "",
@@ -45,11 +53,10 @@ internal suspend fun awaitCondition(
         }
     } catch (e: TimeoutCancellationException) {
         fail(
-            "awaitCondition timed out after 5s waiting for " +
+            "awaitCondition gave up waiting for " +
                 description.ifEmpty { "an UNNAMED condition (pass a description)" } +
-                ". If this test is not wrapped in withContext(Dispatchers.Default) " +
-                "that was 5s of VIRTUAL time, which can pass in milliseconds of " +
-                "real time -- see #44.",
+                " -- " + e.message,
+            e,
         )
     }
 }

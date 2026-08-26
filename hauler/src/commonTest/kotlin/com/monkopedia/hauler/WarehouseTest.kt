@@ -116,10 +116,10 @@ class WarehouseTest {
                 drop1.log(box(message = "from1"))
                 drop2.log(box(message = "from2"))
                 awaitCondition { received.size >= 2 }
+                collectJob.cancelAndJoin()
                 assertEquals(2, received.size)
                 assertTrue(received.any { it.message == "from1" })
                 assertTrue(received.any { it.message == "from2" })
-                collectJob.cancelAndJoin()
                 warehouse.close()
             }
         }
