@@ -34,3 +34,7 @@ build
 
 # Some kotlin/js thing
 kotlin-js-store
+
+# Python bytecode (the guard script in .github/)
+__pycache__/
+*.pyc
