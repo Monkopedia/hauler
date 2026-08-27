@@ -1,0 +1,791 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, wasmJs]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <com.monkopedia:hauler>
+open annotation class com.monkopedia.hauler/FilterDsl : kotlin/Annotation { // com.monkopedia.hauler/FilterDsl|null[0]
+    constructor <init>() // com.monkopedia.hauler/FilterDsl.<init>|<init>(){}[0]
+}
+
+abstract enum class com.monkopedia.hauler/LevelMatchMode : kotlin/Enum<com.monkopedia.hauler/LevelMatchMode> { // com.monkopedia.hauler/LevelMatchMode|null[0]
+    enum entry EQ // com.monkopedia.hauler/LevelMatchMode.EQ|null[0]
+    enum entry GT // com.monkopedia.hauler/LevelMatchMode.GT|null[0]
+    enum entry LT // com.monkopedia.hauler/LevelMatchMode.LT|null[0]
+
+    final val entries // com.monkopedia.hauler/LevelMatchMode.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<com.monkopedia.hauler/LevelMatchMode> // com.monkopedia.hauler/LevelMatchMode.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    abstract fun <#A1: kotlin/Comparable<#A1>> checkMatch(#A1, #A1): kotlin/Boolean // com.monkopedia.hauler/LevelMatchMode.checkMatch|checkMatch(0:0;0:0){0§<kotlin.Comparable<0:0>>}[0]
+    final fun valueOf(kotlin/String): com.monkopedia.hauler/LevelMatchMode // com.monkopedia.hauler/LevelMatchMode.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<com.monkopedia.hauler/LevelMatchMode> // com.monkopedia.hauler/LevelMatchMode.values|values#static(){}[0]
+}
+
+abstract enum class com.monkopedia.hauler/LoggerMatchMode : kotlin/Enum<com.monkopedia.hauler/LoggerMatchMode> { // com.monkopedia.hauler/LoggerMatchMode|null[0]
+    enum entry EXACT // com.monkopedia.hauler/LoggerMatchMode.EXACT|null[0]
+    enum entry PREFIX // com.monkopedia.hauler/LoggerMatchMode.PREFIX|null[0]
+    enum entry REGEX // com.monkopedia.hauler/LoggerMatchMode.REGEX|null[0]
+
+    final val entries // com.monkopedia.hauler/LoggerMatchMode.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<com.monkopedia.hauler/LoggerMatchMode> // com.monkopedia.hauler/LoggerMatchMode.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    abstract fun checkMatch(kotlin/String, kotlin/String): kotlin/Boolean // com.monkopedia.hauler/LoggerMatchMode.checkMatch|checkMatch(kotlin.String;kotlin.String){}[0]
+    final fun valueOf(kotlin/String): com.monkopedia.hauler/LoggerMatchMode // com.monkopedia.hauler/LoggerMatchMode.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<com.monkopedia.hauler/LoggerMatchMode> // com.monkopedia.hauler/LoggerMatchMode.values|values#static(){}[0]
+}
+
+final enum class com.monkopedia.hauler/Level : kotlin/Enum<com.monkopedia.hauler/Level> { // com.monkopedia.hauler/Level|null[0]
+    enum entry DEBUG // com.monkopedia.hauler/Level.DEBUG|null[0]
+    enum entry ERROR // com.monkopedia.hauler/Level.ERROR|null[0]
+    enum entry INFO // com.monkopedia.hauler/Level.INFO|null[0]
+    enum entry TRACE // com.monkopedia.hauler/Level.TRACE|null[0]
+    enum entry WARN // com.monkopedia.hauler/Level.WARN|null[0]
+
+    final val entries // com.monkopedia.hauler/Level.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<com.monkopedia.hauler/Level> // com.monkopedia.hauler/Level.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val intLevel // com.monkopedia.hauler/Level.intLevel|{}intLevel[0]
+        final fun <get-intLevel>(): kotlin/Int // com.monkopedia.hauler/Level.intLevel.<get-intLevel>|<get-intLevel>(){}[0]
+
+    final fun valueOf(kotlin/String): com.monkopedia.hauler/Level // com.monkopedia.hauler/Level.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<com.monkopedia.hauler/Level> // com.monkopedia.hauler/Level.values|values#static(){}[0]
+
+    final object Companion : kotlinx.serialization.internal/SerializerFactory { // com.monkopedia.hauler/Level.Companion|null[0]
+        final fun (kotlin/Int).asLevel(): com.monkopedia.hauler/Level // com.monkopedia.hauler/Level.Companion.asLevel|asLevel@kotlin.Int(){}[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/Level> // com.monkopedia.hauler/Level.Companion.serializer|serializer(){}[0]
+        final fun serializer(kotlin/Array<out kotlinx.serialization/KSerializer<*>>...): kotlinx.serialization/KSerializer<*> // com.monkopedia.hauler/Level.Companion.serializer|serializer(kotlin.Array<out|kotlinx.serialization.KSerializer<*>>...){}[0]
+    }
+}
+
+abstract fun interface com.monkopedia.hauler/Hauler { // com.monkopedia.hauler/Hauler|null[0]
+    abstract suspend fun emit(com.monkopedia.hauler/Box) // com.monkopedia.hauler/Hauler.emit|emit(com.monkopedia.hauler.Box){}[0]
+}
+
+abstract interface com.monkopedia.hauler/AsyncHauler { // com.monkopedia.hauler/AsyncHauler|null[0]
+    abstract fun emit(com.monkopedia.hauler/Box) // com.monkopedia.hauler/AsyncHauler.emit|emit(com.monkopedia.hauler.Box){}[0]
+}
+
+abstract interface com.monkopedia.hauler/BasicDeliveryService : com.monkopedia.ksrpc/RpcHostService { // com.monkopedia.hauler/BasicDeliveryService|null[0]
+    abstract suspend fun dumpCustomerPickup(kotlin/Unit = ...): com.monkopedia.hauler/CustomerPickup // com.monkopedia.hauler/BasicDeliveryService.dumpCustomerPickup|dumpCustomerPickup(kotlin.Unit){}[0]
+    abstract suspend fun recurringCustomerPickup(kotlin/Unit = ...): com.monkopedia.hauler/CustomerPickup // com.monkopedia.hauler/BasicDeliveryService.recurringCustomerPickup|recurringCustomerPickup(kotlin.Unit){}[0]
+    abstract suspend fun weighIn(com.monkopedia.hauler/WeighStation): com.monkopedia.hauler/BasicDeliveryService // com.monkopedia.hauler/BasicDeliveryService.weighIn|weighIn(com.monkopedia.hauler.WeighStation){}[0]
+
+    final class Stub : com.monkopedia.hauler/BasicDeliveryService, com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/BasicDeliveryService.Stub|null[0]
+        constructor <init>(com.monkopedia.ksrpc.channels/SerializedService<*>) // com.monkopedia.hauler/BasicDeliveryService.Stub.<init>|<init>(com.monkopedia.ksrpc.channels.SerializedService<*>){}[0]
+
+        final suspend fun close() // com.monkopedia.hauler/BasicDeliveryService.Stub.close|close(){}[0]
+        final suspend fun dumpCustomerPickup(kotlin/Unit): com.monkopedia.hauler/CustomerPickup // com.monkopedia.hauler/BasicDeliveryService.Stub.dumpCustomerPickup|dumpCustomerPickup(kotlin.Unit){}[0]
+        final suspend fun recurringCustomerPickup(kotlin/Unit): com.monkopedia.hauler/CustomerPickup // com.monkopedia.hauler/BasicDeliveryService.Stub.recurringCustomerPickup|recurringCustomerPickup(kotlin.Unit){}[0]
+        final suspend fun weighIn(com.monkopedia.hauler/WeighStation): com.monkopedia.hauler/BasicDeliveryService // com.monkopedia.hauler/BasicDeliveryService.Stub.weighIn|weighIn(com.monkopedia.hauler.WeighStation){}[0]
+
+        final object Companion { // com.monkopedia.hauler/BasicDeliveryService.Stub.Companion|null[0]
+            constructor <init>() // com.monkopedia.hauler/BasicDeliveryService.Stub.Companion.<init>|<init>(){}[0]
+        }
+    }
+
+    final object Companion : com.monkopedia.ksrpc/RpcObject<com.monkopedia.hauler/BasicDeliveryService> { // com.monkopedia.hauler/BasicDeliveryService.Companion|null[0]
+        final val endpoints // com.monkopedia.hauler/BasicDeliveryService.Companion.endpoints|{}endpoints[0]
+            final fun <get-endpoints>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/BasicDeliveryService.Companion.endpoints.<get-endpoints>|<get-endpoints>(){}[0]
+        final val serviceName // com.monkopedia.hauler/BasicDeliveryService.Companion.serviceName|{}serviceName[0]
+            final fun <get-serviceName>(): kotlin/String // com.monkopedia.hauler/BasicDeliveryService.Companion.serviceName.<get-serviceName>|<get-serviceName>(){}[0]
+        final val serviceTier // com.monkopedia.hauler/BasicDeliveryService.Companion.serviceTier|{}serviceTier[0]
+            final fun <get-serviceTier>(): com.monkopedia.ksrpc/ServiceTier // com.monkopedia.hauler/BasicDeliveryService.Companion.serviceTier.<get-serviceTier>|<get-serviceTier>(){}[0]
+
+        final fun <#A2: kotlin/Any?> createStub(com.monkopedia.ksrpc.channels/SerializedService<#A2>): com.monkopedia.hauler/BasicDeliveryService // com.monkopedia.hauler/BasicDeliveryService.Companion.createStub|createStub(com.monkopedia.ksrpc.channels.SerializedService<0:0>){0§<kotlin.Any?>}[0]
+        final fun findEndpoint(kotlin/String): com.monkopedia.ksrpc/RpcMethod<*, *, *> // com.monkopedia.hauler/BasicDeliveryService.Companion.findEndpoint|findEndpoint(kotlin.String){}[0]
+    }
+}
+
+abstract interface com.monkopedia.hauler/BasicShipper : com.monkopedia.ksrpc/RpcHostService { // com.monkopedia.hauler/BasicShipper|null[0]
+    abstract suspend fun requestDockPickup(kotlin/Unit = ...): com.monkopedia.hauler/LoadingDock // com.monkopedia.hauler/BasicShipper.requestDockPickup|requestDockPickup(kotlin.Unit){}[0]
+    abstract suspend fun requestPickup(kotlin/Unit = ...): com.monkopedia.hauler/DropBox // com.monkopedia.hauler/BasicShipper.requestPickup|requestPickup(kotlin.Unit){}[0]
+
+    final class Stub : com.monkopedia.hauler/BasicShipper, com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/BasicShipper.Stub|null[0]
+        constructor <init>(com.monkopedia.ksrpc.channels/SerializedService<*>) // com.monkopedia.hauler/BasicShipper.Stub.<init>|<init>(com.monkopedia.ksrpc.channels.SerializedService<*>){}[0]
+
+        final suspend fun close() // com.monkopedia.hauler/BasicShipper.Stub.close|close(){}[0]
+        final suspend fun requestDockPickup(kotlin/Unit): com.monkopedia.hauler/LoadingDock // com.monkopedia.hauler/BasicShipper.Stub.requestDockPickup|requestDockPickup(kotlin.Unit){}[0]
+        final suspend fun requestPickup(kotlin/Unit): com.monkopedia.hauler/DropBox // com.monkopedia.hauler/BasicShipper.Stub.requestPickup|requestPickup(kotlin.Unit){}[0]
+
+        final object Companion { // com.monkopedia.hauler/BasicShipper.Stub.Companion|null[0]
+            constructor <init>() // com.monkopedia.hauler/BasicShipper.Stub.Companion.<init>|<init>(){}[0]
+        }
+    }
+
+    final object Companion : com.monkopedia.ksrpc/RpcObject<com.monkopedia.hauler/BasicShipper> { // com.monkopedia.hauler/BasicShipper.Companion|null[0]
+        final val endpoints // com.monkopedia.hauler/BasicShipper.Companion.endpoints|{}endpoints[0]
+            final fun <get-endpoints>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/BasicShipper.Companion.endpoints.<get-endpoints>|<get-endpoints>(){}[0]
+        final val serviceName // com.monkopedia.hauler/BasicShipper.Companion.serviceName|{}serviceName[0]
+            final fun <get-serviceName>(): kotlin/String // com.monkopedia.hauler/BasicShipper.Companion.serviceName.<get-serviceName>|<get-serviceName>(){}[0]
+        final val serviceTier // com.monkopedia.hauler/BasicShipper.Companion.serviceTier|{}serviceTier[0]
+            final fun <get-serviceTier>(): com.monkopedia.ksrpc/ServiceTier // com.monkopedia.hauler/BasicShipper.Companion.serviceTier.<get-serviceTier>|<get-serviceTier>(){}[0]
+
+        final fun <#A2: kotlin/Any?> createStub(com.monkopedia.ksrpc.channels/SerializedService<#A2>): com.monkopedia.hauler/BasicShipper // com.monkopedia.hauler/BasicShipper.Companion.createStub|createStub(com.monkopedia.ksrpc.channels.SerializedService<0:0>){0§<kotlin.Any?>}[0]
+        final fun findEndpoint(kotlin/String): com.monkopedia.ksrpc/RpcMethod<*, *, *> // com.monkopedia.hauler/BasicShipper.Companion.findEndpoint|findEndpoint(kotlin.String){}[0]
+    }
+}
+
+abstract interface com.monkopedia.hauler/CustomerPickup : com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/CustomerPickup|null[0]
+    abstract suspend fun get(kotlin/Int = ...): com.monkopedia.hauler/Palette // com.monkopedia.hauler/CustomerPickup.get|get(kotlin.Int){}[0]
+
+    final class Stub : com.monkopedia.hauler/CustomerPickup, com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/CustomerPickup.Stub|null[0]
+        constructor <init>(com.monkopedia.ksrpc.channels/SerializedService<*>) // com.monkopedia.hauler/CustomerPickup.Stub.<init>|<init>(com.monkopedia.ksrpc.channels.SerializedService<*>){}[0]
+
+        final suspend fun close() // com.monkopedia.hauler/CustomerPickup.Stub.close|close(){}[0]
+        final suspend fun get(kotlin/Int): com.monkopedia.hauler/Palette // com.monkopedia.hauler/CustomerPickup.Stub.get|get(kotlin.Int){}[0]
+
+        final object Companion { // com.monkopedia.hauler/CustomerPickup.Stub.Companion|null[0]
+            constructor <init>() // com.monkopedia.hauler/CustomerPickup.Stub.Companion.<init>|<init>(){}[0]
+        }
+    }
+
+    final object Companion : com.monkopedia.ksrpc/RpcObject<com.monkopedia.hauler/CustomerPickup> { // com.monkopedia.hauler/CustomerPickup.Companion|null[0]
+        final val endpoints // com.monkopedia.hauler/CustomerPickup.Companion.endpoints|{}endpoints[0]
+            final fun <get-endpoints>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/CustomerPickup.Companion.endpoints.<get-endpoints>|<get-endpoints>(){}[0]
+        final val serviceName // com.monkopedia.hauler/CustomerPickup.Companion.serviceName|{}serviceName[0]
+            final fun <get-serviceName>(): kotlin/String // com.monkopedia.hauler/CustomerPickup.Companion.serviceName.<get-serviceName>|<get-serviceName>(){}[0]
+        final val serviceTier // com.monkopedia.hauler/CustomerPickup.Companion.serviceTier|{}serviceTier[0]
+            final fun <get-serviceTier>(): com.monkopedia.ksrpc/ServiceTier // com.monkopedia.hauler/CustomerPickup.Companion.serviceTier.<get-serviceTier>|<get-serviceTier>(){}[0]
+
+        final fun <#A2: kotlin/Any?> createStub(com.monkopedia.ksrpc.channels/SerializedService<#A2>): com.monkopedia.hauler/CustomerPickup // com.monkopedia.hauler/CustomerPickup.Companion.createStub|createStub(com.monkopedia.ksrpc.channels.SerializedService<0:0>){0§<kotlin.Any?>}[0]
+        final fun findEndpoint(kotlin/String): com.monkopedia.ksrpc/RpcMethod<*, *, *> // com.monkopedia.hauler/CustomerPickup.Companion.findEndpoint|findEndpoint(kotlin.String){}[0]
+    }
+}
+
+abstract interface com.monkopedia.hauler/DeliveryService : com.monkopedia.hauler/BasicDeliveryService, com.monkopedia.ksrpc/RpcBidiService { // com.monkopedia.hauler/DeliveryService|null[0]
+    abstract suspend fun dumpDeliveries(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/DeliveryService.dumpDeliveries|dumpDeliveries(){}[0]
+    abstract suspend fun dumpDeliveriesPacked(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Palette> // com.monkopedia.hauler/DeliveryService.dumpDeliveriesPacked|dumpDeliveriesPacked(){}[0]
+    abstract suspend fun streamDeliveries(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/DeliveryService.streamDeliveries|streamDeliveries(){}[0]
+    abstract suspend fun streamDeliveriesPacked(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Palette> // com.monkopedia.hauler/DeliveryService.streamDeliveriesPacked|streamDeliveriesPacked(){}[0]
+    abstract suspend fun weighIn(com.monkopedia.hauler/WeighStation): com.monkopedia.hauler/DeliveryService // com.monkopedia.hauler/DeliveryService.weighIn|weighIn(com.monkopedia.hauler.WeighStation){}[0]
+
+    final class Stub : com.monkopedia.hauler/DeliveryService, com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/DeliveryService.Stub|null[0]
+        constructor <init>(com.monkopedia.ksrpc.channels/SerializedService<*>) // com.monkopedia.hauler/DeliveryService.Stub.<init>|<init>(com.monkopedia.ksrpc.channels.SerializedService<*>){}[0]
+
+        final suspend fun close() // com.monkopedia.hauler/DeliveryService.Stub.close|close(){}[0]
+        final suspend fun dumpCustomerPickup(kotlin/Unit): com.monkopedia.hauler/CustomerPickup // com.monkopedia.hauler/DeliveryService.Stub.dumpCustomerPickup|dumpCustomerPickup(kotlin.Unit){}[0]
+        final suspend fun dumpDeliveries(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/DeliveryService.Stub.dumpDeliveries|dumpDeliveries(){}[0]
+        final suspend fun dumpDeliveriesPacked(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Palette> // com.monkopedia.hauler/DeliveryService.Stub.dumpDeliveriesPacked|dumpDeliveriesPacked(){}[0]
+        final suspend fun recurringCustomerPickup(kotlin/Unit): com.monkopedia.hauler/CustomerPickup // com.monkopedia.hauler/DeliveryService.Stub.recurringCustomerPickup|recurringCustomerPickup(kotlin.Unit){}[0]
+        final suspend fun streamDeliveries(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/DeliveryService.Stub.streamDeliveries|streamDeliveries(){}[0]
+        final suspend fun streamDeliveriesPacked(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Palette> // com.monkopedia.hauler/DeliveryService.Stub.streamDeliveriesPacked|streamDeliveriesPacked(){}[0]
+        final suspend fun weighIn(com.monkopedia.hauler/WeighStation): com.monkopedia.hauler/DeliveryService // com.monkopedia.hauler/DeliveryService.Stub.weighIn|weighIn(com.monkopedia.hauler.WeighStation){}[0]
+
+        final object Companion { // com.monkopedia.hauler/DeliveryService.Stub.Companion|null[0]
+            constructor <init>() // com.monkopedia.hauler/DeliveryService.Stub.Companion.<init>|<init>(){}[0]
+        }
+    }
+
+    final object Companion : com.monkopedia.ksrpc/RpcObject<com.monkopedia.hauler/DeliveryService> { // com.monkopedia.hauler/DeliveryService.Companion|null[0]
+        final val endpoints // com.monkopedia.hauler/DeliveryService.Companion.endpoints|{}endpoints[0]
+            final fun <get-endpoints>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/DeliveryService.Companion.endpoints.<get-endpoints>|<get-endpoints>(){}[0]
+        final val serviceName // com.monkopedia.hauler/DeliveryService.Companion.serviceName|{}serviceName[0]
+            final fun <get-serviceName>(): kotlin/String // com.monkopedia.hauler/DeliveryService.Companion.serviceName.<get-serviceName>|<get-serviceName>(){}[0]
+        final val serviceTier // com.monkopedia.hauler/DeliveryService.Companion.serviceTier|{}serviceTier[0]
+            final fun <get-serviceTier>(): com.monkopedia.ksrpc/ServiceTier // com.monkopedia.hauler/DeliveryService.Companion.serviceTier.<get-serviceTier>|<get-serviceTier>(){}[0]
+
+        final fun <#A2: kotlin/Any?> createStub(com.monkopedia.ksrpc.channels/SerializedService<#A2>): com.monkopedia.hauler/DeliveryService // com.monkopedia.hauler/DeliveryService.Companion.createStub|createStub(com.monkopedia.ksrpc.channels.SerializedService<0:0>){0§<kotlin.Any?>}[0]
+        final fun findEndpoint(kotlin/String): com.monkopedia.ksrpc/RpcMethod<*, *, *> // com.monkopedia.hauler/DeliveryService.Companion.findEndpoint|findEndpoint(kotlin.String){}[0]
+    }
+}
+
+abstract interface com.monkopedia.hauler/DropBox : com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/DropBox|null[0]
+    abstract suspend fun log(com.monkopedia.hauler/Box) // com.monkopedia.hauler/DropBox.log|log(com.monkopedia.hauler.Box){}[0]
+
+    final class Stub : com.monkopedia.hauler/DropBox, com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/DropBox.Stub|null[0]
+        constructor <init>(com.monkopedia.ksrpc.channels/SerializedService<*>) // com.monkopedia.hauler/DropBox.Stub.<init>|<init>(com.monkopedia.ksrpc.channels.SerializedService<*>){}[0]
+
+        final suspend fun close() // com.monkopedia.hauler/DropBox.Stub.close|close(){}[0]
+        final suspend fun log(com.monkopedia.hauler/Box) // com.monkopedia.hauler/DropBox.Stub.log|log(com.monkopedia.hauler.Box){}[0]
+
+        final object Companion { // com.monkopedia.hauler/DropBox.Stub.Companion|null[0]
+            constructor <init>() // com.monkopedia.hauler/DropBox.Stub.Companion.<init>|<init>(){}[0]
+        }
+    }
+
+    final object Companion : com.monkopedia.ksrpc/RpcObject<com.monkopedia.hauler/DropBox> { // com.monkopedia.hauler/DropBox.Companion|null[0]
+        final val endpoints // com.monkopedia.hauler/DropBox.Companion.endpoints|{}endpoints[0]
+            final fun <get-endpoints>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/DropBox.Companion.endpoints.<get-endpoints>|<get-endpoints>(){}[0]
+        final val serviceName // com.monkopedia.hauler/DropBox.Companion.serviceName|{}serviceName[0]
+            final fun <get-serviceName>(): kotlin/String // com.monkopedia.hauler/DropBox.Companion.serviceName.<get-serviceName>|<get-serviceName>(){}[0]
+        final val serviceTier // com.monkopedia.hauler/DropBox.Companion.serviceTier|{}serviceTier[0]
+            final fun <get-serviceTier>(): com.monkopedia.ksrpc/ServiceTier // com.monkopedia.hauler/DropBox.Companion.serviceTier.<get-serviceTier>|<get-serviceTier>(){}[0]
+
+        final fun <#A2: kotlin/Any?> createStub(com.monkopedia.ksrpc.channels/SerializedService<#A2>): com.monkopedia.hauler/DropBox // com.monkopedia.hauler/DropBox.Companion.createStub|createStub(com.monkopedia.ksrpc.channels.SerializedService<0:0>){0§<kotlin.Any?>}[0]
+        final fun findEndpoint(kotlin/String): com.monkopedia.ksrpc/RpcMethod<*, *, *> // com.monkopedia.hauler/DropBox.Companion.findEndpoint|findEndpoint(kotlin.String){}[0]
+    }
+}
+
+abstract interface com.monkopedia.hauler/LoadingDock : com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/LoadingDock|null[0]
+    abstract suspend fun bulkLog(com.monkopedia.hauler/Palette) // com.monkopedia.hauler/LoadingDock.bulkLog|bulkLog(com.monkopedia.hauler.Palette){}[0]
+
+    final class Stub : com.monkopedia.hauler/LoadingDock, com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/LoadingDock.Stub|null[0]
+        constructor <init>(com.monkopedia.ksrpc.channels/SerializedService<*>) // com.monkopedia.hauler/LoadingDock.Stub.<init>|<init>(com.monkopedia.ksrpc.channels.SerializedService<*>){}[0]
+
+        final suspend fun bulkLog(com.monkopedia.hauler/Palette) // com.monkopedia.hauler/LoadingDock.Stub.bulkLog|bulkLog(com.monkopedia.hauler.Palette){}[0]
+        final suspend fun close() // com.monkopedia.hauler/LoadingDock.Stub.close|close(){}[0]
+
+        final object Companion { // com.monkopedia.hauler/LoadingDock.Stub.Companion|null[0]
+            constructor <init>() // com.monkopedia.hauler/LoadingDock.Stub.Companion.<init>|<init>(){}[0]
+        }
+    }
+
+    final object Companion : com.monkopedia.ksrpc/RpcObject<com.monkopedia.hauler/LoadingDock> { // com.monkopedia.hauler/LoadingDock.Companion|null[0]
+        final val endpoints // com.monkopedia.hauler/LoadingDock.Companion.endpoints|{}endpoints[0]
+            final fun <get-endpoints>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/LoadingDock.Companion.endpoints.<get-endpoints>|<get-endpoints>(){}[0]
+        final val serviceName // com.monkopedia.hauler/LoadingDock.Companion.serviceName|{}serviceName[0]
+            final fun <get-serviceName>(): kotlin/String // com.monkopedia.hauler/LoadingDock.Companion.serviceName.<get-serviceName>|<get-serviceName>(){}[0]
+        final val serviceTier // com.monkopedia.hauler/LoadingDock.Companion.serviceTier|{}serviceTier[0]
+            final fun <get-serviceTier>(): com.monkopedia.ksrpc/ServiceTier // com.monkopedia.hauler/LoadingDock.Companion.serviceTier.<get-serviceTier>|<get-serviceTier>(){}[0]
+
+        final fun <#A2: kotlin/Any?> createStub(com.monkopedia.ksrpc.channels/SerializedService<#A2>): com.monkopedia.hauler/LoadingDock // com.monkopedia.hauler/LoadingDock.Companion.createStub|createStub(com.monkopedia.ksrpc.channels.SerializedService<0:0>){0§<kotlin.Any?>}[0]
+        final fun findEndpoint(kotlin/String): com.monkopedia.ksrpc/RpcMethod<*, *, *> // com.monkopedia.hauler/LoadingDock.Companion.findEndpoint|findEndpoint(kotlin.String){}[0]
+    }
+}
+
+abstract interface com.monkopedia.hauler/Shipper : com.monkopedia.hauler/BasicShipper, com.monkopedia.ksrpc/RpcBidiService { // com.monkopedia.hauler/Shipper|null[0]
+    abstract suspend fun deliveries(kotlin/Unit = ...): com.monkopedia.hauler/DeliveryService // com.monkopedia.hauler/Shipper.deliveries|deliveries(kotlin.Unit){}[0]
+
+    final class Stub : com.monkopedia.hauler/Shipper, com.monkopedia.ksrpc/RpcService { // com.monkopedia.hauler/Shipper.Stub|null[0]
+        constructor <init>(com.monkopedia.ksrpc.channels/SerializedService<*>) // com.monkopedia.hauler/Shipper.Stub.<init>|<init>(com.monkopedia.ksrpc.channels.SerializedService<*>){}[0]
+
+        final suspend fun close() // com.monkopedia.hauler/Shipper.Stub.close|close(){}[0]
+        final suspend fun deliveries(kotlin/Unit): com.monkopedia.hauler/DeliveryService // com.monkopedia.hauler/Shipper.Stub.deliveries|deliveries(kotlin.Unit){}[0]
+        final suspend fun requestDockPickup(kotlin/Unit): com.monkopedia.hauler/LoadingDock // com.monkopedia.hauler/Shipper.Stub.requestDockPickup|requestDockPickup(kotlin.Unit){}[0]
+        final suspend fun requestPickup(kotlin/Unit): com.monkopedia.hauler/DropBox // com.monkopedia.hauler/Shipper.Stub.requestPickup|requestPickup(kotlin.Unit){}[0]
+
+        final object Companion { // com.monkopedia.hauler/Shipper.Stub.Companion|null[0]
+            constructor <init>() // com.monkopedia.hauler/Shipper.Stub.Companion.<init>|<init>(){}[0]
+        }
+    }
+
+    final object Companion : com.monkopedia.ksrpc/RpcObject<com.monkopedia.hauler/Shipper> { // com.monkopedia.hauler/Shipper.Companion|null[0]
+        final val endpoints // com.monkopedia.hauler/Shipper.Companion.endpoints|{}endpoints[0]
+            final fun <get-endpoints>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/Shipper.Companion.endpoints.<get-endpoints>|<get-endpoints>(){}[0]
+        final val serviceName // com.monkopedia.hauler/Shipper.Companion.serviceName|{}serviceName[0]
+            final fun <get-serviceName>(): kotlin/String // com.monkopedia.hauler/Shipper.Companion.serviceName.<get-serviceName>|<get-serviceName>(){}[0]
+        final val serviceTier // com.monkopedia.hauler/Shipper.Companion.serviceTier|{}serviceTier[0]
+            final fun <get-serviceTier>(): com.monkopedia.ksrpc/ServiceTier // com.monkopedia.hauler/Shipper.Companion.serviceTier.<get-serviceTier>|<get-serviceTier>(){}[0]
+
+        final fun <#A2: kotlin/Any?> createStub(com.monkopedia.ksrpc.channels/SerializedService<#A2>): com.monkopedia.hauler/Shipper // com.monkopedia.hauler/Shipper.Companion.createStub|createStub(com.monkopedia.ksrpc.channels.SerializedService<0:0>){0§<kotlin.Any?>}[0]
+        final fun findEndpoint(kotlin/String): com.monkopedia.ksrpc/RpcMethod<*, *, *> // com.monkopedia.hauler/Shipper.Companion.findEndpoint|findEndpoint(kotlin.String){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/AndFilter : com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/AndFilter|null[0]
+    constructor <init>(com.monkopedia.hauler/WeighStation, com.monkopedia.hauler/WeighStation) // com.monkopedia.hauler/AndFilter.<init>|<init>(com.monkopedia.hauler.WeighStation;com.monkopedia.hauler.WeighStation){}[0]
+
+    final val first // com.monkopedia.hauler/AndFilter.first|{}first[0]
+        final fun <get-first>(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/AndFilter.first.<get-first>|<get-first>(){}[0]
+    final val second // com.monkopedia.hauler/AndFilter.second|{}second[0]
+        final fun <get-second>(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/AndFilter.second.<get-second>|<get-second>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/AndFilter.component1|component1(){}[0]
+    final fun component2(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/AndFilter.component2|component2(){}[0]
+    final fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/AndFilter.contains|contains(com.monkopedia.hauler.Box){}[0]
+    final fun copy(com.monkopedia.hauler/WeighStation = ..., com.monkopedia.hauler/WeighStation = ...): com.monkopedia.hauler/AndFilter // com.monkopedia.hauler/AndFilter.copy|copy(com.monkopedia.hauler.WeighStation;com.monkopedia.hauler.WeighStation){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/AndFilter.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/AndFilter.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/AndFilter.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/AndFilter> { // com.monkopedia.hauler/AndFilter.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/AndFilter.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/AndFilter.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/AndFilter.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/AndFilter // com.monkopedia.hauler/AndFilter.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/AndFilter) // com.monkopedia.hauler/AndFilter.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.AndFilter){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/AndFilter.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/AndFilter.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/AndFilter> // com.monkopedia.hauler/AndFilter.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/Box { // com.monkopedia.hauler/Box|null[0]
+    constructor <init>(com.monkopedia.hauler/Level, kotlin/String, kotlin/String, kotlin/Long, kotlin/String?, kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/Box.<init>|<init>(com.monkopedia.hauler.Level;kotlin.String;kotlin.String;kotlin.Long;kotlin.String?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+
+    final val level // com.monkopedia.hauler/Box.level|{}level[0]
+        final fun <get-level>(): com.monkopedia.hauler/Level // com.monkopedia.hauler/Box.level.<get-level>|<get-level>(){}[0]
+    final val loggerName // com.monkopedia.hauler/Box.loggerName|{}loggerName[0]
+        final fun <get-loggerName>(): kotlin/String // com.monkopedia.hauler/Box.loggerName.<get-loggerName>|<get-loggerName>(){}[0]
+    final val message // com.monkopedia.hauler/Box.message|{}message[0]
+        final fun <get-message>(): kotlin/String // com.monkopedia.hauler/Box.message.<get-message>|<get-message>(){}[0]
+    final val metadata // com.monkopedia.hauler/Box.metadata|{}metadata[0]
+        final fun <get-metadata>(): kotlin.collections/Map<kotlin/String, kotlin/String>? // com.monkopedia.hauler/Box.metadata.<get-metadata>|<get-metadata>(){}[0]
+    final val threadName // com.monkopedia.hauler/Box.threadName|{}threadName[0]
+        final fun <get-threadName>(): kotlin/String? // com.monkopedia.hauler/Box.threadName.<get-threadName>|<get-threadName>(){}[0]
+    final val timestamp // com.monkopedia.hauler/Box.timestamp|{}timestamp[0]
+        final fun <get-timestamp>(): kotlin/Long // com.monkopedia.hauler/Box.timestamp.<get-timestamp>|<get-timestamp>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/Level // com.monkopedia.hauler/Box.component1|component1(){}[0]
+    final fun component2(): kotlin/String // com.monkopedia.hauler/Box.component2|component2(){}[0]
+    final fun component3(): kotlin/String // com.monkopedia.hauler/Box.component3|component3(){}[0]
+    final fun component4(): kotlin/Long // com.monkopedia.hauler/Box.component4|component4(){}[0]
+    final fun component5(): kotlin/String? // com.monkopedia.hauler/Box.component5|component5(){}[0]
+    final fun component6(): kotlin.collections/Map<kotlin/String, kotlin/String>? // com.monkopedia.hauler/Box.component6|component6(){}[0]
+    final fun copy(com.monkopedia.hauler/Level = ..., kotlin/String = ..., kotlin/String = ..., kotlin/Long = ..., kotlin/String? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...): com.monkopedia.hauler/Box // com.monkopedia.hauler/Box.copy|copy(com.monkopedia.hauler.Level;kotlin.String;kotlin.String;kotlin.Long;kotlin.String?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/Box.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/Box.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/Box.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/Box> { // com.monkopedia.hauler/Box.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/Box.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/Box.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/Box.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/Box // com.monkopedia.hauler/Box.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/Box) // com.monkopedia.hauler/Box.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.Box){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/Box.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/Box.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/Box> // com.monkopedia.hauler/Box.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/CallSign : kotlin.coroutines/CoroutineContext.Element { // com.monkopedia.hauler/CallSign|null[0]
+    constructor <init>(kotlin/String) // com.monkopedia.hauler/CallSign.<init>|<init>(kotlin.String){}[0]
+
+    final val key // com.monkopedia.hauler/CallSign.key|{}key[0]
+        final fun <get-key>(): com.monkopedia.hauler/CallSign.Key // com.monkopedia.hauler/CallSign.key.<get-key>|<get-key>(){}[0]
+    final val name // com.monkopedia.hauler/CallSign.name|{}name[0]
+        final fun <get-name>(): kotlin/String // com.monkopedia.hauler/CallSign.name.<get-name>|<get-name>(){}[0]
+
+    final object Key : kotlin.coroutines/CoroutineContext.Key<com.monkopedia.hauler/CallSign> { // com.monkopedia.hauler/CallSign.Key|null[0]
+        final suspend fun loggingName(): kotlin/String? // com.monkopedia.hauler/CallSign.Key.loggingName|loggingName(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/DeliveryRates { // com.monkopedia.hauler/DeliveryRates|null[0]
+    constructor <init>(kotlin/Int = ..., kotlin/Int = ..., kotlin.time/Duration = ..., kotlin/Function1<kotlin/Throwable, kotlin/Unit> = ...) // com.monkopedia.hauler/DeliveryRates.<init>|<init>(kotlin.Int;kotlin.Int;kotlin.time.Duration;kotlin.Function1<kotlin.Throwable,kotlin.Unit>){}[0]
+
+    final val defaultBoxRetention // com.monkopedia.hauler/DeliveryRates.defaultBoxRetention|{}defaultBoxRetention[0]
+        final fun <get-defaultBoxRetention>(): kotlin/Int // com.monkopedia.hauler/DeliveryRates.defaultBoxRetention.<get-defaultBoxRetention>|<get-defaultBoxRetention>(){}[0]
+    final val defaultPaletteInterval // com.monkopedia.hauler/DeliveryRates.defaultPaletteInterval|{}defaultPaletteInterval[0]
+        final fun <get-defaultPaletteInterval>(): kotlin.time/Duration // com.monkopedia.hauler/DeliveryRates.defaultPaletteInterval.<get-defaultPaletteInterval>|<get-defaultPaletteInterval>(){}[0]
+    final val defaultPaletteSize // com.monkopedia.hauler/DeliveryRates.defaultPaletteSize|{}defaultPaletteSize[0]
+        final fun <get-defaultPaletteSize>(): kotlin/Int // com.monkopedia.hauler/DeliveryRates.defaultPaletteSize.<get-defaultPaletteSize>|<get-defaultPaletteSize>(){}[0]
+    final val onDeliveryError // com.monkopedia.hauler/DeliveryRates.onDeliveryError|{}onDeliveryError[0]
+        final fun <get-onDeliveryError>(): kotlin/Function1<kotlin/Throwable, kotlin/Unit> // com.monkopedia.hauler/DeliveryRates.onDeliveryError.<get-onDeliveryError>|<get-onDeliveryError>(){}[0]
+
+    final fun component1(): kotlin/Int // com.monkopedia.hauler/DeliveryRates.component1|component1(){}[0]
+    final fun component2(): kotlin/Int // com.monkopedia.hauler/DeliveryRates.component2|component2(){}[0]
+    final fun component3(): kotlin.time/Duration // com.monkopedia.hauler/DeliveryRates.component3|component3(){}[0]
+    final fun component4(): kotlin/Function1<kotlin/Throwable, kotlin/Unit> // com.monkopedia.hauler/DeliveryRates.component4|component4(){}[0]
+    final fun copy(kotlin/Int = ..., kotlin/Int = ..., kotlin.time/Duration = ..., kotlin/Function1<kotlin/Throwable, kotlin/Unit> = ...): com.monkopedia.hauler/DeliveryRates // com.monkopedia.hauler/DeliveryRates.copy|copy(kotlin.Int;kotlin.Int;kotlin.time.Duration;kotlin.Function1<kotlin.Throwable,kotlin.Unit>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/DeliveryRates.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/DeliveryRates.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/DeliveryRates.toString|toString(){}[0]
+}
+
+final class com.monkopedia.hauler/LevelFilter : com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/LevelFilter|null[0]
+    constructor <init>(com.monkopedia.hauler/LevelMatchMode, com.monkopedia.hauler/Level) // com.monkopedia.hauler/LevelFilter.<init>|<init>(com.monkopedia.hauler.LevelMatchMode;com.monkopedia.hauler.Level){}[0]
+
+    final val level // com.monkopedia.hauler/LevelFilter.level|{}level[0]
+        final fun <get-level>(): com.monkopedia.hauler/Level // com.monkopedia.hauler/LevelFilter.level.<get-level>|<get-level>(){}[0]
+    final val mode // com.monkopedia.hauler/LevelFilter.mode|{}mode[0]
+        final fun <get-mode>(): com.monkopedia.hauler/LevelMatchMode // com.monkopedia.hauler/LevelFilter.mode.<get-mode>|<get-mode>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/LevelMatchMode // com.monkopedia.hauler/LevelFilter.component1|component1(){}[0]
+    final fun component2(): com.monkopedia.hauler/Level // com.monkopedia.hauler/LevelFilter.component2|component2(){}[0]
+    final fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/LevelFilter.contains|contains(com.monkopedia.hauler.Box){}[0]
+    final fun copy(com.monkopedia.hauler/LevelMatchMode = ..., com.monkopedia.hauler/Level = ...): com.monkopedia.hauler/LevelFilter // com.monkopedia.hauler/LevelFilter.copy|copy(com.monkopedia.hauler.LevelMatchMode;com.monkopedia.hauler.Level){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/LevelFilter.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/LevelFilter.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/LevelFilter.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/LevelFilter> { // com.monkopedia.hauler/LevelFilter.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/LevelFilter.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/LevelFilter.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/LevelFilter.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/LevelFilter // com.monkopedia.hauler/LevelFilter.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/LevelFilter) // com.monkopedia.hauler/LevelFilter.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.LevelFilter){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/LevelFilter.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/LevelFilter.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/LevelFilter> // com.monkopedia.hauler/LevelFilter.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/LoggerNameFilter : com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/LoggerNameFilter|null[0]
+    constructor <init>(com.monkopedia.hauler/LoggerMatchMode, kotlin/String) // com.monkopedia.hauler/LoggerNameFilter.<init>|<init>(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+
+    final val matchMode // com.monkopedia.hauler/LoggerNameFilter.matchMode|{}matchMode[0]
+        final fun <get-matchMode>(): com.monkopedia.hauler/LoggerMatchMode // com.monkopedia.hauler/LoggerNameFilter.matchMode.<get-matchMode>|<get-matchMode>(){}[0]
+    final val query // com.monkopedia.hauler/LoggerNameFilter.query|{}query[0]
+        final fun <get-query>(): kotlin/String // com.monkopedia.hauler/LoggerNameFilter.query.<get-query>|<get-query>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/LoggerMatchMode // com.monkopedia.hauler/LoggerNameFilter.component1|component1(){}[0]
+    final fun component2(): kotlin/String // com.monkopedia.hauler/LoggerNameFilter.component2|component2(){}[0]
+    final fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/LoggerNameFilter.contains|contains(com.monkopedia.hauler.Box){}[0]
+    final fun copy(com.monkopedia.hauler/LoggerMatchMode = ..., kotlin/String = ...): com.monkopedia.hauler/LoggerNameFilter // com.monkopedia.hauler/LoggerNameFilter.copy|copy(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/LoggerNameFilter.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/LoggerNameFilter.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/LoggerNameFilter.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/LoggerNameFilter> { // com.monkopedia.hauler/LoggerNameFilter.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/LoggerNameFilter.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/LoggerNameFilter.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/LoggerNameFilter.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/LoggerNameFilter // com.monkopedia.hauler/LoggerNameFilter.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/LoggerNameFilter) // com.monkopedia.hauler/LoggerNameFilter.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.LoggerNameFilter){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/LoggerNameFilter.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/LoggerNameFilter.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/LoggerNameFilter> // com.monkopedia.hauler/LoggerNameFilter.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/MessageFilter : com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/MessageFilter|null[0]
+    constructor <init>(com.monkopedia.hauler/LoggerMatchMode, kotlin/String) // com.monkopedia.hauler/MessageFilter.<init>|<init>(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+
+    final val matchMode // com.monkopedia.hauler/MessageFilter.matchMode|{}matchMode[0]
+        final fun <get-matchMode>(): com.monkopedia.hauler/LoggerMatchMode // com.monkopedia.hauler/MessageFilter.matchMode.<get-matchMode>|<get-matchMode>(){}[0]
+    final val query // com.monkopedia.hauler/MessageFilter.query|{}query[0]
+        final fun <get-query>(): kotlin/String // com.monkopedia.hauler/MessageFilter.query.<get-query>|<get-query>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/LoggerMatchMode // com.monkopedia.hauler/MessageFilter.component1|component1(){}[0]
+    final fun component2(): kotlin/String // com.monkopedia.hauler/MessageFilter.component2|component2(){}[0]
+    final fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/MessageFilter.contains|contains(com.monkopedia.hauler.Box){}[0]
+    final fun copy(com.monkopedia.hauler/LoggerMatchMode = ..., kotlin/String = ...): com.monkopedia.hauler/MessageFilter // com.monkopedia.hauler/MessageFilter.copy|copy(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/MessageFilter.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/MessageFilter.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/MessageFilter.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/MessageFilter> { // com.monkopedia.hauler/MessageFilter.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/MessageFilter.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/MessageFilter.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/MessageFilter.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/MessageFilter // com.monkopedia.hauler/MessageFilter.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/MessageFilter) // com.monkopedia.hauler/MessageFilter.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.MessageFilter){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/MessageFilter.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/MessageFilter.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/MessageFilter> // com.monkopedia.hauler/MessageFilter.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/NotFilter : com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/NotFilter|null[0]
+    constructor <init>(com.monkopedia.hauler/WeighStation) // com.monkopedia.hauler/NotFilter.<init>|<init>(com.monkopedia.hauler.WeighStation){}[0]
+
+    final val base // com.monkopedia.hauler/NotFilter.base|{}base[0]
+        final fun <get-base>(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/NotFilter.base.<get-base>|<get-base>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/NotFilter.component1|component1(){}[0]
+    final fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/NotFilter.contains|contains(com.monkopedia.hauler.Box){}[0]
+    final fun copy(com.monkopedia.hauler/WeighStation = ...): com.monkopedia.hauler/NotFilter // com.monkopedia.hauler/NotFilter.copy|copy(com.monkopedia.hauler.WeighStation){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/NotFilter.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/NotFilter.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/NotFilter.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/NotFilter> { // com.monkopedia.hauler/NotFilter.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/NotFilter.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/NotFilter.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/NotFilter.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/NotFilter // com.monkopedia.hauler/NotFilter.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/NotFilter) // com.monkopedia.hauler/NotFilter.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.NotFilter){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/NotFilter.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/NotFilter.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/NotFilter> // com.monkopedia.hauler/NotFilter.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/OrFilter : com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/OrFilter|null[0]
+    constructor <init>(com.monkopedia.hauler/WeighStation, com.monkopedia.hauler/WeighStation) // com.monkopedia.hauler/OrFilter.<init>|<init>(com.monkopedia.hauler.WeighStation;com.monkopedia.hauler.WeighStation){}[0]
+
+    final val first // com.monkopedia.hauler/OrFilter.first|{}first[0]
+        final fun <get-first>(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/OrFilter.first.<get-first>|<get-first>(){}[0]
+    final val second // com.monkopedia.hauler/OrFilter.second|{}second[0]
+        final fun <get-second>(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/OrFilter.second.<get-second>|<get-second>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/OrFilter.component1|component1(){}[0]
+    final fun component2(): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/OrFilter.component2|component2(){}[0]
+    final fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/OrFilter.contains|contains(com.monkopedia.hauler.Box){}[0]
+    final fun copy(com.monkopedia.hauler/WeighStation = ..., com.monkopedia.hauler/WeighStation = ...): com.monkopedia.hauler/OrFilter // com.monkopedia.hauler/OrFilter.copy|copy(com.monkopedia.hauler.WeighStation;com.monkopedia.hauler.WeighStation){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/OrFilter.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/OrFilter.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/OrFilter.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/OrFilter> { // com.monkopedia.hauler/OrFilter.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/OrFilter.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/OrFilter.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/OrFilter.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/OrFilter // com.monkopedia.hauler/OrFilter.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/OrFilter) // com.monkopedia.hauler/OrFilter.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.OrFilter){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/OrFilter.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/OrFilter.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/OrFilter> // com.monkopedia.hauler/OrFilter.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/Package { // com.monkopedia.hauler/Package|null[0]
+    constructor <init>(kotlin/Int, kotlin/Int, kotlin/String, kotlin/Long, kotlin/Int?, kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/Package.<init>|<init>(kotlin.Int;kotlin.Int;kotlin.String;kotlin.Long;kotlin.Int?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+
+    final val intLevel // com.monkopedia.hauler/Package.intLevel|{}intLevel[0]
+        final fun <get-intLevel>(): kotlin/Int // com.monkopedia.hauler/Package.intLevel.<get-intLevel>|<get-intLevel>(){}[0]
+    final val loggerName // com.monkopedia.hauler/Package.loggerName|{}loggerName[0]
+        final fun <get-loggerName>(): kotlin/Int // com.monkopedia.hauler/Package.loggerName.<get-loggerName>|<get-loggerName>(){}[0]
+    final val message // com.monkopedia.hauler/Package.message|{}message[0]
+        final fun <get-message>(): kotlin/String // com.monkopedia.hauler/Package.message.<get-message>|<get-message>(){}[0]
+    final val metadata // com.monkopedia.hauler/Package.metadata|{}metadata[0]
+        final fun <get-metadata>(): kotlin.collections/Map<kotlin/String, kotlin/String>? // com.monkopedia.hauler/Package.metadata.<get-metadata>|<get-metadata>(){}[0]
+    final val threadName // com.monkopedia.hauler/Package.threadName|{}threadName[0]
+        final fun <get-threadName>(): kotlin/Int? // com.monkopedia.hauler/Package.threadName.<get-threadName>|<get-threadName>(){}[0]
+    final val timestamp // com.monkopedia.hauler/Package.timestamp|{}timestamp[0]
+        final fun <get-timestamp>(): kotlin/Long // com.monkopedia.hauler/Package.timestamp.<get-timestamp>|<get-timestamp>(){}[0]
+
+    final fun component1(): kotlin/Int // com.monkopedia.hauler/Package.component1|component1(){}[0]
+    final fun component2(): kotlin/Int // com.monkopedia.hauler/Package.component2|component2(){}[0]
+    final fun component3(): kotlin/String // com.monkopedia.hauler/Package.component3|component3(){}[0]
+    final fun component4(): kotlin/Long // com.monkopedia.hauler/Package.component4|component4(){}[0]
+    final fun component5(): kotlin/Int? // com.monkopedia.hauler/Package.component5|component5(){}[0]
+    final fun component6(): kotlin.collections/Map<kotlin/String, kotlin/String>? // com.monkopedia.hauler/Package.component6|component6(){}[0]
+    final fun copy(kotlin/Int = ..., kotlin/Int = ..., kotlin/String = ..., kotlin/Long = ..., kotlin/Int? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...): com.monkopedia.hauler/Package // com.monkopedia.hauler/Package.copy|copy(kotlin.Int;kotlin.Int;kotlin.String;kotlin.Long;kotlin.Int?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/Package.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/Package.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/Package.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/Package> { // com.monkopedia.hauler/Package.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/Package.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/Package.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/Package.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/Package // com.monkopedia.hauler/Package.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/Package) // com.monkopedia.hauler/Package.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.Package){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/Package.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/Package.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/Package> // com.monkopedia.hauler/Package.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/Palette { // com.monkopedia.hauler/Palette|null[0]
+    constructor <init>(kotlin.collections/List<kotlin/String>, kotlin.collections/List<kotlin/String> = ..., kotlin.collections/List<com.monkopedia.hauler/Package>) // com.monkopedia.hauler/Palette.<init>|<init>(kotlin.collections.List<kotlin.String>;kotlin.collections.List<kotlin.String>;kotlin.collections.List<com.monkopedia.hauler.Package>){}[0]
+
+    final val loggerNames // com.monkopedia.hauler/Palette.loggerNames|{}loggerNames[0]
+        final fun <get-loggerNames>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/Palette.loggerNames.<get-loggerNames>|<get-loggerNames>(){}[0]
+    final val messages // com.monkopedia.hauler/Palette.messages|{}messages[0]
+        final fun <get-messages>(): kotlin.collections/List<com.monkopedia.hauler/Package> // com.monkopedia.hauler/Palette.messages.<get-messages>|<get-messages>(){}[0]
+    final val threadNames // com.monkopedia.hauler/Palette.threadNames|{}threadNames[0]
+        final fun <get-threadNames>(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/Palette.threadNames.<get-threadNames>|<get-threadNames>(){}[0]
+
+    final fun component1(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/Palette.component1|component1(){}[0]
+    final fun component2(): kotlin.collections/List<kotlin/String> // com.monkopedia.hauler/Palette.component2|component2(){}[0]
+    final fun component3(): kotlin.collections/List<com.monkopedia.hauler/Package> // com.monkopedia.hauler/Palette.component3|component3(){}[0]
+    final fun copy(kotlin.collections/List<kotlin/String> = ..., kotlin.collections/List<kotlin/String> = ..., kotlin.collections/List<com.monkopedia.hauler/Package> = ...): com.monkopedia.hauler/Palette // com.monkopedia.hauler/Palette.copy|copy(kotlin.collections.List<kotlin.String>;kotlin.collections.List<kotlin.String>;kotlin.collections.List<com.monkopedia.hauler.Package>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/Palette.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/Palette.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/Palette.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/Palette> { // com.monkopedia.hauler/Palette.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/Palette.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/Palette.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/Palette.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/Palette // com.monkopedia.hauler/Palette.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/Palette) // com.monkopedia.hauler/Palette.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.Palette){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/Palette.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/Palette.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/Palette> // com.monkopedia.hauler/Palette.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/ThreadNameFilter : com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/ThreadNameFilter|null[0]
+    constructor <init>(com.monkopedia.hauler/LoggerMatchMode, kotlin/String) // com.monkopedia.hauler/ThreadNameFilter.<init>|<init>(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+
+    final val matchMode // com.monkopedia.hauler/ThreadNameFilter.matchMode|{}matchMode[0]
+        final fun <get-matchMode>(): com.monkopedia.hauler/LoggerMatchMode // com.monkopedia.hauler/ThreadNameFilter.matchMode.<get-matchMode>|<get-matchMode>(){}[0]
+    final val query // com.monkopedia.hauler/ThreadNameFilter.query|{}query[0]
+        final fun <get-query>(): kotlin/String // com.monkopedia.hauler/ThreadNameFilter.query.<get-query>|<get-query>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/LoggerMatchMode // com.monkopedia.hauler/ThreadNameFilter.component1|component1(){}[0]
+    final fun component2(): kotlin/String // com.monkopedia.hauler/ThreadNameFilter.component2|component2(){}[0]
+    final fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/ThreadNameFilter.contains|contains(com.monkopedia.hauler.Box){}[0]
+    final fun copy(com.monkopedia.hauler/LoggerMatchMode = ..., kotlin/String = ...): com.monkopedia.hauler/ThreadNameFilter // com.monkopedia.hauler/ThreadNameFilter.copy|copy(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/ThreadNameFilter.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/ThreadNameFilter.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/ThreadNameFilter.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/ThreadNameFilter> { // com.monkopedia.hauler/ThreadNameFilter.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/ThreadNameFilter.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/ThreadNameFilter.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/ThreadNameFilter.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/ThreadNameFilter // com.monkopedia.hauler/ThreadNameFilter.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/ThreadNameFilter) // com.monkopedia.hauler/ThreadNameFilter.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.ThreadNameFilter){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/ThreadNameFilter.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/ThreadNameFilter.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/ThreadNameFilter> // com.monkopedia.hauler/ThreadNameFilter.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/TimeFilter : com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/TimeFilter|null[0]
+    constructor <init>(com.monkopedia.hauler/LevelMatchMode, kotlin/Long) // com.monkopedia.hauler/TimeFilter.<init>|<init>(com.monkopedia.hauler.LevelMatchMode;kotlin.Long){}[0]
+
+    final val mode // com.monkopedia.hauler/TimeFilter.mode|{}mode[0]
+        final fun <get-mode>(): com.monkopedia.hauler/LevelMatchMode // com.monkopedia.hauler/TimeFilter.mode.<get-mode>|<get-mode>(){}[0]
+    final val time // com.monkopedia.hauler/TimeFilter.time|{}time[0]
+        final fun <get-time>(): kotlin/Long // com.monkopedia.hauler/TimeFilter.time.<get-time>|<get-time>(){}[0]
+
+    final fun component1(): com.monkopedia.hauler/LevelMatchMode // com.monkopedia.hauler/TimeFilter.component1|component1(){}[0]
+    final fun component2(): kotlin/Long // com.monkopedia.hauler/TimeFilter.component2|component2(){}[0]
+    final fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/TimeFilter.contains|contains(com.monkopedia.hauler.Box){}[0]
+    final fun copy(com.monkopedia.hauler/LevelMatchMode = ..., kotlin/Long = ...): com.monkopedia.hauler/TimeFilter // com.monkopedia.hauler/TimeFilter.copy|copy(com.monkopedia.hauler.LevelMatchMode;kotlin.Long){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // com.monkopedia.hauler/TimeFilter.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // com.monkopedia.hauler/TimeFilter.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // com.monkopedia.hauler/TimeFilter.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<com.monkopedia.hauler/TimeFilter> { // com.monkopedia.hauler/TimeFilter.$serializer|null[0]
+        final val descriptor // com.monkopedia.hauler/TimeFilter.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // com.monkopedia.hauler/TimeFilter.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // com.monkopedia.hauler/TimeFilter.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): com.monkopedia.hauler/TimeFilter // com.monkopedia.hauler/TimeFilter.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, com.monkopedia.hauler/TimeFilter) // com.monkopedia.hauler/TimeFilter.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;com.monkopedia.hauler.TimeFilter){}[0]
+    }
+
+    final object Companion { // com.monkopedia.hauler/TimeFilter.Companion|null[0]
+        final val $childSerializers // com.monkopedia.hauler/TimeFilter.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/TimeFilter> // com.monkopedia.hauler/TimeFilter.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class com.monkopedia.hauler/WeighStationBuilder { // com.monkopedia.hauler/WeighStationBuilder|null[0]
+    final fun and(kotlin/Function1<com.monkopedia.hauler/WeighStationBuilder, kotlin/Unit>) // com.monkopedia.hauler/WeighStationBuilder.and|and(kotlin.Function1<com.monkopedia.hauler.WeighStationBuilder,kotlin.Unit>){}[0]
+    final fun level(com.monkopedia.hauler/LevelMatchMode, com.monkopedia.hauler/Level) // com.monkopedia.hauler/WeighStationBuilder.level|level(com.monkopedia.hauler.LevelMatchMode;com.monkopedia.hauler.Level){}[0]
+    final fun logger(com.monkopedia.hauler/LoggerMatchMode, kotlin/String) // com.monkopedia.hauler/WeighStationBuilder.logger|logger(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+    final fun message(com.monkopedia.hauler/LoggerMatchMode, kotlin/String) // com.monkopedia.hauler/WeighStationBuilder.message|message(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+    final fun not(kotlin/Function1<com.monkopedia.hauler/WeighStationBuilder, kotlin/Unit>) // com.monkopedia.hauler/WeighStationBuilder.not|not(kotlin.Function1<com.monkopedia.hauler.WeighStationBuilder,kotlin.Unit>){}[0]
+    final fun or(kotlin/Function1<com.monkopedia.hauler/WeighStationBuilder, kotlin/Unit>) // com.monkopedia.hauler/WeighStationBuilder.or|or(kotlin.Function1<com.monkopedia.hauler.WeighStationBuilder,kotlin.Unit>){}[0]
+    final fun thread(com.monkopedia.hauler/LoggerMatchMode, kotlin/String) // com.monkopedia.hauler/WeighStationBuilder.thread|thread(com.monkopedia.hauler.LoggerMatchMode;kotlin.String){}[0]
+    final fun time(com.monkopedia.hauler/LevelMatchMode, kotlin/Long) // com.monkopedia.hauler/WeighStationBuilder.time|time(com.monkopedia.hauler.LevelMatchMode;kotlin.Long){}[0]
+}
+
+open class com.monkopedia.hauler/Warehouse : com.monkopedia.hauler/Shipper { // com.monkopedia.hauler/Warehouse|null[0]
+    constructor <init>(com.monkopedia.hauler/DeliveryRates) // com.monkopedia.hauler/Warehouse.<init>|<init>(com.monkopedia.hauler.DeliveryRates){}[0]
+
+    open suspend fun close() // com.monkopedia.hauler/Warehouse.close|close(){}[0]
+    open suspend fun deliveries(kotlin/Unit): com.monkopedia.hauler/DeliveryService // com.monkopedia.hauler/Warehouse.deliveries|deliveries(kotlin.Unit){}[0]
+    open suspend fun requestDockPickup(kotlin/Unit): com.monkopedia.hauler/Warehouse.LoadingDock // com.monkopedia.hauler/Warehouse.requestDockPickup|requestDockPickup(kotlin.Unit){}[0]
+    open suspend fun requestPickup(kotlin/Unit): com.monkopedia.hauler/Warehouse.DropBox // com.monkopedia.hauler/Warehouse.requestPickup|requestPickup(kotlin.Unit){}[0]
+
+    final inner class DropBox : com.monkopedia.hauler/DropBox { // com.monkopedia.hauler/Warehouse.DropBox|null[0]
+        constructor <init>() // com.monkopedia.hauler/Warehouse.DropBox.<init>|<init>(){}[0]
+
+        final suspend fun log(com.monkopedia.hauler/Box) // com.monkopedia.hauler/Warehouse.DropBox.log|log(com.monkopedia.hauler.Box){}[0]
+    }
+
+    final inner class LoadingDock : com.monkopedia.hauler/LoadingDock { // com.monkopedia.hauler/Warehouse.LoadingDock|null[0]
+        constructor <init>() // com.monkopedia.hauler/Warehouse.LoadingDock.<init>|<init>(){}[0]
+
+        final suspend fun bulkLog(com.monkopedia.hauler/Palette) // com.monkopedia.hauler/Warehouse.LoadingDock.bulkLog|bulkLog(com.monkopedia.hauler.Palette){}[0]
+    }
+}
+
+sealed class com.monkopedia.hauler/WeighStation { // com.monkopedia.hauler/WeighStation|null[0]
+    abstract fun contains(com.monkopedia.hauler/Box): kotlin/Boolean // com.monkopedia.hauler/WeighStation.contains|contains(com.monkopedia.hauler.Box){}[0]
+
+    final object Companion : kotlinx.serialization.internal/SerializerFactory { // com.monkopedia.hauler/WeighStation.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<com.monkopedia.hauler/WeighStation> // com.monkopedia.hauler/WeighStation.Companion.serializer|serializer(){}[0]
+        final fun serializer(kotlin/Array<out kotlinx.serialization/KSerializer<*>>...): kotlinx.serialization/KSerializer<*> // com.monkopedia.hauler/WeighStation.Companion.serializer|serializer(kotlin.Array<out|kotlinx.serialization.KSerializer<*>>...){}[0]
+    }
+}
+
+final object com.monkopedia.hauler/Garage { // com.monkopedia.hauler/Garage|null[0]
+    final val deliveries // com.monkopedia.hauler/Garage.deliveries|{}deliveries[0]
+        final fun <get-deliveries>(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/Garage.deliveries.<get-deliveries>|<get-deliveries>(){}[0]
+    final val rootHauler // com.monkopedia.hauler/Garage.rootHauler|{}rootHauler[0]
+        final fun <get-rootHauler>(): com.monkopedia.hauler/Hauler // com.monkopedia.hauler/Garage.rootHauler.<get-rootHauler>|<get-rootHauler>(){}[0]
+}
+
+final const val com.monkopedia.hauler/DEBUG_INT // com.monkopedia.hauler/DEBUG_INT|{}DEBUG_INT[0]
+    final fun <get-DEBUG_INT>(): kotlin/Int // com.monkopedia.hauler/DEBUG_INT.<get-DEBUG_INT>|<get-DEBUG_INT>(){}[0]
+final const val com.monkopedia.hauler/ERROR_INT // com.monkopedia.hauler/ERROR_INT|{}ERROR_INT[0]
+    final fun <get-ERROR_INT>(): kotlin/Int // com.monkopedia.hauler/ERROR_INT.<get-ERROR_INT>|<get-ERROR_INT>(){}[0]
+final const val com.monkopedia.hauler/INFO_INT // com.monkopedia.hauler/INFO_INT|{}INFO_INT[0]
+    final fun <get-INFO_INT>(): kotlin/Int // com.monkopedia.hauler/INFO_INT.<get-INFO_INT>|<get-INFO_INT>(){}[0]
+final const val com.monkopedia.hauler/TRACE_INT // com.monkopedia.hauler/TRACE_INT|{}TRACE_INT[0]
+    final fun <get-TRACE_INT>(): kotlin/Int // com.monkopedia.hauler/TRACE_INT.<get-TRACE_INT>|<get-TRACE_INT>(){}[0]
+final const val com.monkopedia.hauler/WARN_INT // com.monkopedia.hauler/WARN_INT|{}WARN_INT[0]
+    final fun <get-WARN_INT>(): kotlin/Int // com.monkopedia.hauler/WARN_INT.<get-WARN_INT>|<get-WARN_INT>(){}[0]
+
+final val com.monkopedia.hauler/DefaultFormat // com.monkopedia.hauler/DefaultFormat|{}DefaultFormat[0]
+    final fun <get-DefaultFormat>(): kotlin.coroutines/SuspendFunction2<kotlinx.coroutines.flow/FlowCollector<kotlin/String>, com.monkopedia.hauler/Box, kotlin/Unit> // com.monkopedia.hauler/DefaultFormat.<get-DefaultFormat>|<get-DefaultFormat>(){}[0]
+final val com.monkopedia.hauler/Flatbed // com.monkopedia.hauler/Flatbed|{}Flatbed[0]
+    final fun <get-Flatbed>(): kotlinx.coroutines.flow/FlowCollector<kotlin/String> // com.monkopedia.hauler/Flatbed.<get-Flatbed>|<get-Flatbed>(){}[0]
+final val com.monkopedia.hauler/UnitFlow // com.monkopedia.hauler/UnitFlow|{}UnitFlow[0]
+    final fun <get-UnitFlow>(): kotlinx.coroutines.flow/Flow<kotlin/Unit> // com.monkopedia.hauler/UnitFlow.<get-UnitFlow>|<get-UnitFlow>(){}[0]
+
+final fun (com.monkopedia.hauler/AsyncHauler).com.monkopedia.hauler/debug(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/debug|debug@com.monkopedia.hauler.AsyncHauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final fun (com.monkopedia.hauler/AsyncHauler).com.monkopedia.hauler/error(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/error|error@com.monkopedia.hauler.AsyncHauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final fun (com.monkopedia.hauler/AsyncHauler).com.monkopedia.hauler/info(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/info|info@com.monkopedia.hauler.AsyncHauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final fun (com.monkopedia.hauler/AsyncHauler).com.monkopedia.hauler/ship(com.monkopedia.hauler/Level, kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/ship|ship@com.monkopedia.hauler.AsyncHauler(com.monkopedia.hauler.Level;kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final fun (com.monkopedia.hauler/AsyncHauler).com.monkopedia.hauler/trace(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/trace|trace@com.monkopedia.hauler.AsyncHauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final fun (com.monkopedia.hauler/AsyncHauler).com.monkopedia.hauler/warn(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/warn|warn@com.monkopedia.hauler.AsyncHauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final fun (com.monkopedia.hauler/BasicDeliveryService).com.monkopedia.hauler/dumpWithPickup(kotlin.time/Duration = ..., kotlin/Int = ..., kotlinx.coroutines/CoroutineScope): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/dumpWithPickup|dumpWithPickup@com.monkopedia.hauler.BasicDeliveryService(kotlin.time.Duration;kotlin.Int;kotlinx.coroutines.CoroutineScope){}[0]
+final fun (com.monkopedia.hauler/BasicDeliveryService).com.monkopedia.hauler/withPickup(kotlin.time/Duration = ..., kotlin/Int = ..., kotlinx.coroutines/CoroutineScope): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/withPickup|withPickup@com.monkopedia.hauler.BasicDeliveryService(kotlin.time.Duration;kotlin.Int;kotlinx.coroutines.CoroutineScope){}[0]
+final fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/asAsync(kotlinx.coroutines/CoroutineScope): com.monkopedia.hauler/AsyncHauler // com.monkopedia.hauler/asAsync|asAsync@com.monkopedia.hauler.Hauler(kotlinx.coroutines.CoroutineScope){}[0]
+final fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/level(com.monkopedia.hauler/Level): com.monkopedia.hauler/Hauler // com.monkopedia.hauler/level|level@com.monkopedia.hauler.Hauler(com.monkopedia.hauler.Level){}[0]
+final fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/named(kotlin/String): com.monkopedia.hauler/Hauler // com.monkopedia.hauler/named|named@com.monkopedia.hauler.Hauler(kotlin.String){}[0]
+final fun (com.monkopedia.hauler/LoadingDock).com.monkopedia.hauler/attach(kotlinx.coroutines/CoroutineScope, com.monkopedia.hauler/DeliveryRates = ...): kotlinx.coroutines/Job // com.monkopedia.hauler/attach|attach@com.monkopedia.hauler.LoadingDock(kotlinx.coroutines.CoroutineScope;com.monkopedia.hauler.DeliveryRates){}[0]
+final fun (com.monkopedia.hauler/Palette).com.monkopedia.hauler/unpack(): kotlin.collections/List<com.monkopedia.hauler/Box> // com.monkopedia.hauler/unpack|unpack@com.monkopedia.hauler.Palette(){}[0]
+final fun (com.monkopedia.hauler/Palette).com.monkopedia.hauler/unpack(com.monkopedia.hauler/Package): com.monkopedia.hauler/Box // com.monkopedia.hauler/unpack|unpack@com.monkopedia.hauler.Palette(com.monkopedia.hauler.Package){}[0]
+final fun (kotlin.collections/List<com.monkopedia.hauler/Box>).com.monkopedia.hauler/pack(): com.monkopedia.hauler/Palette // com.monkopedia.hauler/pack|pack@kotlin.collections.List<com.monkopedia.hauler.Box>(){}[0]
+final fun (kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box>).com.monkopedia.hauler/forwardTo(com.monkopedia.hauler/LoadingDock, kotlinx.coroutines/CoroutineScope, com.monkopedia.hauler/DeliveryRates = ...): kotlinx.coroutines/Job // com.monkopedia.hauler/forwardTo|forwardTo@kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Box>(com.monkopedia.hauler.LoadingDock;kotlinx.coroutines.CoroutineScope;com.monkopedia.hauler.DeliveryRates){}[0]
+final fun (kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box>).com.monkopedia.hauler/level(com.monkopedia.hauler/Level): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/level|level@kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Box>(com.monkopedia.hauler.Level){}[0]
+final fun (kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box>).com.monkopedia.hauler/pack(com.monkopedia.hauler/DeliveryRates = ...): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Palette> // com.monkopedia.hauler/pack|pack@kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Box>(com.monkopedia.hauler.DeliveryRates){}[0]
+final fun (kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box>).com.monkopedia.hauler/route(kotlinx.coroutines/CoroutineScope, kotlinx.coroutines.flow/FlowCollector<kotlin/String>, kotlin.coroutines/SuspendFunction2<kotlinx.coroutines.flow/FlowCollector<kotlin/String>, com.monkopedia.hauler/Box, kotlin/Unit> = ...): kotlinx.coroutines/Job // com.monkopedia.hauler/route|route@kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Box>(kotlinx.coroutines.CoroutineScope;kotlinx.coroutines.flow.FlowCollector<kotlin.String>;kotlin.coroutines.SuspendFunction2<kotlinx.coroutines.flow.FlowCollector<kotlin.String>,com.monkopedia.hauler.Box,kotlin.Unit>){}[0]
+final fun (kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Palette>).com.monkopedia.hauler/unpack(): kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box> // com.monkopedia.hauler/unpack|unpack@kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Palette>(){}[0]
+final fun (kotlinx.coroutines.flow/SharedFlow<com.monkopedia.hauler/Box>).com.monkopedia.hauler/deliveries(kotlinx.coroutines/CoroutineScope, com.monkopedia.hauler/DeliveryRates): com.monkopedia.hauler/DeliveryService // com.monkopedia.hauler/deliveries|deliveries@kotlinx.coroutines.flow.SharedFlow<com.monkopedia.hauler.Box>(kotlinx.coroutines.CoroutineScope;com.monkopedia.hauler.DeliveryRates){}[0]
+final fun com.monkopedia.hauler/combine(kotlin/String, kotlin/Throwable?): kotlin/String // com.monkopedia.hauler/combine|combine(kotlin.String;kotlin.Throwable?){}[0]
+final fun com.monkopedia.hauler/convert(com.monkopedia.hauler/Level, kotlin/String, kotlin/Throwable?, kotlin/String?, kotlin.collections/Map<kotlin/String, kotlin/String>? = ...): com.monkopedia.hauler/Box // com.monkopedia.hauler/convert|convert(com.monkopedia.hauler.Level;kotlin.String;kotlin.Throwable?;kotlin.String?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final fun com.monkopedia.hauler/deliveries(kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box>, kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box>, kotlinx.coroutines/CoroutineScope, com.monkopedia.hauler/DeliveryRates): com.monkopedia.hauler/DeliveryService // com.monkopedia.hauler/deliveries|deliveries(kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Box>;kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Box>;kotlinx.coroutines.CoroutineScope;com.monkopedia.hauler.DeliveryRates){}[0]
+final fun com.monkopedia.hauler/hauler(kotlin/String): com.monkopedia.hauler/Hauler // com.monkopedia.hauler/hauler|hauler(kotlin.String){}[0]
+final fun com.monkopedia.hauler/loggingName(): kotlin/String? // com.monkopedia.hauler/loggingName|loggingName(){}[0]
+final fun com.monkopedia.hauler/route(kotlinx.coroutines/CoroutineScope, kotlinx.coroutines.flow/FlowCollector<kotlin/String>, kotlin.coroutines/SuspendFunction2<kotlinx.coroutines.flow/FlowCollector<kotlin/String>, com.monkopedia.hauler/Box, kotlin/Unit> = ...): kotlinx.coroutines/Job // com.monkopedia.hauler/route|route(kotlinx.coroutines.CoroutineScope;kotlinx.coroutines.flow.FlowCollector<kotlin.String>;kotlin.coroutines.SuspendFunction2<kotlinx.coroutines.flow.FlowCollector<kotlin.String>,com.monkopedia.hauler.Box,kotlin.Unit>){}[0]
+final fun com.monkopedia.hauler/weighStation(kotlin/Function1<com.monkopedia.hauler/WeighStationBuilder, kotlin/Unit>): com.monkopedia.hauler/WeighStation // com.monkopedia.hauler/weighStation|weighStation(kotlin.Function1<com.monkopedia.hauler.WeighStationBuilder,kotlin.Unit>){}[0]
+final inline fun (com.monkopedia.hauler/Palette).com.monkopedia.hauler/forEach(kotlin/Function1<com.monkopedia.hauler/Box, kotlin/Unit>) // com.monkopedia.hauler/forEach|forEach@com.monkopedia.hauler.Palette(kotlin.Function1<com.monkopedia.hauler.Box,kotlin.Unit>){}[0]
+final inline fun <#A: reified kotlin/Any?> (#A).com.monkopedia.hauler/hauler(): com.monkopedia.hauler/Hauler // com.monkopedia.hauler/hauler|hauler@0:0(){0§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any?> com.monkopedia.hauler/createHauler(): com.monkopedia.hauler/Hauler // com.monkopedia.hauler/createHauler|createHauler(){0§<kotlin.Any?>}[0]
+final suspend fun (com.monkopedia.hauler/DropBox).com.monkopedia.hauler/attach(kotlinx.coroutines/CoroutineScope): kotlinx.coroutines/Job // com.monkopedia.hauler/attach|attach@com.monkopedia.hauler.DropBox(kotlinx.coroutines.CoroutineScope){}[0]
+final suspend fun (kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box>).com.monkopedia.hauler/forwardTo(com.monkopedia.hauler/DropBox, kotlinx.coroutines/CoroutineScope): kotlinx.coroutines/Job // com.monkopedia.hauler/forwardTo|forwardTo@kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Box>(com.monkopedia.hauler.DropBox;kotlinx.coroutines.CoroutineScope){}[0]
+final suspend fun (kotlinx.coroutines.flow/Flow<com.monkopedia.hauler/Box>).com.monkopedia.hauler/route(kotlinx.coroutines.flow/FlowCollector<kotlin/String>, kotlin.coroutines/SuspendFunction2<kotlinx.coroutines.flow/FlowCollector<kotlin/String>, com.monkopedia.hauler/Box, kotlin/Unit> = ...) // com.monkopedia.hauler/route|route@kotlinx.coroutines.flow.Flow<com.monkopedia.hauler.Box>(kotlinx.coroutines.flow.FlowCollector<kotlin.String>;kotlin.coroutines.SuspendFunction2<kotlinx.coroutines.flow.FlowCollector<kotlin.String>,com.monkopedia.hauler.Box,kotlin.Unit>){}[0]
+final suspend fun (kotlinx.coroutines.flow/FlowCollector<kotlin/String>).com.monkopedia.hauler/defaultFormat(com.monkopedia.hauler/Box) // com.monkopedia.hauler/defaultFormat|defaultFormat@kotlinx.coroutines.flow.FlowCollector<kotlin.String>(com.monkopedia.hauler.Box){}[0]
+final suspend inline fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/debug(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/debug|debug@com.monkopedia.hauler.Hauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final suspend inline fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/error(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/error|error@com.monkopedia.hauler.Hauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final suspend inline fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/info(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/info|info@com.monkopedia.hauler.Hauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final suspend inline fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/ship(com.monkopedia.hauler/Level, kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/ship|ship@com.monkopedia.hauler.Hauler(com.monkopedia.hauler.Level;kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final suspend inline fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/trace(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/trace|trace@com.monkopedia.hauler.Hauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final suspend inline fun (com.monkopedia.hauler/Hauler).com.monkopedia.hauler/warn(kotlin/String, kotlin/Throwable? = ..., kotlin.collections/Map<kotlin/String, kotlin/String>? = ...) // com.monkopedia.hauler/warn|warn@com.monkopedia.hauler.Hauler(kotlin.String;kotlin.Throwable?;kotlin.collections.Map<kotlin.String,kotlin.String>?){}[0]
+final suspend inline fun com.monkopedia.hauler/route(kotlinx.coroutines.flow/FlowCollector<kotlin/String>, noinline kotlin.coroutines/SuspendFunction2<kotlinx.coroutines.flow/FlowCollector<kotlin/String>, com.monkopedia.hauler/Box, kotlin/Unit>) // com.monkopedia.hauler/route|route(kotlinx.coroutines.flow.FlowCollector<kotlin.String>;kotlin.coroutines.SuspendFunction2<kotlinx.coroutines.flow.FlowCollector<kotlin.String>,com.monkopedia.hauler.Box,kotlin.Unit>){}[0]
