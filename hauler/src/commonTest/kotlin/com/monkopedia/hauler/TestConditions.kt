@@ -24,24 +24,36 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Polls [check] until it returns true, failing the test after five seconds.
  *
- * [description] is REPORTED IN THE FAILURE. Four private copies of this helper
- * took a description and never read it, so a timeout named no condition at all
- * while seven tests polled through it -- exactly the tests that fail
+ * [description] is REPORTED IN THE FAILURE. Two of the four private copies this
+ * replaces took a description and never read it, and 18 call sites polled
+ * through them across four files -- including exactly the tests that fail
  * intermittently (#51). A caller who supplies a description reasonably believes
  * they have made the failure diagnosable; that belief has to be true.
  *
- * ADDS to the runtime's message, never replaces it. Measured, not assumed:
+ * ADDS to the runtime's message, never replaces it -- and which runtime message
+ * you get depends on the clock, which is the part I got wrong first time and
+ * then measured:
  *
- *     Timed out after 5s of _virtual_ (kotlinx.coroutines.test) time. To use the
- *     real time, wrap 'withTimeout' in
- *     'withContext(Dispatchers.Default.limitedParallelism(1))'
+ *     on runTest's VIRTUAL clock:
+ *       "Timed out after 5s of _virtual_ (kotlinx.coroutines.test) time. To use
+ *        the real time, wrap 'withTimeout' in
+ *        'withContext(Dispatchers.Default.limitedParallelism(1))'"
  *
- * That already names WHICH CLOCK ran out and WHAT TO DO -- unconditionally, and
- * it is the single most expensive thing the #44 investigation had to learn. #51
- * quoted it truncated at "time." and concluded it "named nothing"; it named
- * everything except the one thing this helper knows, which is what was being
- * awaited. So the description is prepended and [e] is passed as the cause, which
- * keeps the original message and its stack trace.
+ *     inside withContext(Dispatchers.Default):
+ *       "Timed out waiting for 5000 ms"
+ *
+ * The rich text comes from kotlinx-coroutines-test's TestDispatcher and fires
+ * ONLY on the test scheduler. **15 of the 18 call sites are on a real
+ * dispatcher**, where the runtime says nothing about which clock or what to do.
+ * So #51's original complaint -- that a timeout named nothing -- was RIGHT for
+ * the majority of sites, and the correction I first wrote here (that the
+ * runtime "unconditionally" names the clock and the remedy) was measured on the
+ * virtual case alone and generalised. It is withdrawn.
+ *
+ * That makes the description MORE load-bearing than I claimed, not less: for
+ * most callers it is the only thing in the message that identifies what was
+ * being awaited. [e] is passed as the cause, so whichever runtime text applies
+ * survives along with its stack trace.
  */
 internal suspend fun awaitCondition(
     description: String = "",

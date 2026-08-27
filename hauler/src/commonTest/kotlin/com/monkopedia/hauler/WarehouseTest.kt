@@ -52,9 +52,12 @@ class WarehouseTest {
 
                 val testBox = box(message = "hello")
                 dropBox.log(testBox)
-                awaitCondition { received.isNotEmpty() }
-                assertEquals(listOf(testBox), received)
+                awaitCondition("the logged box to arrive") { received.isNotEmpty() }
+                // Join before asserting (#52). assertEquals(listOf(..), received) is an
+                // exact-count read expressed as list equality, and it ITERATES a bare list
+                // the collector is still appending to -- the same CME shape #49 fixed.
                 collectJob.cancelAndJoin()
+                assertEquals(listOf(testBox), received)
                 warehouse.close()
             }
         }
@@ -76,9 +79,9 @@ class WarehouseTest {
                 delay(50)
 
                 dock.bulkLog(boxes.pack())
-                awaitCondition { received.size >= 2 }
-                assertEquals(boxes, received)
+                awaitCondition("both logged boxes to arrive") { received.size >= 2 }
                 collectJob.cancelAndJoin()
+                assertEquals(boxes, received)
                 warehouse.close()
             }
         }
