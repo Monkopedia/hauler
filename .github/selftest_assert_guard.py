@@ -33,6 +33,9 @@ SUITE_ZERO = '<testsuite name="s" tests="0" failures="0"></testsuite>'
 SUITE_TORN = '<testsuite name="s" tests="3"'  # truncated: unparseable
 SUITE_NOATTR = '<testsuite name="s" failures="0"></testsuite>'
 
+# A literal, so that deleting a case is a RED rather than a smaller denominator.
+EXPECTED_STATES = 11
+
 
 def write(root: Path, task: str, files: dict) -> None:
     d = root / RESULTS / task
@@ -44,14 +47,19 @@ def write(root: Path, task: str, files: dict) -> None:
 CASES = []
 
 
-def case(name, expect, rc=1):
+def case(name, expect, rc=1, mutate=None):
     def deco(fn):
-        CASES.append({"name": name, "expect": expect, "rc": rc, "setup": fn})
+        CASES.append({"name": name, "expect": expect, "rc": rc,
+                      "setup": fn, "mutate": mutate})
         return fn
     return deco
 
 
-@case("no results directory", ["no results directory at", "NOT a pass"])
+@case("no results directory",
+      # The em dash is deliberate: it is the only non-ASCII character the guard
+      # emits, and without it in an assertion a mojibake'd message still
+      # matched every ASCII substring.
+      ["no results directory at", "\u2014 cannot determine whether it ran", "NOT a pass"])
 def _(root):
     (root / RESULTS).mkdir(parents=True, exist_ok=True)
     return ["ghostTask"]
@@ -75,7 +83,7 @@ def _(root):
     return ["partialTask"]
 
 
-@case("tests= present but not an integer", ["is not an integer"])
+@case("tests= present but not an integer", ["is not a plain non-negative integer"])
 def _(root):
     write(root, "bogusTask", {"a.xml": '<testsuite name="s" tests="0x10"></testsuite>'})
     return ["bogusTask"]
@@ -98,11 +106,34 @@ def _(root):
     return []
 
 
-@case("good task THEN phantom -- the v3 unwind shape",
-      ["3 tests executed", "no results directory at"])
+@case("phantom THEN good task -- the v3 unwind shape",
+      ["no results directory at", "3 tests executed"])
 def _(root):
     write(root, "goodTask", {"a.xml": SUITE_OK})
-    return ["goodTask", "phantomTask"]
+    # FAILING TASK FIRST, deliberately. With the good task first, a guard that
+    # aborts the whole run at the first failure emits both messages and exits 1
+    # -- indistinguishable from one that examines every task. Verified: that
+    # mutation passed this case in its original order. Only the phantom-first
+    # order proves later tasks are still examined.
+    return ["phantomTask", "goodTask"]
+
+
+@case("guard CRASHES -- proves the crash detector can fire",
+      ["crashed:", "A crash is not a pass"], rc=1, mutate="raise")
+def _(root):
+    # THE DETECTOR HAD NEVER FIRED. `"crashed:" in out` is this harness's
+    # central negative assertion, and nothing drove the guard's top-level
+    # handler -- so renaming that marker left every case green. Nothing the
+    # guard can be FED reaches it: ET.ParseError and OSError are both caught
+    # inside check(), a directory named *.xml is filtered by is_file(), and a
+    # NUL in a task name cannot survive execve.
+    #
+    # So this case runs a COPY of the real guard with a `raise` injected into
+    # check(). That proves two things a green run otherwise assumes: the
+    # guard's own handler converts an unexpected exception into a refusal
+    # rather than a pass, and this harness notices when it does not.
+    write(root, "goodTask", {"a.xml": SUITE_OK})
+    return ["goodTask"]
 
 
 @case("happy path", ["3 tests executed"], rc=0)
@@ -118,26 +149,51 @@ def main() -> int:
         print(f"::error::self-test cannot find the guard at {GUARD}")
         return 1
 
-    driven, failures = 0, []
+    driven, failures = [], []
     for c in CASES:
-        with tempfile.TemporaryDirectory() as td:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
             root = Path(td)
             args = c["setup"](root)
-            p = subprocess.run(
-                [sys.executable, str(GUARD), *args],
-                cwd=root, capture_output=True, text=True,
-                encoding="utf-8", errors="replace",
-            )
-        out = p.stdout + p.stderr
-        driven += 1
+            guard = GUARD
+            if c["mutate"] == "raise":
+                guard = root / "mutated_guard.py"
+                src = GUARD.read_text(encoding="utf-8")
+                marker = "    d = RESULTS / task\n"
+                assert src.count(marker) == 1, "mutation anchor moved"
+                guard.write_text(
+                    src.replace(marker, marker + '    raise RuntimeError("injected")\n'),
+                    encoding="utf-8")
+            try:
+                p = subprocess.run(
+                    [sys.executable, str(guard), *args],
+                    cwd=root, capture_output=True, text=True,
+                    # STRICT, not "replace". The guard emits a non-ASCII em
+                    # dash; a runner whose stdout encoding mangles it (Windows
+                    # cp1252 encodes U+2014 as 0x97) produced bytes that
+                    # "replace" silently turned into U+FFFD while every ASCII
+                    # assertion still matched -- green, on the exact scenario
+                    # this file exists to test. Strict raises instead.
+                    encoding="utf-8", errors="strict",
+                )
+                out = p.stdout + p.stderr
+                rc = p.returncode
+            except UnicodeDecodeError as e:
+                out, rc = f"UNDECODABLE OUTPUT: {e}", -1
+        driven.append(c["name"])
         problems = []
-        if p.returncode != c["rc"]:
-            problems.append(f"exit {p.returncode}, expected {c['rc']}")
+        if rc != c["rc"]:
+            problems.append(f"exit {rc}, expected {c['rc']}")
         for want in c["expect"]:
             if want not in out:
                 problems.append(f"missing text: {want!r}")
-        # A red for the WRONG reason is the failure this file exists to catch.
-        if "crashed:" in out:
+        # The guard prints refusals as GitHub annotations. Without this, a
+        # traceback that merely ECHOES the source line containing the message
+        # literal satisfied "message asserted" for a guard that printed nothing.
+        if c["rc"] != 0 and "::error::" not in out:
+            problems.append("no ::error:: annotation -- message may be a traceback echo")
+        # A red for the WRONG reason is the failure this file exists to catch --
+        # except in the case that deliberately induces one.
+        if c["mutate"] != "raise" and "crashed:" in out:
             problems.append("guard CRASHED -- red for the wrong reason")
         if problems:
             failures.append((c["name"], problems, out.strip()))
@@ -148,20 +204,24 @@ def main() -> int:
             for line in out.strip().splitlines():
                 print(f"      | {line}")
         else:
-            print(f"ok    {c['name']}  (exit {p.returncode}, message asserted)")
+            print(f"ok    {c['name']}  (exit {rc}, message asserted)")
 
-    # A state that never ran and a state that ran correctly are otherwise
-    # indistinguishable in this output. Assert the denominator.
-    print(f"\n{driven} of {len(CASES)} states driven; {len(failures)} failed.")
-    if driven != len(CASES):
-        print(f"::error::self-test drove only {driven} of {len(CASES)} states.")
+    # Against a LITERAL constant, not len(CASES). Comparing a counter to the
+    # length of the list it iterates is not a check -- both move together, so
+    # deleting a case left the old version reporting "9 of 9 ... All 9 states
+    # behaved as specified" and exit 0.
+    print(f"\n{len(driven)} of {EXPECTED_STATES} states driven; {len(failures)} failed.")
+    if len(driven) != EXPECTED_STATES:
+        missing = set(c["name"] for c in CASES) - set(driven)
+        print(f"::error::self-test drove {len(driven)} of {EXPECTED_STATES} expected states.")
+        print(f"::error::Not driven: {', '.join(sorted(missing)) or '(cases were removed from the file)'}")
         print("::error::States not driven are NOT states that passed.")
         return 1
     if failures:
         print(f"::error::{len(failures)} refusal branch(es) did not behave as specified "
               f"on {sys.platform}.")
         return 1
-    print(f"All {len(CASES)} states behaved as specified on {sys.platform}.")
+    print(f"All {EXPECTED_STATES} states behaved as specified on {sys.platform}.")
     return 0
 
 

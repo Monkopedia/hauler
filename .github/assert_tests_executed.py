@@ -32,6 +32,28 @@ def err(msg: str) -> None:
     print(f"::error::{msg}")
 
 
+MAX_PLAUSIBLE = 10_000_000
+
+
+def _count(fname: str, raw: str, attr: str, bad: list):
+    """Parse an XML count attribute, or record why it is unusable and return None.
+
+    Deliberately stricter than int(): int() accepts a leading sign, so
+    tests="-1" printed "-1 tests executed" and exited 0, and tests="-5" beside
+    tests="5" summed to zero and redded with the WRONG message. It also accepts
+    "1_8_1" and full-width digits, neither of which Gradle emits.
+    """
+    txt = raw.strip()
+    if not txt.isascii() or not txt.isdigit():
+        bad.append(f"{fname}: {attr}={raw!r} is not a plain non-negative integer")
+        return None
+    n = int(txt, 10)
+    if n > MAX_PLAUSIBLE:
+        bad.append(f"{fname}: {attr}={n} is implausible; refusing rather than reporting it")
+        return None
+    return n
+
+
 def check(task: str) -> bool:
     """True if the task demonstrably executed tests. Every other outcome is
     an error WITH ITS OWN MESSAGE -- a red that misdescribes its cause costs
@@ -55,16 +77,36 @@ def check(task: str) -> bool:
         except (ET.ParseError, OSError) as e:
             bad.append(f"{f.name}: {e}")
             continue
-        suites = [root] if root.tag == "testsuite" else list(root.iter("testsuite"))
+        # EVERY suite in the file, not just the first. Gradle writes one suite
+        # per file, but a <testsuites> wrapper is legal JUnit XML and taking
+        # only the first counted 4 of 10 -- a subtotal wearing the face of a
+        # total, which is the defect this script exists to refuse.
+        # Direct children only: nested suites would be counted twice.
+        suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
         n = None
         for s in suites:
-            if s.get("tests") is not None:
-                try:
-                    n = int(s.get("tests"), 10)
-                except ValueError:
-                    bad.append(f"{f.name}: tests={s.get('tests')!r} is not an integer")
-                    n = None
+            raw = s.get("tests")
+            if raw is None:
+                continue
+            ran = _count(f.name, raw, "tests", bad)
+            if ran is None:
+                n = None
                 break
+            # `tests` INCLUDES skipped testcases. A suite where everything is
+            # @Ignore'd reports tests=181 skipped=181 and would print
+            # "181 tests executed" -- the exact green-badge-over-nothing this
+            # file exists to catch, read off the very attribute the docstring
+            # calls the evidence.
+            skip_raw = s.get("skipped", "0")
+            skipped = _count(f.name, skip_raw, "skipped", bad)
+            if skipped is None:
+                n = None
+                break
+            if skipped > ran:
+                bad.append(f"{f.name}: skipped={skipped} exceeds tests={ran}")
+                n = None
+                break
+            n = (n or 0) + ran - skipped
         if n is None:
             if not bad or not bad[-1].startswith(f.name):
                 bad.append(f"{f.name}: no <testsuite tests=...> attribute")
@@ -101,13 +143,23 @@ def main(argv: list) -> int:
         return 1
     # Count what was examined rather than inferring it: an unhandled failure
     # must not leave later tasks silently reported as passing.
-    ok, examined = True, 0
-    for task in argv:
-        ok &= check(task)
-        examined += 1
-    if examined != len(argv):
-        err(f"examined only {examined} of {len(argv)} task(s). Tasks not examined are NOT tasks that passed.")
-        return 1
+    # In a FINALLY, because the only way to examine fewer tasks than were asked
+    # for is to leave the loop by exception -- and a plain `if` after the loop
+    # never runs in that case. The previous version put this check after the
+    # loop, where `examined` could not differ from len(argv) by construction:
+    # a completeness gate that could not fire, in the file whose subject is
+    # gates that cannot fire.
+    ok, examined = True, []
+    try:
+        for task in argv:
+            ok &= check(task)
+            examined.append(task)
+    finally:
+        if len(examined) != len(argv):
+            missing = ", ".join(t for t in argv if t not in examined)
+            err(f"examined only {len(examined)} of {len(argv)} task(s); never checked: {missing}")
+            err("The run did not complete. Tasks not examined are NOT tasks that passed.")
+            ok = False
     return 0 if ok else 1
 
 
