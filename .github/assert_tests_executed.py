@@ -27,6 +27,19 @@ from pathlib import Path
 
 RESULTS = Path("hauler/build/test-results")
 
+# These messages contain a non-ASCII em dash, and Windows' default stdout
+# encoding is cp1252, which encodes it as the single byte 0x97. That is not a
+# crash -- it is silent mojibake in the GitHub annotation, and it went
+# unnoticed on every green Windows run until a self-test decoded strictly.
+# Reconfigure rather than removing the character: a guard whose refusals are
+# garbled on one platform is a guard that reads as broken exactly when it is
+# working.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except (AttributeError, OSError):  # pragma: no cover - very old/odd streams
+        pass
+
 
 def err(msg: str) -> None:
     print(f"::error::{msg}")
