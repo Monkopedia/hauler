@@ -43,6 +43,26 @@ apiValidation {
     // so 10 of the 11 published platform artifacts had no ABI gate at all. See #21.
     klib {
         enabled = true
+
+        // WITHOUT THIS, THE GATE FAILS OPEN. When a native target is not supported by the
+        // host compiler, BCV *infers* that target's ABI from the baseline instead of
+        // building it, and the check passes -- at warning level only. Measured on this
+        // branch: adding `kotlin.native.enableKlibsCrossCompilation=false` to
+        // gradle.properties produced BUILD SUCCESSFUL in 925ms with
+        //   // Targets: [js, linuxArm64, linuxX64, mingwX64, wasmJs]
+        // Five of ten targets -- every Apple one -- silently dropped out of the
+        // comparison. It is not hypothetical: the same config narrows to 5 targets on
+        // any KGP between 2.1 and 2.2.20, and on any runner that is neither Linux nor
+        // macOS.
+        //
+        // With strictValidation, that case becomes a hard stop:
+        //   "Validation could not be performed as some targets (namely [iosArm64, ...])
+        //    are not available and the strictValidation mode was enabled."
+        // and it costs nothing on today's config -- 25 actionable tasks, 25 executed.
+        //
+        // A gate that can quietly stop checking half its targets is the #21 defect one
+        // level over, in the PR that exists to fix #21.
+        strictValidation = true
     }
 }
 
