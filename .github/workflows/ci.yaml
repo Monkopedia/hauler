@@ -85,9 +85,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # macosX64Test is expected to report SKIPPED: GitHub's macOS images are
-      # Apple Silicon, so there is no x86 host to execute it on. Listed anyway so
-      # the job log records whether that is true for this repo.
+      # macosX64Test reports SKIPPED here: Kotlin disables it at CONFIGURATION
+      # time on an arm64 host. That is a DEFAULT, not a limit -- the check is
+      # overridable and the x64 binary then runs under Rosetta (measured
+      # elsewhere in the fleet; hauler#58 prices it). Listed anyway so the job
+      # log records the skip rather than hiding it.
       - name: Clear stale test results
         run: rm -rf hauler/build/test-results
       - name: Apple tests
