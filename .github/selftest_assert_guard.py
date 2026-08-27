@@ -163,24 +163,29 @@ def main() -> int:
                 guard.write_text(
                     src.replace(marker, marker + '    raise RuntimeError("injected")\n'),
                     encoding="utf-8")
+            # BYTES, decoded here rather than by subprocess. With text=True the
+            # decode happens on subprocess's reader THREAD: a UnicodeDecodeError
+            # there kills the thread, leaves stdout as None, and surfaces as
+            # "TypeError: NoneType + str" -- a headline that says nothing about
+            # encoding, four lines below the real finding. Decoding at the call
+            # site turns the same event into a reportable result.
+            p = subprocess.run([sys.executable, str(guard), *args],
+                               cwd=root, capture_output=True)
+            rc = p.returncode
+            raw = p.stdout + p.stderr
+            mojibake = None
             try:
-                p = subprocess.run(
-                    [sys.executable, str(guard), *args],
-                    cwd=root, capture_output=True, text=True,
-                    # STRICT, not "replace". The guard emits a non-ASCII em
-                    # dash; a runner whose stdout encoding mangles it (Windows
-                    # cp1252 encodes U+2014 as 0x97) produced bytes that
-                    # "replace" silently turned into U+FFFD while every ASCII
-                    # assertion still matched -- green, on the exact scenario
-                    # this file exists to test. Strict raises instead.
-                    encoding="utf-8", errors="strict",
-                )
-                out = p.stdout + p.stderr
-                rc = p.returncode
+                out = raw.decode("utf-8", "strict")
             except UnicodeDecodeError as e:
-                out, rc = f"UNDECODABLE OUTPUT: {e}", -1
+                mojibake = e
+                out = raw.decode("utf-8", "replace")
         driven.append(c["name"])
         problems = []
+        if mojibake is not None:
+            problems.append(
+                f"guard emitted non-UTF-8 output ({mojibake.reason} at byte "
+                f"{mojibake.start}) -- its messages are MANGLED on this runner, "
+                "which is silent in a green run")
         if rc != c["rc"]:
             problems.append(f"exit {rc}, expected {c['rc']}")
         for want in c["expect"]:
