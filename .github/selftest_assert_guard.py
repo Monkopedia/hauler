@@ -25,6 +25,16 @@ import sys
 import tempfile
 from pathlib import Path
 
+# This file ECHOES the guard's output, em dash included, so it needs the same
+# treatment as the guard: on cp1252 it printed the correct finding and then died
+# with UnicodeEncodeError while reporting it -- the bug it was written to catch,
+# in the reporter.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except (AttributeError, OSError):  # pragma: no cover
+        pass
+
 GUARD = Path(__file__).resolve().parent / "assert_tests_executed.py"
 RESULTS = Path("hauler/build/test-results")
 
@@ -32,9 +42,21 @@ SUITE_OK = '<testsuite name="s" tests="3" failures="0"></testsuite>'
 SUITE_ZERO = '<testsuite name="s" tests="0" failures="0"></testsuite>'
 SUITE_TORN = '<testsuite name="s" tests="3"'  # truncated: unparseable
 SUITE_NOATTR = '<testsuite name="s" failures="0"></testsuite>'
+# EVERY fixture above is a single bare <testsuite> root. That is why a guard with
+# skip-deduction removed, and one that counts only the first suite, both passed
+# this harness green -- the shapes those defects live in were never fed to it.
+# A refusal-test whose fixtures cannot express a defect proves the guard is
+# UNCHANGED, not that it is correct.
+SUITES_MULTI = ('<testsuites><testsuite name="a" tests="4"/>'
+                '<testsuite name="b" tests="6"/></testsuites>')
+SUITES_ONE_NOATTR = ('<testsuites><testsuite name="a" tests="4"/>'
+                     '<testsuite name="b"/></testsuites>')
+SUITE_SKIPPED_SOME = '<testsuite name="s" tests="181" skipped="3"/>'
+SUITE_SKIPPED_ALL = '<testsuite name="s" tests="5" skipped="5"/>'
+SUITE_NEGATIVE = '<testsuite name="s" tests="-1"/>'
 
 # A literal, so that deleting a case is a RED rather than a smaller denominator.
-EXPECTED_STATES = 11
+EXPECTED_STATES = 16
 
 
 def write(root: Path, task: str, files: dict) -> None:
@@ -134,6 +156,41 @@ def _(root):
     # rather than a pass, and this harness notices when it does not.
     write(root, "goodTask", {"a.xml": SUITE_OK})
     return ["goodTask"]
+
+
+@case("multi-suite file is SUMMED, not truncated to the first",
+      ["10 tests executed"], rc=0)
+def _(root):
+    write(root, "multiTask", {"a.xml": SUITES_MULTI})
+    return ["multiTask"]
+
+
+@case("skipped testcases are DEDUCTED from tests=",
+      ["178 tests executed"], rc=0)
+def _(root):
+    write(root, "skipTask", {"a.xml": SUITE_SKIPPED_SOME})
+    return ["skipTask"]
+
+
+@case("a suite where EVERY test is skipped is not a pass",
+      ["report ZERO tests executed"])
+def _(root):
+    write(root, "allSkipTask", {"a.xml": SUITE_SKIPPED_ALL})
+    return ["allSkipTask"]
+
+
+@case("a sibling suite with no tests= poisons the file",
+      ["no tests= attribute", "subtotal"])
+def _(root):
+    write(root, "dropTask", {"a.xml": SUITES_ONE_NOATTR})
+    return ["dropTask"]
+
+
+@case("negative tests= is refused, not summed",
+      ["is not a plain non-negative integer"])
+def _(root):
+    write(root, "negTask", {"a.xml": SUITE_NEGATIVE})
+    return ["negTask"]
 
 
 @case("happy path", ["3 tests executed"], rc=0)
