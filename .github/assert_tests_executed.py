@@ -97,9 +97,17 @@ def check(task: str) -> bool:
         # Direct children only: nested suites would be counted twice.
         suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
         n = None
+        missing_attr = False
         for s in suites:
             raw = s.get("tests")
             if raw is None:
+                # A suite with no `tests=` inside a <testsuites> wrapper was
+                # SILENTLY SKIPPED and its siblings summed as though complete --
+                # 4 reported as the total for a file whose real total is unknown.
+                # That is the subtotal-as-total defect again, in the very fix
+                # written to close it: I summed the suites I could read and said
+                # nothing about the one I could not.
+                missing_attr = True
                 continue
             ran = _count(f.name, raw, "tests", bad)
             if ran is None:
@@ -120,6 +128,10 @@ def check(task: str) -> bool:
                 n = None
                 break
             n = (n or 0) + ran - skipped
+        if missing_attr and n is not None:
+            bad.append(f"{f.name}: a <testsuite> in this file has no tests= attribute; "
+                       f"{n} would be a subtotal")
+            n = None
         if n is None:
             if not bad or not bad[-1].startswith(f.name):
                 bad.append(f"{f.name}: no <testsuite tests=...> attribute")
