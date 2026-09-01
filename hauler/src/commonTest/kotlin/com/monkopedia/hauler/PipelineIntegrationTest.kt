@@ -24,7 +24,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -62,15 +61,6 @@ class PipelineIntegrationTest {
         suspend fun snapshot(): List<T> = lock.withLock { items.toList() }
     }
 
-    private suspend fun awaitCondition(
-        description: String = "",
-        check: suspend () -> Boolean,
-    ) {
-        withTimeout(5.seconds) {
-            while (!check()) delay(1)
-        }
-    }
-
     @Test
     fun dropBox_to_streamDeliveries() =
         runTest {
@@ -92,15 +82,20 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().size >= 3 }
 
-                assertEquals(3, received.snapshot().size)
+                // Join BEFORE snapshotting (#52/A3). The mutex makes each snapshot
+                // CONSISTENT; it does not make the writer QUIESCENT. awaitCondition
+                // releases the instant the count is reached, so an exact-count read
+                // can be satisfied by a snapshot taken before a later arrival -- a
+                // correct view of the wrong moment.
+                collectJob.cancelAndJoin()
                 val snap = received.snapshot()
+                assertEquals(3, snap.size)
                 assertEquals(Level.INFO, snap[0].level)
                 assertEquals("first", snap[0].message)
                 assertEquals(Level.WARN, snap[1].level)
                 assertEquals("second", snap[1].message)
                 assertEquals(Level.ERROR, snap[2].level)
                 assertEquals("third", snap[2].message)
-                collectJob.cancelAndJoin()
                 warehouse.close()
             }
         }
@@ -130,12 +125,17 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().size >= 3 }
 
-                assertEquals(3, received.snapshot().size)
+                // Join BEFORE snapshotting (#52/A3). The mutex makes each snapshot
+                // CONSISTENT; it does not make the writer QUIESCENT. awaitCondition
+                // releases the instant the count is reached, so an exact-count read
+                // can be satisfied by a snapshot taken before a later arrival -- a
+                // correct view of the wrong moment.
+                collectJob.cancelAndJoin()
                 val snap = received.snapshot()
+                assertEquals(3, snap.size)
                 assertEquals("bulk1", snap[0].message)
                 assertEquals("bulk2", snap[1].message)
                 assertEquals("bulk3", snap[2].message)
-                collectJob.cancelAndJoin()
                 warehouse.close()
             }
         }
@@ -168,11 +168,17 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().size >= 4 }
 
-                assertEquals(4, received.snapshot().size)
-                assertTrue(received.snapshot().any { it.loggerName == "Source1" })
-                assertTrue(received.snapshot().any { it.loggerName == "Source2" })
-                assertEquals(2, received.snapshot().count { it.loggerName == "Source3" })
+                // Join BEFORE snapshotting (#52/A3). The mutex makes each snapshot
+                // CONSISTENT; it does not make the writer QUIESCENT. awaitCondition
+                // releases the instant the count is reached, so an exact-count read
+                // can be satisfied by a snapshot taken before a later arrival -- a
+                // correct view of the wrong moment.
                 collectJob.cancelAndJoin()
+                val snap = received.snapshot()
+                assertEquals(4, snap.size)
+                assertTrue(snap.any { it.loggerName == "Source1" })
+                assertTrue(snap.any { it.loggerName == "Source2" })
+                assertEquals(2, snap.count { it.loggerName == "Source3" })
                 warehouse.close()
             }
         }
@@ -200,11 +206,16 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().size >= 2 }
 
-                assertEquals(2, received.snapshot().size)
+                // Join BEFORE snapshotting (#52/A3). The mutex makes each snapshot
+                // CONSISTENT; it does not make the writer QUIESCENT. awaitCondition
+                // releases the instant the count is reached, so an exact-count read
+                // can be satisfied by a snapshot taken before a later arrival -- a
+                // correct view of the wrong moment.
+                collectJob.cancelAndJoin()
                 val snap = received.snapshot()
+                assertEquals(2, snap.size)
                 assertEquals("keep-warn", snap[0].message)
                 assertEquals("keep-error", snap[1].message)
-                collectJob.cancelAndJoin()
                 warehouse.close()
             }
         }
@@ -233,14 +244,18 @@ class PipelineIntegrationTest {
                 dropBox.log(box(message = "batch-b"))
 
                 awaitCondition("batched delivery received") {
-                    val allBoxes = received.snapshot().flatMap { it.unpack() }
-                    allBoxes.size >= 2
+                    received.snapshot().flatMap { it.unpack() }.size >= 2
                 }
+                // Join BEFORE snapshotting (#52/A3). The mutex makes each snapshot
+                // CONSISTENT; it does not make the writer QUIESCENT. awaitCondition
+                // releases the instant the count is reached, so an exact-count read
+                // can be satisfied by a snapshot taken before a later arrival -- a
+                // correct view of the wrong moment.
+                collectJob.cancelAndJoin()
 
                 val allBoxes = received.snapshot().flatMap { it.unpack() }
                 assertTrue(allBoxes.any { it.message == "batch-a" })
                 assertTrue(allBoxes.any { it.message == "batch-b" })
-                collectJob.cancelAndJoin()
                 warehouse.close()
             }
         }
@@ -265,10 +280,15 @@ class PipelineIntegrationTest {
 
                 awaitCondition { received.snapshot().isNotEmpty() }
 
-                assertEquals(1, received.snapshot().size)
-                val snap = received.snapshot()
-                assertEquals(meta, snap[0].metadata)
+                // Join BEFORE snapshotting (#52/A3). The mutex makes each snapshot
+                // CONSISTENT; it does not make the writer QUIESCENT. awaitCondition
+                // releases the instant the count is reached, so an exact-count read
+                // can be satisfied by a snapshot taken before a later arrival -- a
+                // correct view of the wrong moment.
                 collectJob.cancelAndJoin()
+                val snap = received.snapshot()
+                assertEquals(1, snap.size)
+                assertEquals(meta, snap[0].metadata)
                 warehouse.close()
             }
         }
@@ -305,9 +325,15 @@ class PipelineIntegrationTest {
                 }
 
                 // Subscriber receives replayed "historical" + new "live"
-                assertTrue(live.snapshot().any { it.message == "historical" })
-                assertTrue(live.snapshot().any { it.message == "live" })
+                // Join BEFORE snapshotting (#52/A3). The mutex makes each snapshot
+                // CONSISTENT; it does not make the writer QUIESCENT. awaitCondition
+                // releases the instant the count is reached, so an exact-count read
+                // can be satisfied by a snapshot taken before a later arrival -- a
+                // correct view of the wrong moment.
                 collectJob.cancelAndJoin()
+                val snap = live.snapshot()
+                assertTrue(snap.any { it.message == "historical" })
+                assertTrue(snap.any { it.message == "live" })
                 warehouse.close()
             }
         }

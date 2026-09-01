@@ -22,11 +22,9 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.seconds
 
 class WarehouseTest {
     private fun box(
@@ -36,12 +34,6 @@ class WarehouseTest {
         timestamp: Long = 1000L,
         threadName: String? = "main",
     ) = Box(level, loggerName, message, timestamp, threadName)
-
-    private suspend fun awaitCondition(check: () -> Boolean) {
-        withTimeout(5.seconds) {
-            while (!check()) delay(1)
-        }
-    }
 
     @Test
     fun dropBox_sendsToDelivery() =
@@ -60,9 +52,12 @@ class WarehouseTest {
 
                 val testBox = box(message = "hello")
                 dropBox.log(testBox)
-                awaitCondition { received.isNotEmpty() }
-                assertEquals(listOf(testBox), received)
+                awaitCondition("the logged box to arrive") { received.isNotEmpty() }
+                // Join before asserting (#52). assertEquals(listOf(..), received) is an
+                // exact-count read expressed as list equality, and it ITERATES a bare list
+                // the collector is still appending to -- the same CME shape #49 fixed.
                 collectJob.cancelAndJoin()
+                assertEquals(listOf(testBox), received)
                 warehouse.close()
             }
         }
@@ -84,9 +79,9 @@ class WarehouseTest {
                 delay(50)
 
                 dock.bulkLog(boxes.pack())
-                awaitCondition { received.size >= 2 }
-                assertEquals(boxes, received)
+                awaitCondition("both logged boxes to arrive") { received.size >= 2 }
                 collectJob.cancelAndJoin()
+                assertEquals(boxes, received)
                 warehouse.close()
             }
         }
@@ -124,10 +119,10 @@ class WarehouseTest {
                 drop1.log(box(message = "from1"))
                 drop2.log(box(message = "from2"))
                 awaitCondition { received.size >= 2 }
+                collectJob.cancelAndJoin()
                 assertEquals(2, received.size)
                 assertTrue(received.any { it.message == "from1" })
                 assertTrue(received.any { it.message == "from2" })
-                collectJob.cancelAndJoin()
                 warehouse.close()
             }
         }
