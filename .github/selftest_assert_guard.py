@@ -98,7 +98,10 @@ def _(root):
     return ["emptyTask"]
 
 
-@case("all XML unparseable", ["NONE parseable", "PARSER failure"])
+# "a.xml:" pins the per-file REASON line. Without it the guard could name
+# neither the file nor the parser error and stay green -- five other `bad`
+# reasons are pinned by other cases; this was the exception.
+@case("all XML unparseable", ["NONE parseable", "PARSER failure", "a.xml:"])
 def _(root):
     write(root, "tornTask", {"a.xml": SUITE_TORN, "b.xml": SUITE_TORN})
     return ["tornTask"]
@@ -122,7 +125,10 @@ def _(root):
     return ["noattrTask"]
 
 
-@case("parsed cleanly, zero tests", ["report ZERO tests executed"])
+@case("parsed cleanly, zero tests",
+      # Every other two-line refusal has BOTH lines pinned; this was the one
+      # second line that was not.
+      ["report ZERO tests executed", "find out why the suite is empty"])
 def _(root):
     write(root, "zeroTask", {"a.xml": SUITE_ZERO})
     return ["zeroTask"]
@@ -146,7 +152,15 @@ def _(root):
 
 
 @case("guard CRASHES -- proves the crash detector can fire",
-      ["crashed:", "A crash is not a pass"], rc=1, mutate="raise")
+      # The last two also pin the COMPLETENESS gate's own message. The injected
+      # raise unwinds mid-list, which is the only way to reach it -- but with
+      # only the crash strings asserted, deleting that gate's refusal entirely
+      # left this file green. It is the gate the guard's own comments record as
+      # having once been unable to fire, so leaving its text unpinned was the
+      # exact defect twice over.
+      ["crashed:", "A crash is not a pass",
+       "examined only 0 of 1 task(s)",
+       "Tasks not examined are NOT tasks that passed"], rc=1, mutate="raise")
 def _(root):
     # THE DETECTOR HAD NEVER FIRED. `"crashed:" in out` is this harness's
     # central negative assertion, and nothing drove the guard's top-level
@@ -245,7 +259,11 @@ def main() -> int:
                 guard = root / "mutated_guard.py"
                 src = GUARD.read_text(encoding="utf-8")
                 marker = "    d = RESULTS / task\n"
-                assert src.count(marker) == 1, "mutation anchor moved"
+                if src.count(marker) != 1:
+                    # NOT an assert: `python -O` strips those, which would make
+                    # this check vanish in a file whose subject is checks that
+                    # cannot fire.
+                    raise RuntimeError(f"mutation anchor moved: {marker!r}")
                 guard.write_text(
                     src.replace(marker, marker + '    raise RuntimeError("injected")\n'),
                     encoding="utf-8")
