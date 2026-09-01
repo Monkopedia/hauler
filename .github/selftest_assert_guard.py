@@ -54,9 +54,14 @@ SUITES_ONE_NOATTR = ('<testsuites><testsuite name="a" tests="4"/>'
 SUITE_SKIPPED_SOME = '<testsuite name="s" tests="181" skipped="3"/>'
 SUITE_SKIPPED_ALL = '<testsuite name="s" tests="5" skipped="5"/>'
 SUITE_NEGATIVE = '<testsuite name="s" tests="-1"/>'
+# The last two refusal branches with no case. Both let a broken guard exit 0:
+# with `skipped > ran` removed the guard printed "-5 tests executed" and passed,
+# and a NEGATIVE total is the specific hazard _count's own docstring records.
+SUITE_SKIP_EXCEEDS = '<testsuite name="s" tests="5" skipped="10"/>'
+SUITE_IMPLAUSIBLE = '<testsuite name="s" tests="99999999999"/>'
 
 # A literal, so that deleting a case is a RED rather than a smaller denominator.
-EXPECTED_STATES = 16
+EXPECTED_STATES = 18
 
 
 def write(root: Path, task: str, files: dict) -> None:
@@ -129,7 +134,7 @@ def _(root):
 
 
 @case("phantom THEN good task -- the v3 unwind shape",
-      ["no results directory at", "3 tests executed"])
+      ["no results directory at", " 3 tests executed"])
 def _(root):
     write(root, "goodTask", {"a.xml": SUITE_OK})
     # FAILING TASK FIRST, deliberately. With the good task first, a guard that
@@ -159,14 +164,14 @@ def _(root):
 
 
 @case("multi-suite file is SUMMED, not truncated to the first",
-      ["10 tests executed"], rc=0)
+      [" 10 tests executed"], rc=0)
 def _(root):
     write(root, "multiTask", {"a.xml": SUITES_MULTI})
     return ["multiTask"]
 
 
 @case("skipped testcases are DEDUCTED from tests=",
-      ["178 tests executed"], rc=0)
+      [" 178 tests executed"], rc=0)
 def _(root):
     write(root, "skipTask", {"a.xml": SUITE_SKIPPED_SOME})
     return ["skipTask"]
@@ -193,7 +198,21 @@ def _(root):
     return ["negTask"]
 
 
-@case("happy path", ["3 tests executed"], rc=0)
+@case("skipped greater than tests is refused, not summed as negative",
+      ["skipped=10 exceeds tests=5"])
+def _(root):
+    write(root, "skipExceedsTask", {"a.xml": SUITE_SKIP_EXCEEDS})
+    return ["skipExceedsTask"]
+
+
+@case("an implausible count is refused rather than reported",
+      ["is implausible; refusing"])
+def _(root):
+    write(root, "hugeTask", {"a.xml": SUITE_IMPLAUSIBLE})
+    return ["hugeTask"]
+
+
+@case("happy path", [" 3 tests executed"], rc=0)
 def _(root):
     write(root, "goodTask", {"a.xml": SUITE_OK})
     return ["goodTask"]
