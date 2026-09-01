@@ -198,8 +198,18 @@ def _(root):
     return ["negTask"]
 
 
+# CONVENTION, stated because two adjacent cases briefly disagreed: expect strings
+# assert MESSAGE CONTENT, never rendering. The trailing "\n" this case carried for
+# one commit came from err()'s print(), not from the guard's string -- so it pinned
+# the assertion to "bad entries are printed one per line" and would have broken on
+# an unrelated change to how `bad` is joined. The substring risk it guarded against
+# (matching a hypothetical "tests=50") is unreachable: SUITE_SKIP_EXCEEDS pins
+# tests="5", so `ran` is always 5. It bought no discrimination and cost coupling.
+# Count expects ARE anchored with a leading space -- there the risk is real, because
+# totals are computed and " 3 tests executed" genuinely can appear inside
+# "103 tests executed".
 @case("skipped greater than tests is refused, not summed as negative",
-      ["skipped=10 exceeds tests=5\n"])
+      ["skipped=10 exceeds tests=5"])
 def _(root):
     write(root, "skipExceedsTask", {"a.xml": SUITE_SKIP_EXCEEDS})
     return ["skipExceedsTask"]
