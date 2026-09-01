@@ -44,6 +44,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: SPIKE — prove the guard's REFUSAL paths on this runner
+        run: ./.github/selftest_assert_guard.py
+
       - name: Clear stale test results
         run: rm -rf hauler/build/test-results
       - name: Assemble, test, apiCheck, ktlint
@@ -90,6 +93,9 @@ jobs:
       # overridable and the x64 binary then runs under Rosetta (measured
       # elsewhere in the fleet; hauler#58 prices it). Listed anyway so the job
       # log records the skip rather than hiding it.
+      - name: SPIKE — prove the guard's REFUSAL paths on this runner
+        run: ./.github/selftest_assert_guard.py
+
       - name: Clear stale test results
         run: rm -rf hauler/build/test-results
       - name: Apple tests
@@ -123,6 +129,10 @@ jobs:
           java-version: 21
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: SPIKE — prove the guard's REFUSAL paths on this runner
+        shell: bash
+        run: ./.github/selftest_assert_guard.py
+
       - name: Clear stale test results
         shell: bash
         run: rm -rf hauler/build/test-results
