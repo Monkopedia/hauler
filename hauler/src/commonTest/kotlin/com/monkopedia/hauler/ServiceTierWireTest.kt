@@ -66,9 +66,9 @@ class ServiceTierWireTest {
                     withTimeout(5.seconds) {
                         while (received.isEmpty()) delay(5)
                     }
+                    collectJob.cancelAndJoin()
                     assertEquals(1, received.size)
                     assertEquals("hi", received[0].message)
-                    collectJob.cancelAndJoin()
                 } finally {
                     runCatching { channel.close() }
                     warehouse.close()
@@ -102,10 +102,10 @@ class ServiceTierWireTest {
                     withTimeout(5.seconds) {
                         while (received.size < 2) delay(5)
                     }
+                    collectJob.cancelAndJoin()
                     assertEquals(2, received.size)
                     assertEquals("keep-warn", received[0].message)
                     assertEquals("keep-error", received[1].message)
-                    collectJob.cancelAndJoin()
                 } finally {
                     runCatching { channel.close() }
                     warehouse.close()

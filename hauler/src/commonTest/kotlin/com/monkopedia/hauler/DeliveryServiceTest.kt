@@ -49,16 +49,6 @@ class DeliveryServiceTest {
         return Triple(flow, service, scope)
     }
 
-    /** Wait for a condition by polling, yielding to let external scopes run. */
-    private suspend fun awaitCondition(
-        description: String = "",
-        check: () -> Boolean,
-    ) {
-        withTimeout(5.seconds) {
-            while (!check()) delay(1)
-        }
-    }
-
     // --- streamDeliveries ---
 
     @Test
@@ -76,10 +66,10 @@ class DeliveryServiceTest {
                 flow.emit(box(message = "a"))
                 flow.emit(box(message = "b"))
                 awaitCondition { received.size >= 2 }
+                collectJob.cancelAndJoin()
                 assertEquals(2, received.size)
                 assertEquals("a", received[0].message)
                 assertEquals("b", received[1].message)
-                collectJob.cancelAndJoin()
                 scope.cancel()
             }
         }
@@ -155,9 +145,9 @@ class DeliveryServiceTest {
                 flow.emit(box(level = Level.INFO, message = "info"))
                 flow.emit(box(level = Level.ERROR, message = "error"))
                 awaitCondition { received.size >= 1 }
+                collectJob.cancelAndJoin()
                 assertEquals(1, received.size)
                 assertEquals("error", received[0].message)
-                collectJob.cancelAndJoin()
                 scope.cancel()
             }
         }
@@ -182,12 +172,26 @@ class DeliveryServiceTest {
                 flow.emit(box(level = Level.INFO, loggerName = "com.example", message = "yes"))
                 flow.emit(box(level = Level.INFO, loggerName = "org.other", message = "no"))
                 flow.emit(box(level = Level.DEBUG, loggerName = "com.example", message = "no2"))
-                awaitCondition { received.size >= 1 }
-                // Brief extra wait to verify no others arrive
+                awaitCondition("the one box that passes both filters") { received.size >= 1 }
+                // Brief extra wait to give an INCORRECTLY-passing box time to arrive.
                 repeat(50) { delay(1) }
+                // Join BEFORE asserting (#52). This is a negative test -- its whole point is
+                // the two boxes that must NOT arrive -- and `received` is a bare mutableListOf
+                // still being written by a collector on another thread. With no happens-before
+                // edge, a reader that has not observed the write sees size == 1 and passes even
+                // if the filter is broken: the right answer and the wrong answer are the same
+                // observation, so no repetition count can surface it. cancelAndJoin() supplies
+                // the edge and removes the writer.
+                //
+                // NOTE the orderings are NOT the same as its sibling
+                // streamDeliveries_cancellationStopsDelivery, which joins FIRST and only then
+                // emits the box that must not arrive. That works there because the bad box is
+                // emitted after the collector is gone. Here the bad boxes must be emitted while
+                // the collector is LIVE -- otherwise the test proves nothing -- so the order is
+                // emit, wait, join, assert. Both are correct; do not "align" them.
+                collectJob.cancelAndJoin()
                 assertEquals(1, received.size)
                 assertEquals("yes", received[0].message)
-                collectJob.cancelAndJoin()
                 scope.cancel()
             }
         }

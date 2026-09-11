@@ -68,11 +68,11 @@ class FlowsTest {
                 withTimeout(5.seconds) {
                     while (result.size < 2) delay(50)
                 }
+                collectJob.cancelAndJoin()
                 assertEquals(2, result.size)
                 assertEquals("a", result[0].message)
                 assertEquals("b", result[1].message)
 
-                collectJob.cancelAndJoin()
                 scope.cancel()
                 warehouse.close()
             }
@@ -101,11 +101,11 @@ class FlowsTest {
                 withTimeout(5.seconds) {
                     while (result.size < 2) delay(50)
                 }
+                collectJob.cancelAndJoin()
                 assertEquals(2, result.size)
                 assertEquals("r1", result[0].message)
                 assertEquals("r2", result[1].message)
 
-                collectJob.cancelAndJoin()
                 scope.cancel()
                 warehouse.close()
             }
