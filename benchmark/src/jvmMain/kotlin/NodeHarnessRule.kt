@@ -18,7 +18,6 @@ package com.monkopedia.hauler.benchmark
 import com.monkopedia.ksrpc.channels.Connection
 import com.monkopedia.ksrpc.ksrpcEnvironment
 import com.monkopedia.ksrpc.sockets.asConnection
-import com.monkopedia.ksrpc.sockets.internal.swallow
 import com.monkopedia.ksrpc.toStub
 
 class NodeHarnessRule : BeforeAfterRule() {

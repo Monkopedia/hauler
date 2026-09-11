@@ -128,7 +128,12 @@ kotlin {
 // }
 
 tasks.register("runBenchmark", JavaExec::class) {
-    classpath = sourceSets["main"].runtimeClasspath
+    // This module is Kotlin Multiplatform and the `application` plugin is commented out above,
+    // so there is no `main` source set -- `sourceSets["main"]` threw "SourceSet with name 'main'
+    // not found" at task-realisation time. It went unnoticed because `tasks.register` is lazy:
+    // `assemble` never realises this task, so only actually asking for runBenchmark surfaced it.
+    val jvmMainCompilation = kotlin.jvm().compilations.getByName("main")
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("com.monkopedia.hauler.benchmark.MainKt")
     val jsTask = tasks["jsNodeProductionRun"] as NodeJsExec
     val runArgs = mutableListOf<String>()
