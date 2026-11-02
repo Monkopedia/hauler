@@ -17,15 +17,19 @@ package com.monkopedia.hauler
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class PickupsTest {
@@ -176,4 +180,82 @@ class PickupsTest {
                 scope.cancel()
             }
         }
+
+    // --- Subscribed by the time forwardTo returns (#65) ---
+    //
+    // Against a hot replay = 0 source, the shape of Garage.deliveries: the replay =
+    // 100 flows above hide the bug by replaying to a late subscriber.
+
+    @Test
+    fun forwardToDropBox_isSubscribedWhenItReturns() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val lost =
+                    countBoxesLostRightAfterAttach(DROP_BOX_ATTACHES) { source, scope, sink ->
+                        source.forwardTo(
+                            object : DropBox {
+                                override suspend fun log(logEvent: Box) = sink.send(logEvent.message)
+                            },
+                            scope,
+                        )
+                    }
+                assertEquals(0, lost, "boxes lost right after forwardTo(DropBox) returned: $lost of $DROP_BOX_ATTACHES")
+            }
+        }
+
+    @Test
+    fun forwardToLoadingDock_isSubscribedWhenItReturns() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 1.milliseconds, onDeliveryError = {})
+                val lost =
+                    countBoxesLostRightAfterAttach(LOADING_DOCK_ATTACHES) { source, scope, sink ->
+                        source.forwardTo(
+                            object : LoadingDock {
+                                override suspend fun bulkLog(logs: Palette) = logs.unpack().forEach { sink.send(it.message) }
+                            },
+                            scope,
+                            rates,
+                        )
+                    }
+                assertEquals(0, lost, "boxes lost right after forwardTo(LoadingDock) returned: $lost of $LOADING_DOCK_ATTACHES")
+            }
+        }
+
+    /**
+     * Attaches [attaches] times, each to a fresh hot source, and emits one box the
+     * moment [attach] returns. A SENTINEL then goes out once the source shows a
+     * subscriber, so it always arrives; the first thing the sink sees is either
+     * the box (delivered) or the sentinel (the box was dropped before anyone
+     * subscribed). That bounds every iteration without a per-loss timeout.
+     */
+    private suspend fun countBoxesLostRightAfterAttach(
+        attaches: Int,
+        attach: suspend (source: MutableSharedFlow<Box>, scope: CoroutineScope, sink: Channel<String>) -> Job,
+    ): Int {
+        val scope = CoroutineScope(SupervisorJob())
+        var lost = 0
+        repeat(attaches) {
+            val source = MutableSharedFlow<Box>(extraBufferCapacity = 64)
+            val sink = Channel<String>(Channel.UNLIMITED)
+            val job = attach(source, scope, sink)
+            source.emit(box(message = "box"))
+            awaitCondition("a subscriber on the source") { source.subscriptionCount.value > 0 }
+            source.emit(box(message = "sentinel"))
+            if (withTimeout(5.seconds) { sink.receive() } == "sentinel") lost++
+            job.cancelAndJoin()
+        }
+        scope.cancel()
+        return lost
+    }
+
+    private companion object {
+        // LoadingDock loses ~300 of 300 without the fix: deterministic. The DropBox
+        // window is a few instructions wide (~0.1-0.4% on JVM), so its arm is
+        // PROBABILISTIC -- red in 3 of 5 runs at 1000. 1000 rather than more because
+        // the single-threaded targets spend ~0.5ms per attach against mocha's 2s
+        // test timeout, and they cannot open that window anyway.
+        const val LOADING_DOCK_ATTACHES = 300
+        const val DROP_BOX_ATTACHES = 1000
+    }
 }
