@@ -17,15 +17,19 @@ package com.monkopedia.hauler
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class PickupsTest {
@@ -176,4 +180,83 @@ class PickupsTest {
                 scope.cancel()
             }
         }
+
+    // --- Subscribed by the time forwardTo returns (#65) ---
+    //
+    // Against a hot replay = 0 source, the shape of Garage.deliveries: the replay =
+    // 100 flows above hide the bug by replaying to a late subscriber.
+
+    @Test
+    fun forwardToDropBox_isSubscribedWhenItReturns() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val lost =
+                    countBoxesLostRightAfterAttach { source, scope, sink ->
+                        source.forwardTo(
+                            object : DropBox {
+                                override suspend fun log(logEvent: Box) = sink.send(logEvent.message)
+                            },
+                            scope,
+                        )
+                    }
+                assertEquals(0, lost, "boxes lost right after forwardTo(DropBox) returned: $lost of $ATTACHES")
+            }
+        }
+
+    @Test
+    fun forwardToLoadingDock_isSubscribedWhenItReturns() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 1.milliseconds, onDeliveryError = {})
+                val lost =
+                    countBoxesLostRightAfterAttach { source, scope, sink ->
+                        source.forwardTo(
+                            object : LoadingDock {
+                                override suspend fun bulkLog(logs: Palette) = logs.unpack().forEach { sink.send(it.message) }
+                            },
+                            scope,
+                            rates,
+                        )
+                    }
+                assertEquals(0, lost, "boxes lost right after forwardTo(LoadingDock) returned: $lost of $ATTACHES")
+            }
+        }
+
+    /**
+     * Attaches [ATTACHES] times, each to a fresh hot source, and emits one box the
+     * moment [attach] returns. Both happen on [Dispatchers.Unconfined], which makes
+     * the window deterministic on every target: the old DropBox overload's
+     * `launched.complete()` resumes the caller inline, on the collector's stack,
+     * BEFORE it reaches `collect`, and the old LoadingDock overload's dispatched
+     * launch has not run at all. A SENTINEL then goes out once the source shows a
+     * subscriber, so it always arrives; the first thing the sink sees is either
+     * the box (delivered) or the sentinel (the box was dropped before anyone
+     * subscribed). That bounds every iteration without a per-loss timeout.
+     */
+    private suspend fun countBoxesLostRightAfterAttach(
+        attach: suspend (source: MutableSharedFlow<Box>, scope: CoroutineScope, sink: Channel<String>) -> Job,
+    ): Int {
+        val scope = CoroutineScope(SupervisorJob())
+        var lost = 0
+        repeat(ATTACHES) {
+            val source = MutableSharedFlow<Box>(extraBufferCapacity = 64)
+            val sink = Channel<String>(Channel.UNLIMITED)
+            val job =
+                withContext(Dispatchers.Unconfined) {
+                    attach(source, scope, sink).also { source.emit(box(message = "box")) }
+                }
+            awaitCondition("a subscriber on the source") { source.subscriptionCount.value > 0 }
+            source.emit(box(message = "sentinel"))
+            if (withTimeout(5.seconds) { sink.receive() } == "sentinel") lost++
+            job.cancelAndJoin()
+        }
+        scope.cancel()
+        return lost
+    }
+
+    private companion object {
+        // Without the fix, both arms lose (nearly) every box on every target, so
+        // a handful of attaches is enough; it is not a sampling count.
+        const val ATTACHES = 20
+    }
 }

@@ -3,6 +3,19 @@
 All notable changes to `hauler` are documented here. This project adheres to
 [semantic versioning](https://semver.org/).
 
+## Unreleased
+
+### Fixed
+
+- `LoadingDock.attach` / `Deliveries.forwardTo(LoadingDock, …)` returned before
+  subscribing, so on the hot `replay = 0` `Garage.deliveries` every box logged
+  between the call returning and the collector starting was silently dropped
+  (300 of 300 in a JVM probe). `DropBox.attach` / `forwardTo(DropBox, …)` had the
+  same window, narrower (3 of 2000). Both now return already subscribed (#65).
+  No signature change.
+- `DropBox.attach` / `forwardTo(DropBox, …)` on an already-cancelled scope no
+  longer hangs waiting for a collector that never starts (#65).
+
 ## 0.4.2
 
 ### Dependencies
