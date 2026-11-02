@@ -13,6 +13,8 @@ All notable changes to `hauler` are documented here. This project adheres to
   (300 of 300 in a JVM probe). `DropBox.attach` / `forwardTo(DropBox, …)` had the
   same window, narrower (3 of 2000). Both now return already subscribed (#65).
   No signature change.
+- `DropBox.attach` / `forwardTo(DropBox, …)` on an already-cancelled scope no
+  longer hangs waiting for a collector that never starts (#65).
 
 ## 0.4.2
 

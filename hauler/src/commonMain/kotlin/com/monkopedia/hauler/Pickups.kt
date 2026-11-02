@@ -46,8 +46,11 @@ interface LoadingDock : RpcService {
  * the call reaches [dropBox] even on a hot `replay = 0` source like
  * [Garage.deliveries] (#65). [CoroutineStart.UNDISPATCHED] runs the collector up
  * to its first suspension -- which is after `SharedFlow.collect` has registered --
- * before [launch] returns. The `suspend` is no longer needed for that and stays
- * only so the published signature does not change.
+ * before [launch] returns. That runs on the CALLER's thread until the collector
+ * first suspends, so with a cold or replaying source and a [dropBox] that does not
+ * suspend, boxes are delivered before this returns -- for `flowOf(a, b, c)`, all
+ * of them. The `suspend` is no longer needed and stays only so the published
+ * signature does not change.
  */
 suspend fun Deliveries.forwardTo(
     dropBox: DropBox,

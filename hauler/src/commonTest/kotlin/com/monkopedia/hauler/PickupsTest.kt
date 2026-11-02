@@ -191,7 +191,7 @@ class PickupsTest {
         runTest {
             withContext(Dispatchers.Default) {
                 val lost =
-                    countBoxesLostRightAfterAttach(DROP_BOX_ATTACHES) { source, scope, sink ->
+                    countBoxesLostRightAfterAttach { source, scope, sink ->
                         source.forwardTo(
                             object : DropBox {
                                 override suspend fun log(logEvent: Box) = sink.send(logEvent.message)
@@ -199,7 +199,7 @@ class PickupsTest {
                             scope,
                         )
                     }
-                assertEquals(0, lost, "boxes lost right after forwardTo(DropBox) returned: $lost of $DROP_BOX_ATTACHES")
+                assertEquals(0, lost, "boxes lost right after forwardTo(DropBox) returned: $lost of $ATTACHES")
             }
         }
 
@@ -209,7 +209,7 @@ class PickupsTest {
             withContext(Dispatchers.Default) {
                 val rates = DeliveryRates(defaultPaletteSize = 2, defaultPaletteInterval = 1.milliseconds, onDeliveryError = {})
                 val lost =
-                    countBoxesLostRightAfterAttach(LOADING_DOCK_ATTACHES) { source, scope, sink ->
+                    countBoxesLostRightAfterAttach { source, scope, sink ->
                         source.forwardTo(
                             object : LoadingDock {
                                 override suspend fun bulkLog(logs: Palette) = logs.unpack().forEach { sink.send(it.message) }
@@ -218,28 +218,33 @@ class PickupsTest {
                             rates,
                         )
                     }
-                assertEquals(0, lost, "boxes lost right after forwardTo(LoadingDock) returned: $lost of $LOADING_DOCK_ATTACHES")
+                assertEquals(0, lost, "boxes lost right after forwardTo(LoadingDock) returned: $lost of $ATTACHES")
             }
         }
 
     /**
-     * Attaches [attaches] times, each to a fresh hot source, and emits one box the
-     * moment [attach] returns. A SENTINEL then goes out once the source shows a
+     * Attaches [ATTACHES] times, each to a fresh hot source, and emits one box the
+     * moment [attach] returns. Both happen on [Dispatchers.Unconfined], which makes
+     * the window deterministic on every target: the old DropBox overload's
+     * `launched.complete()` resumes the caller inline, on the collector's stack,
+     * BEFORE it reaches `collect`, and the old LoadingDock overload's dispatched
+     * launch has not run at all. A SENTINEL then goes out once the source shows a
      * subscriber, so it always arrives; the first thing the sink sees is either
      * the box (delivered) or the sentinel (the box was dropped before anyone
      * subscribed). That bounds every iteration without a per-loss timeout.
      */
     private suspend fun countBoxesLostRightAfterAttach(
-        attaches: Int,
         attach: suspend (source: MutableSharedFlow<Box>, scope: CoroutineScope, sink: Channel<String>) -> Job,
     ): Int {
         val scope = CoroutineScope(SupervisorJob())
         var lost = 0
-        repeat(attaches) {
+        repeat(ATTACHES) {
             val source = MutableSharedFlow<Box>(extraBufferCapacity = 64)
             val sink = Channel<String>(Channel.UNLIMITED)
-            val job = attach(source, scope, sink)
-            source.emit(box(message = "box"))
+            val job =
+                withContext(Dispatchers.Unconfined) {
+                    attach(source, scope, sink).also { source.emit(box(message = "box")) }
+                }
             awaitCondition("a subscriber on the source") { source.subscriptionCount.value > 0 }
             source.emit(box(message = "sentinel"))
             if (withTimeout(5.seconds) { sink.receive() } == "sentinel") lost++
@@ -250,12 +255,8 @@ class PickupsTest {
     }
 
     private companion object {
-        // LoadingDock loses ~300 of 300 without the fix: deterministic. The DropBox
-        // window is a few instructions wide (~0.1-0.4% on JVM), so its arm is
-        // PROBABILISTIC -- red in 3 of 5 runs at 1000. 1000 rather than more because
-        // the single-threaded targets spend ~0.5ms per attach against mocha's 2s
-        // test timeout, and they cannot open that window anyway.
-        const val LOADING_DOCK_ATTACHES = 300
-        const val DROP_BOX_ATTACHES = 1000
+        // Without the fix, both arms lose (nearly) every box on every target, so
+        // a handful of attaches is enough; it is not a sampling count.
+        const val ATTACHES = 20
     }
 }
