@@ -25,6 +25,10 @@ import kotlin.time.Duration.Companion.milliseconds
  * example, an exception inside a custom `Flow<Box>` driving the warehouse, or a serialization
  * failure mid-stream. It is NOT called for errors in the client's own `.collect { }` block;
  * those propagate to the client-side coroutine as usual.
+ *
+ * [defaultBoxRetention] bounds both the replay a [Warehouse] keeps and what a [CustomerPickup]
+ * buffers between polls, so a polling dump can return everything retained.
+ * [defaultPaletteSize] is only the batch size for packed streams.
  */
 data class DeliveryRates(
     val defaultBoxRetention: Int = 1000,

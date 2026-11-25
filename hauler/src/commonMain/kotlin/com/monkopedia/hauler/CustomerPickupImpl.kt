@@ -30,7 +30,7 @@ internal class CustomerPickupImpl(
 ) : CustomerPickup {
     private val scope = CoroutineScope(parentScope.coroutineContext + SupervisorJob())
     private val lock = Mutex()
-    private val circBuffer = CircularBuffer<Box>(deliveryRates.defaultPaletteSize)
+    private val circBuffer = CircularBuffer<Box>(deliveryRates.defaultBoxRetention)
 
     init {
         scope.launch {

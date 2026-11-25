@@ -21,7 +21,12 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -109,5 +114,63 @@ class FlowsTest {
                 scope.cancel()
                 warehouse.close()
             }
+        }
+
+    /**
+     * #69: a pickup's buffer was sized by `defaultPaletteSize` (500) while the Warehouse replays
+     * `defaultBoxRetention` (1000), and the whole replay lands in the buffer on subscribe, before
+     * the first poll. Under default [DeliveryRates] both polling paths silently returned only the
+     * newest 500 of 1000 retained boxes, while the streaming dump returned all 1000.
+     *
+     * Runs on the virtual scheduler ON PURPOSE: there, a pickup's collector drains the whole
+     * replay before the first poll can run -- the worst case, and the 500-of-1000 shape #69
+     * measured on a real Warehouse. On a real dispatcher a poll could interleave with the replay
+     * and lose fewer boxes, so the RED would depend on timing. The source is built exactly as [Warehouse] builds its own.
+     */
+    private suspend fun TestScope.retainedService(): Pair<DeliveryService, List<String>> {
+        val rates = DeliveryRates()
+        val source = MutableSharedFlow<Box>(replay = rates.defaultBoxRetention)
+        val expected = (0 until rates.defaultBoxRetention).map { "m$it" }
+        expected.forEach { source.emit(box(message = it)) }
+        val service = source.deliveries(backgroundScope, rates)
+        // The streaming dump is the baseline the polling paths must match.
+        assertEquals(expected, service.dumpDeliveries().toList().map { it.message })
+        return service to expected
+    }
+
+    /** Count first, so a RED reads "expected 1000, was 500" rather than two 1000-name lists. */
+    private fun assertSameMessages(
+        expected: List<String>,
+        actual: List<Box>,
+    ) {
+        assertEquals(expected.size, actual.size, "boxes returned of ${expected.size} retained")
+        assertEquals(expected, actual.map { it.message })
+    }
+
+    @Test
+    fun dumpWithPickup_returnsEveryRetainedBox_underDefaultRates() =
+        runTest {
+            val (service, expected) = retainedService()
+            val dumped = mutableListOf<Box>()
+            backgroundScope.launch {
+                service
+                    .dumpWithPickup(interval = 20.milliseconds, closeScope = backgroundScope)
+                    .collect { dumped.add(it) }
+            }
+            // 1000 boxes at 100 per 20ms poll need 200ms; allow five times that.
+            advanceTimeBy(1.seconds)
+            runCurrent()
+            assertSameMessages(expected, dumped)
+        }
+
+    @Test
+    fun recurringCustomerPickup_returnsEveryRetainedBox_underDefaultRates() =
+        runTest {
+            val (service, expected) = retainedService()
+            val pickup = service.recurringCustomerPickup()
+            runCurrent()
+            val picked = pickup.get(maxEntries = expected.size).unpack()
+            pickup.close()
+            assertSameMessages(expected, picked)
         }
 }

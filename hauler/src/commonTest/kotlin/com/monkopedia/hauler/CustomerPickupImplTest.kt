@@ -82,7 +82,7 @@ class CustomerPickupImplTest {
     @Test
     fun get_respectsCircularBufferSize() =
         runTest {
-            val rates = DeliveryRates(defaultPaletteSize = 3, onDeliveryError = {})
+            val rates = DeliveryRates(defaultBoxRetention = 3, onDeliveryError = {})
             val flow = MutableSharedFlow<Box>(replay = 100)
             val pickup = CustomerPickupImpl(flow, rates, this)
 
@@ -132,7 +132,7 @@ class CustomerPickupImplTest {
     fun get_respectsMaxEntries() =
         runTest {
             val flow = MutableSharedFlow<Box>(replay = 100)
-            val pickup = CustomerPickupImpl(flow, DeliveryRates(defaultPaletteSize = 100, onDeliveryError = {}), this)
+            val pickup = CustomerPickupImpl(flow, DeliveryRates(defaultBoxRetention = 100, onDeliveryError = {}), this)
 
             for (i in 1..5) {
                 flow.emit(box(message = "msg$i"))
