@@ -16,6 +16,16 @@ All notable changes to `hauler` are documented here. This project adheres to
   pickup is now 1000 `Box` references by default (was 500). Lowering either
   setting no longer shrinks a pickup below the other, so to bound pickup memory
   you now have to lower both.
+- `Garage.rootHauler` discarded a box whenever a subscriber of `Garage.deliveries`
+  was more than 64 boxes behind, and nothing recorded it: `tryEmit`'s result was
+  ignored (#45). Every such drop is now counted in the new
+  `Garage.droppedBoxes: StateFlow<Long>`. The hauler is still lossy by design (it
+  never suspends the logging call); the loss is now observable and documented.
+
+### Documented
+
+- `Garage.deliveries` is hot with `replay = 0`: a box emitted while nothing is
+  collecting is delivered to no one, and is not counted as dropped (#45).
 
 ## 0.4.2
 

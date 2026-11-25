@@ -15,11 +15,18 @@
  */
 package com.monkopedia.hauler
 
+import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -229,5 +236,59 @@ class GarageTest {
             namedHauler.emit(box())
             withTimeout(2.seconds) { job.join() }
             assertEquals("MyComponent", result[0].loggerName)
+        }
+
+    // --- Garage overflow accounting (#45) ---
+
+    @Test
+    fun garage_everyBoxIsDeliveredOrCountedAsDropped() =
+        runTest {
+            withContext(Dispatchers.Default) {
+                val tag = "overflow-accounting"
+                val droppedBefore = Garage.droppedBoxes.value
+                val firstIndex = CompletableDeferred<Int>()
+                val release = CompletableDeferred<Unit>()
+                val delivered = atomic(0)
+                val job =
+                    launch {
+                        Garage.deliveries.filter { it.loggerName == tag }.collect {
+                            if (delivered.incrementAndGet() == 1) {
+                                firstIndex.complete(it.message.toInt())
+                                release.await()
+                            }
+                        }
+                    }
+                // Boxes emitted before the collector subscribes reach no one (replay = 0), so
+                // keep emitting until it holds one. From then on it is stuck: the 64-box buffer
+                // fills and every later box must either be buffered or counted as dropped.
+                var emitted = 0
+                awaitCondition("the collector to receive its first box") {
+                    Garage.rootHauler.emit(box(loggerName = tag, message = "${emitted++}"))
+                    firstIndex.isCompleted
+                }
+                // 16 concurrent senders: a non-atomic drop counter would lose increments here.
+                val senders = 16
+                val perSender = 1000
+                (0 until senders)
+                    .map {
+                        async(Dispatchers.Default) {
+                            repeat(perSender) { Garage.rootHauler.emit(box(loggerName = tag)) }
+                        }
+                    }.awaitAll()
+                val offered = emitted + senders * perSender - firstIndex.await()
+                release.complete(Unit)
+
+                // All it can ever receive: the box it held, plus the full buffer behind it.
+                awaitCondition("the collector to drain the 64-box buffer") {
+                    delivered.value == 1 + 64
+                }
+                assertEquals(
+                    (offered - delivered.value).toLong(),
+                    Garage.droppedBoxes.value - droppedBefore,
+                    "of $offered boxes offered, ${delivered.value} were delivered; " +
+                        "every other one must be counted in droppedBoxes",
+                )
+                job.cancel()
+            }
         }
 }
