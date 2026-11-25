@@ -3,6 +3,20 @@
 All notable changes to `hauler` are documented here. This project adheres to
 [semantic versioning](https://semver.org/).
 
+## Unreleased
+
+### Fixed
+
+- A `CustomerPickup` (`recurringCustomerPickup`, `dumpCustomerPickup`, and so
+  `withPickup` / `dumpWithPickup`) now buffers up to the larger of
+  `DeliveryRates.defaultBoxRetention` and `defaultPaletteSize` boxes between
+  polls, instead of `defaultPaletteSize` alone. Under the defaults the Warehouse
+  replays 1000 boxes but a pickup held only 500, so the polling dump silently
+  dropped the oldest half of the replay (#69). The worst-case buffer per open
+  pickup is now 1000 `Box` references by default (was 500). Lowering either
+  setting no longer shrinks a pickup below the other, so to bound pickup memory
+  you now have to lower both.
+
 ## 0.4.2
 
 ### Dependencies
