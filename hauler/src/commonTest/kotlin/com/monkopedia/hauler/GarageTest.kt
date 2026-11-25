@@ -18,6 +18,8 @@ package com.monkopedia.hauler
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
@@ -250,8 +252,10 @@ class GarageTest {
                 val job =
                     launch {
                         Garage.deliveries.filter { it.loggerName == tag }.collect {
-                            delivered.incrementAndGet()
-                            if (firstIndex.complete(it.message.toInt())) release.await()
+                            if (delivered.incrementAndGet() == 1) {
+                                firstIndex.complete(it.message.toInt())
+                                release.await()
+                            }
                         }
                     }
                 // Boxes emitted before the collector subscribes reach no one (replay = 0), so
@@ -262,10 +266,16 @@ class GarageTest {
                     Garage.rootHauler.emit(box(loggerName = tag, message = "${emitted++}"))
                     firstIndex.isCompleted
                 }
-                repeat(200) {
-                    Garage.rootHauler.emit(box(loggerName = tag, message = "${emitted++}"))
-                }
-                val offered = emitted - firstIndex.await()
+                // 16 concurrent senders: a non-atomic drop counter would lose increments here.
+                val senders = 16
+                val perSender = 1000
+                (0 until senders)
+                    .map {
+                        async(Dispatchers.Default) {
+                            repeat(perSender) { Garage.rootHauler.emit(box(loggerName = tag)) }
+                        }
+                    }.awaitAll()
+                val offered = emitted + senders * perSender - firstIndex.await()
                 release.complete(Unit)
 
                 // All it can ever receive: the box it held, plus the full buffer behind it.

@@ -44,7 +44,8 @@ object Garage {
     /**
      * Never suspends, and is therefore LOSSY. Each [Box] is offered to every current subscriber of
      * [deliveries] with a 64-box buffer; if the slowest subscriber's buffer is full, the box is
-     * discarded and counted in [droppedBoxes].
+     * discarded for ALL subscribers, not just the slow one, and counted once in [droppedBoxes].
+     * One stuck subscriber therefore costs every other subscriber the same boxes.
      */
     val rootHauler: Hauler =
         Hauler { box ->
