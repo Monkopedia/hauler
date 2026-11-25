@@ -391,6 +391,7 @@ public final class com/monkopedia/hauler/FlowsKt {
 public final class com/monkopedia/hauler/Garage {
 	public static final field INSTANCE Lcom/monkopedia/hauler/Garage;
 	public final fun getDeliveries ()Lkotlinx/coroutines/flow/Flow;
+	public final fun getDroppedBoxes ()Lkotlinx/coroutines/flow/StateFlow;
 	public final fun getRootHauler ()Lcom/monkopedia/hauler/Hauler;
 }
 
