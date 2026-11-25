@@ -17,6 +17,8 @@ package com.monkopedia.hauler
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
@@ -82,7 +84,7 @@ class CustomerPickupImplTest {
     @Test
     fun get_respectsCircularBufferSize() =
         runTest {
-            val rates = DeliveryRates(defaultBoxRetention = 3, onDeliveryError = {})
+            val rates = DeliveryRates(defaultBoxRetention = 3, defaultPaletteSize = 3, onDeliveryError = {})
             val flow = MutableSharedFlow<Box>(replay = 100)
             val pickup = CustomerPickupImpl(flow, rates, this)
 
@@ -176,5 +178,47 @@ class CustomerPickupImplTest {
             pollBoxes(pickup, 1)
             pickup.close()
             // Verifies close() doesn't throw
+        }
+
+    /**
+     * Subscribe a pickup under [rates], emit [count] LIVE boxes before any poll, and return what a
+     * single get() hands back. Virtual time: the collector buffers every box before get() runs.
+     */
+    private suspend fun TestScope.liveBurst(
+        rates: DeliveryRates,
+        count: Int,
+    ): List<Box> {
+        // Built as Warehouse builds its own source.
+        val flow = MutableSharedFlow<Box>(replay = rates.defaultBoxRetention)
+        val pickup = CustomerPickupImpl(flow, rates, this)
+        runCurrent()
+        for (i in 0 until count) {
+            flow.emit(box(message = "live$i"))
+        }
+        runCurrent()
+        val boxes = pickup.get(maxEntries = count).unpack()
+        pickup.close()
+        return boxes
+    }
+
+    // #69 review: "live only, no history" (retention 0) is a valid Warehouse config; a pickup
+    // under it must still deliver live boxes rather than throw from a zero-capacity buffer.
+    @Test
+    fun get_deliversLiveBoxes_whenRetentionIsZero() =
+        runTest {
+            val boxes = liveBurst(DeliveryRates(defaultBoxRetention = 0, onDeliveryError = {}), 10)
+            assertEquals(10, boxes.size, "live boxes returned of 10 emitted")
+            assertEquals((0 until 10).map { "live$it" }, boxes.map { it.message })
+        }
+
+    // #69 review: lowering retention below the palette size must not shrink how many live boxes a
+    // pickup holds between polls; the buffer is bounded by the larger of the two settings.
+    @Test
+    fun get_keepsLiveBurst_whenRetentionIsBelowPaletteSize() =
+        runTest {
+            val rates = DeliveryRates(defaultBoxRetention = 100, defaultPaletteSize = 500, onDeliveryError = {})
+            val boxes = liveBurst(rates, 300)
+            assertEquals(300, boxes.size, "live boxes returned of 300 emitted")
+            assertEquals((0 until 300).map { "live$it" }, boxes.map { it.message })
         }
 }

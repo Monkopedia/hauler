@@ -26,9 +26,10 @@ import kotlin.time.Duration.Companion.milliseconds
  * failure mid-stream. It is NOT called for errors in the client's own `.collect { }` block;
  * those propagate to the client-side coroutine as usual.
  *
- * [defaultBoxRetention] bounds both the replay a [Warehouse] keeps and what a [CustomerPickup]
- * buffers between polls, so a polling dump can return everything retained.
- * [defaultPaletteSize] is only the batch size for packed streams.
+ * [defaultBoxRetention] bounds the replay a [Warehouse] keeps; [defaultPaletteSize] is the batch
+ * size for packed streams. A [CustomerPickup] buffers up to the LARGER of the two between polls,
+ * so a polling dump can return everything retained and a live burst is never capped below the
+ * palette size.
  */
 data class DeliveryRates(
     val defaultBoxRetention: Int = 1000,

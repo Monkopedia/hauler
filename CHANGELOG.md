@@ -8,13 +8,14 @@ All notable changes to `hauler` are documented here. This project adheres to
 ### Fixed
 
 - A `CustomerPickup` (`recurringCustomerPickup`, `dumpCustomerPickup`, and so
-  `withPickup` / `dumpWithPickup`) now buffers up to
-  `DeliveryRates.defaultBoxRetention` boxes between polls instead of
-  `defaultPaletteSize`. Under the defaults the Warehouse replays 1000 boxes but a
-  pickup held only 500, so the polling dump silently dropped the oldest half of
-  the replay (#69). The worst-case buffer per open pickup is now 1000 `Box`
-  references by default (was 500); a caller who tuned `defaultPaletteSize` to
-  bound pickup memory should tune `defaultBoxRetention` instead.
+  `withPickup` / `dumpWithPickup`) now buffers up to the larger of
+  `DeliveryRates.defaultBoxRetention` and `defaultPaletteSize` boxes between
+  polls, instead of `defaultPaletteSize` alone. Under the defaults the Warehouse
+  replays 1000 boxes but a pickup held only 500, so the polling dump silently
+  dropped the oldest half of the replay (#69). The worst-case buffer per open
+  pickup is now 1000 `Box` references by default (was 500). Lowering either
+  setting no longer shrinks a pickup below the other, so to bound pickup memory
+  you now have to lower both.
 
 ## 0.4.2
 
