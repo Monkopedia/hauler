@@ -17,20 +17,22 @@ package com.monkopedia.hauler.benchmark
 
 import com.monkopedia.hauler.Box
 import com.monkopedia.hauler.DefaultFormat
+import com.monkopedia.hauler.DeliveryRates
 import com.monkopedia.hauler.Garage
 import com.monkopedia.hauler.Level
 import com.monkopedia.hauler.Warehouse
 import com.monkopedia.hauler.attach
 import com.monkopedia.hauler.benchmark.ConnectionType.DEFAULT
 import com.monkopedia.hauler.deliveries
-import com.monkopedia.hauler.dumpDeliveries
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.launch
@@ -51,17 +53,25 @@ abstract class HighVolumeTest(
     @Test
     fun testExecute() =
         runBlocking {
-            val warehouse = Warehouse()
+            val warehouse = Warehouse(DeliveryRates())
             val warehouseJob = launchAttach(warehouse)
             val stop = Box(Level.ERROR, "DONE", "DONE", 0, null)
+            // streamDeliveries() subscribes to a hot SharedFlow, whereas the 0.3.x
+            // deliveries(scope) it replaced performed a registerDelivery RPC that the server
+            // only emitted to once registered. Production must therefore not start until this
+            // collector is actually subscribed, or the run silently loses everything emitted
+            // before it -- which presents as a message-count assertion failure, not an error.
+            val collecting = CompletableDeferred<Unit>()
             val messageAsync =
                 async {
                     warehouse
                         .deliveries()
-                        .deliveries(this)
+                        .streamDeliveries()
+                        .onStart { collecting.complete(Unit) }
                         .takeWhile { it != stop }
                         .toCollection(mutableListOf())
                 }
+            collecting.await()
             harness.setShipper(warehouse)
 
             val time =
@@ -91,17 +101,25 @@ abstract class HighVolumeTest(
     @Test
     fun testBulkExecute() =
         runBlocking {
-            val warehouse = Warehouse()
+            val warehouse = Warehouse(DeliveryRates())
             val warehouseJob = launchAttach(warehouse)
             val stop = Box(Level.ERROR, "DONE", "DONE", 0, null)
+            // streamDeliveries() subscribes to a hot SharedFlow, whereas the 0.3.x
+            // deliveries(scope) it replaced performed a registerDelivery RPC that the server
+            // only emitted to once registered. Production must therefore not start until this
+            // collector is actually subscribed, or the run silently loses everything emitted
+            // before it -- which presents as a message-count assertion failure, not an error.
+            val collecting = CompletableDeferred<Unit>()
             val messageAsync =
                 async {
                     warehouse
                         .deliveries()
-                        .deliveries(this)
+                        .streamDeliveries()
+                        .onStart { collecting.complete(Unit) }
                         .takeWhile { it != stop }
                         .toCollection(mutableListOf())
                 }
+            collecting.await()
             harness.setShipper(warehouse)
 
             val time =

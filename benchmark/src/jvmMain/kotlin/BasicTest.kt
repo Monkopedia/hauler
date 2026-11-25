@@ -16,11 +16,11 @@
 package com.monkopedia.hauler.benchmark
 
 import com.monkopedia.hauler.DefaultFormat
+import com.monkopedia.hauler.DeliveryRates
 import com.monkopedia.hauler.Garage
 import com.monkopedia.hauler.Warehouse
 import com.monkopedia.hauler.attach
 import com.monkopedia.hauler.benchmark.ConnectionType.DEFAULT
-import com.monkopedia.hauler.dumpDeliveries
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -40,7 +40,7 @@ abstract class BasicTest {
     @Test
     fun testExecute() =
         runBlocking {
-            val warehouse = Warehouse()
+            val warehouse = Warehouse(DeliveryRates())
             val warehouseJob = launchAttach(warehouse)
             harness.setShipper(warehouse)
 
@@ -60,7 +60,7 @@ abstract class BasicTest {
     @Test
     fun testBulkExecute() =
         runBlocking {
-            val warehouse = Warehouse()
+            val warehouse = Warehouse(DeliveryRates())
             val warehouseJob = launchAttach(warehouse)
             harness.setShipper(warehouse)
 
