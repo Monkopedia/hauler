@@ -73,16 +73,27 @@ class TerminatorsTest {
             assertTrue(prefix1.contains("MyLogger"))
         }
 
+    // The timestamp is local time in the system zone and contains no space, so everything after
+    // the first space is the zone-independent rest of the line.
     @Test
-    fun defaultFormat_nullThreadName() =
+    fun defaultFormat_rendersLevelAndThread() =
+        runTest {
+            val lines = mutableListOf<String>()
+            val collector = FlowCollector<String> { lines.add(it) }
+            collector.defaultFormat(box(level = Level.WARN, message = "msg"))
+
+            assertEquals(listOf("WARN (main) com.example.Test - msg"), lines.map { it.substringAfter(' ') })
+        }
+
+    // Box.threadName is null on js, wasmJs and native unless a CallSign is installed (#48).
+    @Test
+    fun defaultFormat_nullThreadName_omitsThreadSegment() =
         runTest {
             val lines = mutableListOf<String>()
             val collector = FlowCollector<String> { lines.add(it) }
             collector.defaultFormat(box(threadName = null, message = "msg"))
 
-            assertEquals(1, lines.size)
-            assertTrue(lines[0].contains("null"))
-            assertTrue(lines[0].contains("msg"))
+            assertEquals(listOf("INFO com.example.Test - msg"), lines.map { it.substringAfter(' ') })
         }
 
     @Test
