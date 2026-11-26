@@ -45,6 +45,9 @@ internal class CustomerPickupImpl(
     }
 
     override suspend fun get(maxEntries: Int): Palette {
+        // maxEntries arrives over RPC: reject a bad value before the buffer is emptied, so a
+        // failed call cannot discard what the pickup is holding (#68).
+        require(maxEntries >= 0) { "maxEntries must be >= 0, was $maxEntries" }
         val items =
             lock.withLock {
                 val all = circBuffer.toListAndClear()

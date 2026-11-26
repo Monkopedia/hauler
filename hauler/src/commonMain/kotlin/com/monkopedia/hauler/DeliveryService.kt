@@ -75,6 +75,12 @@ interface DeliveryService :
 /** Polling interface for pulling log batches on demand. */
 @KsService
 interface CustomerPickup : RpcService {
+    /**
+     * Returns up to [maxEntries] of the oldest buffered boxes and removes them from the buffer.
+     *
+     * A negative [maxEntries] fails the call (`IllegalArgumentException` in-process) and leaves the
+     * buffer untouched.
+     */
     @KsMethod("/get")
     suspend fun get(maxEntries: Int = 100): Palette
 }
