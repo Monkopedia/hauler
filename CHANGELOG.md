@@ -22,6 +22,14 @@ All notable changes to `hauler` are documented here. This project adheres to
   `Garage.droppedBoxes: StateFlow<Long>`. The hauler is still lossy by design (it
   never suspends the logging call); the loss is now observable and documented.
 
+- `CustomerPickup.get(maxEntries)` with a negative `maxEntries` emptied the pickup's
+  buffer before failing, so one bad call (local, or from any remote client, since
+  `maxEntries` is an RPC parameter) discarded every buffered box (#68). A negative
+  value is now rejected up front with `IllegalArgumentException("maxEntries must be
+  >= 0, was …")` and the buffer is left intact. The call still fails, as it did
+  before; only the loss is gone. `maxEntries = 0` is unchanged: it returns nothing
+  and keeps the buffer.
+
 ### Documented
 
 - `Garage.deliveries` is hot with `replay = 0`: a box emitted while nothing is

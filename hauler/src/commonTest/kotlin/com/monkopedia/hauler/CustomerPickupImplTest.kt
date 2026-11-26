@@ -23,6 +23,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 class CustomerPickupImplTest {
@@ -220,5 +222,56 @@ class CustomerPickupImplTest {
             val boxes = liveBurst(rates, 300)
             assertEquals(300, boxes.size, "live boxes returned of 300 emitted")
             assertEquals((0 until 300).map { "live$it" }, boxes.map { it.message })
+        }
+
+    /** A pickup holding [count] buffered boxes. Virtual time: every box is buffered on return. */
+    private fun TestScope.bufferedPickup(count: Int): CustomerPickup {
+        val flow = MutableSharedFlow<Box>(replay = count)
+        val pickup = CustomerPickupImpl(flow, DeliveryRates(onDeliveryError = {}), this)
+        runCurrent()
+        repeat(count) { flow.tryEmit(box(message = "box$it")) }
+        runCurrent()
+        return pickup
+    }
+
+    // #68: maxEntries is an RPC parameter. A negative value is rejected, and the rejection must
+    // not cost the caller (or anyone else polling) the boxes the pickup was holding.
+    @Test
+    fun get_negativeMaxEntries_isRejected_andKeepsTheBuffer() =
+        runTest {
+            for (bad in listOf(-1, Int.MIN_VALUE)) {
+                val pickup = bufferedPickup(50)
+                val error = assertFailsWith<IllegalArgumentException> { pickup.get(maxEntries = bad) }
+                val kept = pickup.get(maxEntries = 100).unpack()
+                assertEquals(
+                    (0 until 50).map { "box$it" },
+                    kept.map { it.message },
+                    "boxes still buffered after get($bad) was rejected",
+                )
+                assertTrue(
+                    error.message.orEmpty().contains("maxEntries must be >= 0, was $bad"),
+                    "get($bad) rejected by the maxEntries guard, got: ${error.message}",
+                )
+                pickup.close()
+            }
+        }
+
+    @Test
+    fun get_negativeMaxEntries_isRejected_onAnEmptyPickup() =
+        runTest {
+            val pickup = bufferedPickup(0)
+            val error = assertFailsWith<IllegalArgumentException> { pickup.get(maxEntries = -1) }
+            assertEquals("maxEntries must be >= 0, was -1", error.message)
+            pickup.close()
+        }
+
+    // Zero is valid: it returns nothing and leaves every buffered box for the next poll.
+    @Test
+    fun get_zeroMaxEntries_returnsNothing_andKeepsTheBuffer() =
+        runTest {
+            val pickup = bufferedPickup(50)
+            assertEquals(0, pickup.get(maxEntries = 0).unpack().size, "boxes returned by get(0)")
+            assertEquals((0 until 50).map { "box$it" }, pickup.get(maxEntries = 100).unpack().map { it.message })
+            pickup.close()
         }
 }
