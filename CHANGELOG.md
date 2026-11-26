@@ -5,6 +5,23 @@ All notable changes to `hauler` are documented here. This project adheres to
 
 ## Unreleased
 
+### Changed
+
+- **The default console format (`DefaultFormat` / `defaultFormat`, used by
+  `route(...)` when no formatter is passed) now prints each line differently.**
+  It never printed the box's level, and when `Box.threadName` was null it printed a
+  literal `(null)` — which is every line on js, wasmJs and all native targets unless
+  a `CallSign` is installed, since only JVM has a thread name to fall back to (#48).
+  The level now follows the timestamp, and the ` (thread)` segment is left out when
+  there is no thread name. Anything that parses the default output needs updating.
+
+  ```
+  before:  2026-03-20T05:46:40 (null) MyClass - Something happened
+           2026-03-20T05:46:40 (main) MyClass - Something happened
+  after:   2026-03-20T05:46:40 INFO MyClass - Something happened
+           2026-03-20T05:46:40 INFO (main) MyClass - Something happened
+  ```
+
 ### Fixed
 
 - A `CustomerPickup` (`recurringCustomerPickup`, `dumpCustomerPickup`, and so

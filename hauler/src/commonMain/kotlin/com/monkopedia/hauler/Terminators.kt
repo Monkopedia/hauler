@@ -50,7 +50,10 @@ val DefaultFormat: Formatter = FlowCollector<String>::defaultFormat
 
 private val defaultTimeZone = TimeZone.currentSystemDefault()
 
-/** Format a [Box] as "timestamp (thread) logger - message", one line per newline in the message. */
+/**
+ * Format a [Box] as "timestamp LEVEL (thread) logger - message", one line per newline in the
+ * message. The " (thread)" segment is omitted when [Box.threadName] is null.
+ */
 suspend fun FlowCollector<String>.defaultFormat(box: Box) {
     val time =
         Instant
@@ -59,9 +62,10 @@ suspend fun FlowCollector<String>.defaultFormat(box: Box) {
     val prefix =
         buildString {
             append(time)
-            append(" (")
-            append(box.threadName)
-            append(") ")
+            append(' ')
+            append(box.level)
+            box.threadName?.let { append(" ($it)") }
+            append(' ')
             append(box.loggerName)
             append(" - ")
         }
